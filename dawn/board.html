@@ -1,0 +1,100 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your call to your agents</title>
+<style>
+:root{--bg:#0b0f1a;--card:#131a2b;--line:#243049;--fg:#eef2ff;--dim:#8b95b3;--acc:#3dd6c6;--warn:#ffb547}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:17px/1.35 system-ui,-apple-system,Segoe UI,sans-serif;display:grid;grid-template-rows:auto 1fr;overflow:hidden}
+header{display:flex;align-items:center;gap:10px;padding:12px 24px;border-bottom:1px solid var(--line)}
+h1{font-size:21px;margin:0 8px 0 0;font-weight:650;white-space:nowrap}
+.tab{background:none;border:1px solid var(--line);color:var(--dim);border-radius:9px;padding:6px 12px;font-size:15px;cursor:pointer;white-space:nowrap}
+.tab.on{border-color:var(--acc);color:var(--fg);background:#0f2a2a}.tab b{color:var(--acc);margin-right:6px}
+.pill{padding:3px 11px;border-radius:999px;background:var(--line);color:var(--dim);font-size:14px;white-space:nowrap}.pill.live{background:#0f3d3a;color:var(--acc)}.pill.done{background:#33290f;color:var(--warn)}
+#st{margin-left:auto}#fs{background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:5px 10px;font-size:14px;cursor:pointer}
+.view{display:none;min-height:0;padding:16px 24px}.view.on{display:grid}
+#v1{align-content:center;gap:22px}.lead{font-size:30px;margin:0}.small{color:var(--dim);margin:0}
+.steps{display:flex;gap:14px;align-items:stretch}.step{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.step b{display:block;font-size:34px;color:var(--acc)}.step h3{margin:6px 0;font-size:20px}.step p{margin:0;color:var(--dim);font-size:15px}.arr{color:var(--dim);font-size:24px;align-self:center}
+#v2{grid-template-rows:auto auto 1fr;gap:14px}
+.stats{display:flex;gap:14px}.stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px}.stat b{display:block;font-size:42px;color:var(--acc)}.stat span{color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:15px}
+.evs{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;overflow:hidden;min-height:0}
+.evs h2,.side h2{font-size:13px;color:var(--dim);margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em}
+.ev{font-size:17px;margin:0 0 9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--fg)}.ev i{color:var(--acc);font-style:normal;margin-right:10px}
+#v3{grid-template-rows:auto 1fr;gap:12px}
+.funnel{display:flex;align-items:center;gap:12px}.f{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 14px}
+.f b{display:block;font-size:28px;color:var(--acc);line-height:1.1}.f span{color:var(--dim);font-size:14px}
+.grid3{display:grid;grid-template-columns:1fr 280px;gap:14px;min-height:0}
+#rows{display:flex;flex-direction:column;gap:12px;min-height:0}
+.row{flex:1;min-height:0;display:flex;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;opacity:.5;cursor:pointer;transition:all .3s}
+.row.on{opacity:1;border-color:var(--acc)}.row.now{opacity:1;border-color:var(--warn)}
+.txt{flex:1;min-width:0;display:flex;flex-direction:column}.q{color:var(--dim);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.said{font-size:21px;margin:4px 0 2px}.under{font-size:16px;color:var(--acc)}.wait{font-size:16px;color:var(--warn);margin-top:6px}.wait.off{color:var(--dim)}
+.alts{font-size:13px;color:var(--dim);margin-top:4px}.act{margin-top:auto;display:flex;align-items:center;gap:10px;padding-top:6px}.task{flex:1;font-size:15px}
+img.main{height:100%;max-width:36%;aspect-ratio:16/9;object-fit:cover;border-radius:10px}
+button.go{background:var(--acc);color:#04211f;border:0;border-radius:9px;padding:8px 13px;font-weight:700;font-size:15px;cursor:pointer}button.go.irrev{background:var(--warn);color:#2a1a00}.ok{color:var(--acc);font-weight:650;font-size:14px}
+.side{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;overflow:hidden;min-height:0}.t{margin:0 0 8px;font-size:15px}
+.zoomed .row{display:none}.zoomed .row.z{display:flex;flex:1}.zoomed .row.z img.main{max-width:55%}
+.close{display:none;color:var(--warn)}.row.z .close{display:inline}
+</style></head><body>
+<header><h1>Your call &rarr; your agents</h1>
+<button class="tab" data-v="1"><b>1</b>How it works</button><button class="tab" data-v="2"><b>2</b>What your agents did</button><button class="tab" data-v="3"><b>3</b>Your call &rarr; decisions</button>
+<span id="st" class="pill">waiting for the call</span><span id="tm" class="pill"></span><button id="fs">Fullscreen (F)</button></header>
+<section class="view" id="v1">
+ <p class="lead">The agent prompts the human, not the other way round.</p>
+ <div class="steps">
+  <div class="step"><b>1</b><h3>Your agents build</h3><p>8 Gemini agents in Buzz plus Claude work in the repo, all afternoon.</p></div><div class="arr">&rarr;</div>
+  <div class="step"><b>2</b><h3>Pre-read</h3><p>Gemini 3.8 Flash compresses the repo, its graph and history into a briefing.</p></div><div class="arr">&rarr;</div>
+  <div class="step"><b>3</b><h3>The call</h3><p>Gradium voice and Gemini Flash-Lite on your Ray-Bans: it asks, you answer freely.</p></div><div class="arr">&rarr;</div>
+  <div class="step"><b>4</b><h3>Live board</h3><p>Your words become decisions and Nano Banana images in real time.</p></div><div class="arr">&rarr;</div>
+  <div class="step"><b>5</b><h3>Back to the agents</h3><p>Your click commits the tasks; the night shift continues. Works with any repo.</p></div>
+ </div>
+ <p class="small">Built in one afternoon at the Tech Europe Agentic AI Hackathon, Zurich &middot; Google DeepMind + Gradium</p>
+</section>
+<section class="view" id="v2">
+ <div class="stats"><div class="stat"><b id="sEv">&ndash;</b><span>events in the repo today</span></div><div class="stat"><b id="sAg">&ndash;</b><span>agents involved</span></div><div class="stat"><b>1</b><span>afternoon of building</span></div></div>
+ <div class="chips" id="chips"></div>
+ <div class="evs"><h2>Latest work by your agents</h2><div id="evs"></div></div>
+</section>
+<section class="view" id="v3">
+ <div class="funnel">
+  <div class="f"><b id="nEv">&ndash;</b><span>repo events read</span></div>
+  <div class="f"><b>5</b><span>open threads found</span></div>
+  <div class="f"><b id="nDec">0/3</b><span>decisions from you</span></div>
+  <div class="f"><b id="nTask">0</b><span>tasks sent to your agents</span></div>
+ </div>
+ <div class="grid3"><section id="rows"></section><div class="side"><h2>What you said</h2><div id="tr"></div></div></div>
+</section>
+<script>
+const $=s=>document.querySelector(s);let S=null,Z=null;
+function show(v){document.querySelectorAll('.view').forEach(e=>e.classList.toggle('on',e.id==='v'+v));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v))}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>show(t.dataset.v));
+const fs=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+$('#fs').onclick=fs;
+document.addEventListener('keydown',e=>{if(['1','2','3'].includes(e.key))show(e.key);if(e.key==='f'||e.key==='F')fs()});
+show('3');
+function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+async function approve(k,ev){ev.stopPropagation();await fetch('/api/board/approve/'+k,{method:'POST'});tick()}
+function zoom(k){Z=(Z===k)?null:k;render()}
+fetch('/api/board/context').then(r=>r.json()).then(c=>{$('#nEv').textContent=c.events||'-';$('#sEv').textContent=c.events||'-';$('#sAg').textContent=(c.agents||[]).length||'-';
+ $('#chips').innerHTML=(c.agents||[]).map(a=>`<span class="chip">${esc(a)}</span>`).join('');
+ $('#evs').innerHTML=(c.recent||[]).slice().reverse().map(e=>`<p class="ev"><i>${esc(e.agent)}</i>${esc(e.title)}</p>`).join('')}).catch(()=>{});
+function render(){const s=S;if(!s)return;
+ const st=$('#st');st.className='pill '+((s.status==='live'||s.status==='wrapping')?'live':s.status==='done'?'done':'');
+ st.textContent={waiting:'waiting for the call',live:'\u25CF live call',wrapping:'\u25CF wrapping up',done:'call ended'}[s.status]||s.status;
+ if(s.started){const sec=Math.round((s.ended||Date.now()/1000)-s.started);$('#tm').textContent=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}else $('#tm').textContent='';
+ const cfg=s.config||{},dec=s.decisions||{},keys=Object.keys(cfg);const cur=(s.status==='live')?keys.find(k=>!dec[k]):null;
+ let h='',n=0,t=0;
+ for(const k of keys){const c=cfg[k],d=dec[k];if(d)n++;if(d&&d.approved)t++;
+  h+=`<div class="row ${d?'on':''} ${k===cur?'now':''} ${Z===k?'z':''}" onclick="zoom('${k}')">`;
+  if(d&&d.img)h+=`<img class="main" src="/board-img/${d.img}" onerror="this.style.display='none'">`;
+  h+=`<div class="txt"><div class="q">${k} &middot; ${esc(c.question)} <span class="close">&middot; click to go back</span></div>`;
+  if(d){h+=`<div class="said">&ldquo;${esc(d.said)}&rdquo;</div><div class="under">&rarr; ${esc(d.understood)}</div><div class="alts">Also prepared: ${esc(c.options.filter((o,i)=>i!==d.option).map(o=>o.title).join(' \u00B7 '))}</div>`;
+   h+=`<div class="act"><div class="task">Next: <b>${esc(d.task)}</b></div>`+(d.approved?`<span class="ok">&check; ${esc(d.dispatch||'approved')}</span>`:`<button class="go ${c.irreversible?'irrev':''}" onclick="approve('${k}',event)">${c.irreversible?'Final click: approve':'Approve &rarr; night shift'}</button>`)+`</div>`}
+  else h+=`<div class="wait ${k===cur?'':'off'}">${k===cur?'listening\u2026':'open'}</div>`;
+  h+='</div></div>'}
+ const R=$('#rows');R.innerHTML=h;R.classList.toggle('zoomed',!!Z);
+ $('#nDec').textContent=n+'/'+keys.length;$('#nTask').textContent=t;
+ $('#tr').innerHTML=(s.transcript||[]).slice(-7).map(x=>`<p class="t">${esc(x)}</p>`).join('');
+}
+async function tick(){try{S=await (await fetch('/api/board/state',{cache:'no-store'})).json();render()}catch(e){}}
+setInterval(tick,800);tick();
+</script></body></html>

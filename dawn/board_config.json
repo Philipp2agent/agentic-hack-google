@@ -1,0 +1,12 @@
+{
+ "A": {"question": "What should the night shift make rock-solid tonight?", "irreversible": false, "options": [
+   {"title": "Plug-and-play for any repo", "task": "Setup script and repo importer for any team", "img": "A0.png", "subject": "a glowing plug connecting into many small code repositories drawn as tiny houses"},
+   {"title": "Real WhatsApp calls", "task": "Integrate WhatsApp Business Calling", "img": "A1.png", "subject": "a ringing smartphone with sound waves next to a pair of smart glasses"},
+   {"title": "Sharper live dashboard", "task": "Polish the live decision board", "img": "A2.png", "subject": "a clean screen with three highlighted decision cards and a branching tree"}]},
+ "B": {"question": "Open the repo to the public for the jury?", "irreversible": true, "options": [
+   {"title": "Go public for the jury", "task": "Key scan, then publish the repo", "img": "B0.png", "subject": "a vault door opening onto a bright tree made of code, people looking in"},
+   {"title": "Keep it private for now", "task": "Prepare release notes, stay private", "img": "B1.png", "subject": "a closed glowing safe with a small clock, calm and secure"}]},
+ "C": {"question": "Offer this call to the other teams?", "irreversible": false, "options": [
+   {"title": "Offer it to all teams", "task": "Send onboarding link to 42 teams", "img": "C0.png", "subject": "a network of many small glowing teams connected by lines to one central phone"},
+   {"title": "Not yet", "task": "Park the team rollout until tomorrow", "img": "C1.png", "subject": "a single phone on a desk, other desks dimmed in the background"}]}
+}

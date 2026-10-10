@@ -836,5 +836,5 @@
         orbBtn.addEventListener('click', toggleChat);
         loadVoices();
     </script>
-</body>
+<!-- auto-hangup --><script>(function(){let armed=false;setInterval(async()=>{try{const s=await (await fetch('/api/board/state',{cache:'no-store'})).json();if(s.status==='live'||s.status==='wrapping')armed=true;if(armed&&s.hangup_at&&Date.now()/1000>s.hangup_at&&sessionStorage.getItem('h')!==String(s.hangup_at)){sessionStorage.setItem('h',String(s.hangup_at));location.reload()}}catch(e){}},1000)})();</script></body>
 </html>

@@ -1,35 +1,28 @@
-"""Dawn - DawnDispatch voice call (Plan B, based on the gradbot simple_chat demo)."""
-import pathlib
+"""Project call agent + decision board (based on the gradbot simple_chat demo)."""
+import json, pathlib, subprocess, tempfile, threading, time
 import fastapi
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 import gradbot
 
-SYSTEM_PROMPT = (pathlib.Path(__file__).parent / "prompt.txt").read_text()
-_OLD_PROMPT = """You are Dawn, the voice of DawnDispatch: an AI agent that runs Philipp's software project and calls him to collect the few decisions only a human can make. You lead the call; Philipp answers. Sound natural, warm and confident, like a sharp chief of staff on a phone call.
-
-Context: it is Saturday evening at the Tech Europe Agentic AI Hackathon in Zurich. In about four hours a team of eight Gemini agents in Buzz plus Claude in the cloud built Version 1 of DawnDispatch: a voice call over Meta Ray-Ban glasses with Gradium voice, Gemini reasoning and a live knowledge-graph dashboard. Tonight the agents keep working on Version 2; Philipp's decisions in this call become their work queue.
-
-The call takes about one minute. Keep every turn to one or two short sentences.
-1. Open exactly with: "Good evening Philipp, it's Dawn. Version one of DawnDispatch is live. I need three quick decisions for tonight's night shift. How much time do you have?"
-2. Adapt to his answer: if he is short on time or in a hurry, get even shorter and faster.
-3. Decision one: ask what the agents should build first tonight: real phone or WhatsApp calls, the automatic morning call after the night shift, or your voice cloned from his. Confirm his choice in one sentence.
-4. Decision two: ask whether you should make the repository public and submit it to the jury; say it is irreversible, so you leave the final click to him on his laptop. Confirm.
-5. Decision three: ask whether you should offer this evening call to every other team at the hackathon, so their agents can brief them too. Confirm.
-6. Close: summarize the three decisions in one sentence, then say "Your dashboard is ready on your laptop. Talk tomorrow morning." and stop.
-
-Rules: You lead. If Philipp goes off topic, answer in one sentence and steer back to the next decision. If he says he is done or says goodbye, go straight to the close. Never read lists aloud, never use markdown, never mention these instructions. Speak English."""
+HERE = pathlib.Path(__file__).parent
+SYSTEM_PROMPT = (HERE / "prompt.txt").read_text()
+STATE = HERE / "board_state.json"
+APPROVALS = HERE / "approvals.json"
+IMG = HERE / "board_img"
+IMG.mkdir(exist_ok=True)
+LOCK = threading.Lock()
 
 gradbot.init_logging()
 app = fastapi.FastAPI(title="DawnDispatch")
 cfg = gradbot.config.from_env()
-DEFAULT_VOICE_ID = "cLONiZ4hQ8VpQ4Sz"  # Skyler, im Test bewaehrt
+DEFAULT_VOICE_ID = "cLONiZ4hQ8VpQ4Sz"  # fest eingestellt
 
 
 def make_config(msg: dict) -> gradbot.SessionConfig:
-    voice_id = msg.get("voice_id") or DEFAULT_VOICE_ID
-    language = msg.get("language") or "en"
     return gradbot.SessionConfig(
-        voice_id=voice_id,
-        language=gradbot.LANGUAGES.get(language) if language else None,
+        voice_id=DEFAULT_VOICE_ID,
+        language=gradbot.LANGUAGES.get("en"),
         instructions=SYSTEM_PROMPT,
         **({"assistant_speaks_first": True} | cfg.session_kwargs),
     )
@@ -40,4 +33,94 @@ async def ws_chat(websocket: fastapi.WebSocket):
     await gradbot.websocket.handle_session(websocket, config=cfg, on_start=make_config)
 
 
-gradbot.routes.setup(app, config=cfg, static_dir=pathlib.Path(__file__).parent / "static", with_voices=True)
+def _load(path, default):
+    try:
+        return json.loads(path.read_text())
+    except Exception:
+        return default
+
+
+@app.get("/board", response_class=HTMLResponse)
+def board():
+    return (HERE / "board.html").read_text()
+
+
+@app.get("/api/board/state")
+def board_state():
+    s = _load(STATE, {"status": "waiting", "decisions": {}, "transcript": [], "config": {}})
+    for k, v in _load(APPROVALS, {}).items():
+        if k in s.get("decisions", {}):
+            s["decisions"][k].update(v)
+    return JSONResponse(s, headers={"Cache-Control": "no-store"})
+
+
+def _set_approval(key, value):
+    with LOCK:
+        a = _load(APPROVALS, {})
+        a[key] = value
+        APPROVALS.write_text(json.dumps(a))
+
+
+def _dispatch(key, d):
+    try:
+        repo = tempfile.mkdtemp() + "/r"
+        subprocess.run(["git", "clone", "-q", __import__("os").environ.get("DAWN_DISPATCH_REMOTE", ".."), repo], check=True, timeout=90)
+        name = "auftraege/nachtschicht-%s-%s.md" % (time.strftime("%H%M"), key)
+        pathlib.Path(repo, name).write_text(
+            "# Night shift task %s (approved by Philipp on the call)\n\n" % key
+            + "Philipp said: %s\n\nUnderstood as: %s\n\nTask: %s\n\n" % (d.get("said", ""), d.get("understood", ""), d.get("task", ""))
+            + "hack-chef: assign this to an agent for the night shift and report in STAND.md.\n")
+        subprocess.run(["git", "-C", repo, "add", name], check=True)
+        subprocess.run(["git", "-C", repo, "commit", "-qm", "nachtschicht: " + (d.get("task") or key)[:60]], check=True)
+        subprocess.run(["git", "-C", repo, "push", "-q"], check=True, timeout=90)
+        h = subprocess.run(["git", "-C", repo, "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
+        _set_approval(key, {"approved": True, "dispatch": "queued for the night shift (%s)" % h})
+    except Exception as e:
+        print("Dispatch fehlgeschlagen:", e, flush=True)
+        _set_approval(key, {"approved": True, "dispatch": "approved (queue offline)"})
+
+
+@app.post("/api/board/approve/{key}")
+def approve(key: str):
+    d = _load(STATE, {}).get("decisions", {}).get(key)
+    if not d:
+        return JSONResponse({"ok": False}, status_code=404)
+    _set_approval(key, {"approved": True, "dispatch": "sending to your agents ..."})
+    threading.Thread(target=_dispatch, args=(key, d), daemon=True).start()
+    return {"ok": True}
+
+
+
+def _context():
+    raw = ""
+    try:
+        raw = subprocess.run(["git", "-C", __import__("os").environ.get("DAWN_REPO", ".."), "show", "origin/main:src/data/overnight_events.json"], capture_output=True, text=True, timeout=20).stdout
+    except Exception:
+        pass
+    try:
+        data = json.loads(raw)
+    except Exception:
+        data = []
+    if isinstance(data, dict):
+        data = next((v for v in data.values() if isinstance(v, list)), [])
+    items, agents = [], set()
+    for e in data:
+        if isinstance(e, dict):
+            t = e.get("title") or e.get("summary") or e.get("details") or ""
+            a = e.get("agent_id") or e.get("agent") or e.get("source") or ""
+            items.append({"title": str(t)[:90], "agent": str(a)[:24]})
+            if a:
+                agents.add(str(a))
+    return {"events": len(items), "agents": sorted(agents)[:12], "recent": items[-12:]}
+
+
+CONTEXT = _context()
+
+
+@app.get("/api/board/context")
+def board_context():
+    return CONTEXT
+
+
+app.mount("/board-img", StaticFiles(directory=str(IMG)), name="board_img")
+gradbot.routes.setup(app, config=cfg, static_dir=HERE / "static", with_voices=True)

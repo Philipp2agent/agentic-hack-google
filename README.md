@@ -1,3 +1,55 @@
+# Your agents prompt you
+
+**A voice call that turns hours of agent work into one minute of human decisions.**
+{Tech: Europe} Agentic AI Hackathon Zurich, 10 Oct 2026 · Track: Open Innovation · Partner tech: **Google DeepMind** (Gemini, Nano Banana) + **Gradium** (real-time voice)
+
+## The problem
+Agent teams now work for hours. The bottleneck is no longer code but the human: commits, branches and open questions pile up and wait for decisions nobody has time to read.
+
+## What it does
+1. **Pre-read.** Gemini 3.8 Flash reads the repository, its knowledge graph (85 events today) and history, and compresses it into a briefing with open threads.
+2. **The call.** While you walk, the project agent calls you, hands-free on Meta Ray-Ban glasses: Gradium real-time voice (STT and TTS) plus Gemini Flash-Lite. It leads the conversation, asks the three decisions only you can make, and you answer freely.
+3. **Live decision board.** On the laptop your words appear as you speak: what you said, how it was understood, the chosen branch with a Nano Banana image generated from your words, and the next task.
+4. **Back to the agents.** One click commits the tasks to the repository, where the agent team picks them up. Irreversible steps, like publishing, always wait for your final click.
+
+## Why it matters
+- **Takes action:** approved decisions become committed tasks for the agent team.
+- **Helps a real person:** one minute on the way to the desk instead of an hour of reading logs.
+- **Human stays in control:** nothing irreversible happens without the final click.
+- **Runs live:** real voice, real repository, real-time board.
+
+## Run it
+Requirements: Python 3.11+, a Gradium API key, a Gemini API key.
+
+```bash
+pip install gradbot fastapi "uvicorn[standard]"
+export GRADIUM_API_KEY=...  GEMINI_API_KEY=...  LLM_API_KEY=$GEMINI_API_KEY
+export LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai   # no trailing slash
+export LLM_MODEL=gemini-3.5-flash-lite  DAWN_REPO=/path/to/your/repo
+cd dawn
+python gen_prompt.py                                  # pre-read your repo into prompt.txt
+uvicorn main:app --port 8088 2>&1 | tee dawn.log &    # call page and decision board
+python bridge.py                                      # live bridge: call to board
+```
+
+Open the call page on your phone (the microphone needs HTTPS, for example `cloudflared tunnel --url http://localhost:8088`) and `/board` on the laptop. The decisions and their prepared branches live in `dawn/board_config.json`; the pre-read works on any Git repository.
+
+## What is in this repo
+| Path | What |
+|---|---|
+| `dawn/` | The live demo from the video: call (gradbot), pre-read, live bridge, decision board |
+| `src/core`, `src/data` | Knowledge graph and agenda built from 85 real repository events |
+| `src/dashboard`, `src/live` | Before/after graph dashboard and a live mission-control screen |
+| `docs/` | Architecture, live-event contract, test plan, video script |
+| `auftraege/`, `STAND.md`, `AGENTEN.md` | How it was built: the tasks and status board of the agent team |
+
+## How it was built
+One human, one afternoon. A team of eight Gemini agents in Buzz (coordinator, builders, designer, reviewer, marketing) plus Claude sessions for architecture and integration. The coordinator kept a shared status board in this repository; every file in `auftraege/` is a real assignment. The project agent in the video reads exactly this history.
+
+---
+
+*Below: the original README written by the agent team.*
+
 # DawnDispatch
 
 > **Autonomous Commute Voice Dispatcher & Live Knowledge Graph**  

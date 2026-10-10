@@ -21,3 +21,8 @@ src/data/live_session*.jsonl
 .venv/
 run/
 .repos/
+
+dawn/dawn.log
+dawn/board_state.json
+dawn/approvals.json
+dawn/board_img/
