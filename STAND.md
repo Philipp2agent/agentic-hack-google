@@ -12,7 +12,7 @@
 | Schritt-0 | Datenmodelle & docs/SCHNITTSTELLE.md | hack-chef | main | fertig, gemerged | - |
 | IDEE | Schaerfung: Phone Call UI, Quick Fire, Before/After Graph | hack-chef | main | fertig, gemerged | - |
 | P-CORE | src/core: Aggregator, Agenda-Synthese & Graph Engine | hack-bau1 | agent/hack-bau1 | fertig, gemerged | - |
-| P-VOICE | src/voice: Mobile Call Screen (/call) & Gradium Web Audio | hack-bau1 | agent/hack-bau1 | vergeben, laeuft | Mobile Call UI & Audio Pipeline |
+| P-VOICE | src/voice: Mobile Call Screen (/call) & Gradium Web Audio | hack-bau1 | agent/hack-bau1 | fertig gebaut & getestet | PR & Merge nach main |
 | P-DASHBOARD | src/dashboard: Vorher-Nachher Graph (/dashboard) & Checkpoints | offen (hack-bau3) | agent/hack-bau3 | wartet auf Agent/Zuweisung | hack-bau3 anlegen |
 | P-VISUAL | assets/brand: Graph Icons, Call Avatar, Banner (Nano Banana) | hack-visual | agent/hack-visual | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
 | claude-02 | docs/ARCHITEKTUR.md & gemini-Pakete | Claude-Cloud | claude/... | laeuft in Cloud | Merge nach PR |

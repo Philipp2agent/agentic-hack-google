@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DawnDispatch — Commute Voice Call</title>
+  <link rel="stylesheet" href="/static/call.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="mobile-body">
+  <div class="phone-frame">
+    <!-- Top Status Bar (Smartphone Style) -->
+    <header class="status-bar">
+      <div class="status-left">
+        <span class="status-time" id="status-clock">07:15</span>
+      </div>
+      <div class="status-dynamic-island">
+        <div class="island-pill">
+          <span class="island-dot"></span>
+          <span class="island-text" id="island-status">Ray-Ban Connected</span>
+        </div>
+      </div>
+      <div class="status-right">
+        <span class="status-icon">5G</span>
+        <svg class="battery-icon" viewBox="0 0 24 12" width="22" height="11">
+          <rect x="0.5" y="0.5" width="20" height="11" rx="2.5" fill="none" stroke="currentColor"/>
+          <rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/>
+          <path d="M22 4v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </header>
+
+    <!-- MAIN CALL SCREEN -->
+    <main class="call-content">
+      
+      <!-- INCOMING CALL SCREEN -->
+      <section id="screen-incoming" class="screen-view active">
+        <div class="caller-meta">
+          <div class="incoming-label">INCOMING CALL</div>
+          <h1 class="caller-name">DawnDispatch</h1>
+          <div class="caller-sub">Overnight Swarm Standup</div>
+          <div class="bluetooth-badge">
+            <svg class="bt-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m7 7 10 10-5 5V2l5 5L7 17"/>
+            </svg>
+            <span>Meta Ray-Ban Smart Glasses</span>
+          </div>
+        </div>
+
+        <div class="avatar-container">
+          <div class="pulse-ring ring-1"></div>
+          <div class="pulse-ring ring-2"></div>
+          <div class="pulse-ring ring-3"></div>
+          <div class="avatar-disc">
+            <div class="avatar-glasses-icon">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="6" cy="12" r="4"/>
+                <circle cx="18" cy="12" r="4"/>
+                <path d="M10 12h4M2 12h0M22 12h0"/>
+                <path d="M4 8l3-3M20 8l-3-3" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="incoming-prompt">
+          <p>Philipp walking to office</p>
+          <span class="prompt-sub">Double-tap glasses temple or press Answer</span>
+        </div>
+
+        <div class="incoming-actions">
+          <button id="btn-decline" class="call-btn btn-decline" aria-label="Decline call">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+              <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.99.99 0 0 1 0-1.41C3.28 8.78 7.42 7 12 7s8.72 1.78 11.71 4.67c.39.39.39 1.02 0 1.41l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.1-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
+            </svg>
+            <span>Decline</span>
+          </button>
+
+          <button id="btn-accept" class="call-btn btn-accept" aria-label="Answer call">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+              <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-.99-1z"/>
+            </svg>
+            <span>Answer</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ACTIVE CALL SCREEN -->
+      <section id="screen-active" class="screen-view">
+        <div class="active-header">
+          <div class="active-caller">DawnDispatch Agent</div>
+          <div class="call-timer" id="call-timer">00:00</div>
+          <div class="audio-route-chip">
+            <span class="route-dot"></span>
+            <span>Ray-Ban Bluetooth Audio</span>
+          </div>
+        </div>
+
+        <!-- Waveform Audio Visualizer -->
+        <div class="waveform-container" id="waveform">
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+        </div>
+
+        <!-- Live Quick-Fire Dialog Card -->
+        <div class="dialog-card">
+          <div class="dialog-badge" id="dialog-phase-badge">OPENING GREETING</div>
+          <div class="agent-speech-bubble" id="agent-speech">
+            "Good morning Philipp. Swarm overnight triage ready. How much time do you have?"
+          </div>
+          <div class="user-speech-bubble" id="user-speech">
+            Listening for your voice...
+          </div>
+        </div>
+
+        <!-- Quick Fire Yes/No Quick-Tap Controls -->
+        <div class="quickfire-tap-bar" id="quickfire-controls">
+          <button class="qf-btn qf-yes" data-answer="Yes">
+            <span>✓ YES</span>
+            <small>Approve</small>
+          </button>
+          <button class="qf-btn qf-hold" data-answer="Hold">
+            <span>⏸ HOLD</span>
+            <small>Checkpoint</small>
+          </button>
+          <button class="qf-btn qf-no" data-answer="No">
+            <span>✕ NO</span>
+            <small>Reject</small>
+          </button>
+        </div>
+
+        <!-- In-Call Actions -->
+        <div class="active-controls">
+          <button id="btn-mute" class="control-circle-btn" aria-label="Mute microphone">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M8 22h8"/>
+            </svg>
+            <span>Mute</span>
+          </button>
+
+          <button id="btn-end-call" class="call-btn btn-hangup" aria-label="End call">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+              <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.99.99 0 0 1 0-1.41C3.28 8.78 7.42 7 12 7s8.72 1.78 11.71 4.67c.39.39.39 1.02 0 1.41l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.1-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
+            </svg>
+          </button>
+
+          <button id="btn-speaker" class="control-circle-btn active" aria-label="Speaker / Ray-Ban toggle">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            </svg>
+            <span>Ray-Ban</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ENDED CALL SCREEN -->
+      <section id="screen-ended" class="screen-view">
+        <div class="ended-icon-wrapper">
+          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#22c55e" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+
+        <h2 class="ended-title">Call Completed</h2>
+        <div class="ended-duration" id="ended-duration-label">Duration: 00:58</div>
+        <p class="ended-desc">
+          Decisions recorded hands-free via Meta Ray-Ban audio during morning walk.
+        </p>
+
+        <div class="summary-card">
+          <div class="summary-header">
+            <span>SYNC STATUS</span>
+            <span class="badge-synced">✓ SYNCED</span>
+          </div>
+          <ul class="summary-list" id="summary-decision-list">
+            <li>Loading decisions...</li>
+          </ul>
+        </div>
+
+        <div class="ended-actions">
+          <a href="/dashboard" class="btn-dashboard-jump">
+            <span>Open Laptop Dashboard</span>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <button id="btn-restart-call" class="btn-restart">Simulate Call Again</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Mobile Indicator -->
+    <footer class="phone-home-indicator">
+      <div class="home-bar"></div>
+    </footer>
+  </div>
+
+  <script src="/static/call.js"></script>
+</body>
+</html>
