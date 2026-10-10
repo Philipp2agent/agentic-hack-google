@@ -1,8 +1,8 @@
 # STAND agentic-hack-google
 
 ## FRAGEN AN PHILIPP
-- 1. claude-03 Tonbestaetigung: PR #3 liegt vor – Mergen erst wenn claude-03 Audio-Funktion bestaetigt? -> Empfehlung: 1A (Ja, warten auf Ton-Bestaetigung gemaess sprint-1830)
-- 2. Produktname: Top 3 Auswahl folgt unmittelbar sobald hack-ideen die 15 Namen geliefert hat.
+- 1. Produktname fuer Video 2 & Branding: Welcher Favorit soll es werden? (A: PromptMe | B: Dawn / DawnDispatch | C: Dispatch) -> Empfehlung: 1A (PromptMe - dreht "Human prompts Agent" genial um)
+- 2. Modell-Konfiguration fuer hack-visual, hack-marketing & hack-review in Buzz (melden Provider-Fehler): (A: In Buzz Desktop Modell neu zuweisen & Neustart | B: hack-chef baut Pakete mit hack-bau1/main) -> Empfehlung: 2A
 
 ## CLAUDE-LINKS ZUM KLICKEN
 - [claude-05: Plug-and-Play fuer jedes Repo (setup.sh, from_repo.py, start.sh, Deadline 18:20)](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-05.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
@@ -21,9 +21,9 @@
 | P-DEMO-DATA | Demo-Agenda-Daten gemaess docs/LIVE-EVENTS.md | hack-bau1 | main | fertig, gemerged | - |
 | P-VISUAL | Brand-Assets (Banner, Call-Avatar, Graph-Icons) | hack-bau1 | main | fertig, gemerged | assets/brand/* live |
 | claude-04 | Live-Visualisierung /src/live Mission Control | Claude-Cloud | main | fertig, gemerged | PR #4 gemerged auf main |
+| S-IDEEN | 15 Produktnamen (Agent promptet Menschen, merkbar) | hack-ideen | main | fertig, gemerged | docs/NAMEN.md live, Top 3 zur Wahl |
 | claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools | Claude-Cloud | claude/auftraege-claude-03-jh0o10 | PR #3 bereit | Merge nach Ton-Bestaetigung |
 | claude-05 | Plug-and-Play fuer jedes Repo (setup.sh, start.sh) | Claude-Cloud | claude/claude-05 | vergeben | Claude-Link klicken |
-| S-IDEEN | 15 Produktnamen (Agent promptet Menschen, merkbar) | hack-ideen | agent/hack-ideen | vergeben | Top 3 als FRAGE nach STAND.md |
 | S-MKTG | Video-2-Skript (2 Min) & README-Erzaehlung "Try in 3 min" | hack-marketing | agent/hack-marketing | vergeben | docs/VIDEO_SCRIPT_V2.md |
 | S-VISUAL | Neutrale Titelkarte & Abspann ("8 Gemini agents + Claude") | hack-visual | agent/hack-visual | vergeben | assets/brand/video2_* |
 | S-LIVE-UI | Live-Ansicht verfeinern (Fokus zentriert, Rest gedimmt) | hack-bau2 | agent/hack-bau2 | vergeben | src/live/static/ |
@@ -47,8 +47,8 @@ gantt
   Phase 7 Abgabe                 :p7, 18:45, 19:00
   section Parallele Spuren Sprint 18:20
   claude-04 Live Mission Control :done, p_cl4, 17:00, 17:55
+  S-IDEEN 15 Produktnamen        :done, p_ide, 17:55, 17:58
   claude-05 Plug-and-Play Repo   :crit, active, p_cl5, 17:55, 18:20
-  S-IDEEN 15 Produktnamen        :active, p_ide, 17:55, 18:10
   S-MKTG Video-2-Skript & Story  :active, p_mkt, 17:55, 18:15
   S-VISUAL Titelkarte & Abspann  :active, p_vis, 17:55, 18:15
   S-LIVE-UI Brillen-Fokus Screen :active, p_b2, 17:55, 18:15
