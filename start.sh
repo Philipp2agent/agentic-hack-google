@@ -13,7 +13,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --fresh) FRESH=1; shift ;;
     --no-tunnel) TUNNEL=0; shift ;;
-    -h|--help) sed -n '2,8p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,7p' "$0"; exit 0 ;;
     *) echo "unknown option: $1"; exit 1 ;;
   esac
 done

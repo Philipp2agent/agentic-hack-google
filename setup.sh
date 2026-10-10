@@ -19,7 +19,7 @@ while [ $# -gt 0 ]; do
     --name) NAME_ARG="$2"; shift 2 ;;
     --yes|-y) YES=1; shift ;;
     --skip-prompt) SKIP_PROMPT=1; shift ;;
-    -h|--help) sed -n '2,9p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,8p' "$0"; exit 0 ;;
     *) echo "unknown option: $1"; exit 1 ;;
   esac
 done
