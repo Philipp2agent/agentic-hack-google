@@ -1,23 +1,56 @@
 [
   {
     "item_id": "agenda-01",
-    "topic": "Swarm Agent Delegation for Subsystems",
-    "question_for_lead": "Should we spin up hack-bau2 and hack-bau3, or assign voice and dashboard to existing agents?",
-    "recommended_action": "APPROVE - assign voice to hack-bau1 and dashboard to hack-chef to reduce swarm overhead",
-    "is_irreversible": false
+    "topic": "Status Version 1: Today's Swarm Build (Ray-Ban & Web Call)",
+    "question_for_lead": "Version 1 was built today: simulated web call on Ray-Ban glasses, low-latency audio, before/after graph. Anything you want me to flag?",
+    "recommended_action": "APPROVE - Lock in Version 1 hackathon baseline and proceed to Version 2 triage",
+    "is_irreversible": false,
+    "action_type": "NOTE",
+    "event_ids": [
+      "evt-005",
+      "evt-006",
+      "evt-008"
+    ],
+    "priority": 1
   },
   {
     "item_id": "agenda-02",
-    "topic": "Parallel Task Execution Pipeline Kickoff",
-    "question_for_lead": "Unblock parallel worker execution following the overnight parallelstart trigger?",
-    "recommended_action": "APPROVE - activate parallel agent task queues immediately",
-    "is_irreversible": true
+    "topic": "Decision Version 2: Autonomous Build Pipeline & Roadmap Options",
+    "question_for_lead": "The agent owns the code and the human: which Version 2 feature should the autonomous build pipeline prioritize — Option A WhatsApp Calling, Option B autonomous Night Shift, or Option C cloned Voice?",
+    "recommended_action": "APPROVE - Select Version 2 priority candidate and dispatch to autonomous build pipeline ('The agent owns the code and the human')",
+    "is_irreversible": false,
+    "action_type": "DISPATCH_AGENT",
+    "event_ids": [
+      "evt-001",
+      "evt-007"
+    ],
+    "priority": 2
   },
   {
     "item_id": "agenda-03",
-    "topic": "Ray-Ban Demo and Schema Baseline",
-    "question_for_lead": "Accept updated data models, Ray-Ban commute script, and web voice specs as current milestone?",
-    "recommended_action": "APPROVE - lock Schritt 0 interface specs and advance to live testing",
-    "is_irreversible": false
+    "topic": "Version 2 Checkpoint: Autonomous Main Commit & Public Repo Submission",
+    "question_for_lead": "Shall I enable autonomous main commits and make the repo public for 19:00 hackathon submission?",
+    "recommended_action": "APPROVE with Human Checkpoint - Irreversible autonomous write access and public release requires desk sign-off",
+    "is_irreversible": true,
+    "action_type": "DEPLOY",
+    "event_ids": [
+      "evt-009",
+      "evt-010"
+    ],
+    "priority": 3
+  },
+  {
+    "item_id": "agenda-04",
+    "topic": "Scale: Hackathon Swarm Expansion & Multi-Team Commute Calls",
+    "question_for_lead": "Should I scale the autonomous morning commute call to every other team at the hackathon?",
+    "recommended_action": "APPROVE - Expand autonomous triage swarm to all 42 hackathon teams",
+    "is_irreversible": false,
+    "action_type": "UPDATE_BUDGET",
+    "event_ids": [
+      "evt-002",
+      "evt-003",
+      "evt-004"
+    ],
+    "priority": 4
   }
 ]

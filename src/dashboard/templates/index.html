@@ -8,6 +8,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
+  <script>
+    // Fallback if /static/style.css is not reachable (e.g. static file browsing)
+    if (!document.styleSheets.length) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'style.css';
+      document.head.appendChild(link);
+    }
+  </script>
 </head>
 <body>
   <div class="app-container">
@@ -18,7 +27,7 @@
           <span class="logo-icon">⚡</span>
           <div class="brand-titles">
             <h1>DawnDispatch</h1>
-            <span class="brand-sub">Autonomous Commute Triage & Knowledge Graph</span>
+            <span class="brand-sub">Autonomous Commute Triage & Knowledge Graph (v1 ➔ v2)</span>
           </div>
         </div>
         <div class="status-pills">
@@ -42,10 +51,10 @@
             <span class="btn-icon">◫</span> Split-View
           </button>
           <button id="btn-view-before" class="btn-toggle" title="Nur Kontext Davor anzeigen">
-            <span class="btn-icon">◀</span> Davor
+            <span class="btn-icon">◀</span> Davor (v1 Pre-Call)
           </button>
           <button id="btn-view-after" class="btn-toggle" title="Nur Kontext Danach anzeigen">
-            <span class="btn-icon">▶</span> Danach
+            <span class="btn-icon">▶</span> Danach (v1 ➔ v2)
           </button>
         </div>
 
@@ -58,12 +67,39 @@
       </div>
     </header>
 
+    <!-- Evolution & Checkpoint Filter Strip -->
+    <section class="evolution-strip">
+      <div class="evolution-legend">
+        <span class="legend-title">Wissensgraph Evolution:</span>
+        <div class="legend-pill pill-v1" title="Heute gebaut: Web Call, Meta Ray-Ban BT, Gradium STT/TTS, lokale Swarm Triage">
+          <span class="legend-dot dot-v1"></span>
+          <span class="legend-text"><strong>v1 MVP</strong> (Heute gebaut: Web Call & Ray-Ban)</span>
+        </div>
+        <div class="legend-pill pill-v2" title="Zukunft & Roadmap: WhatsApp Calling, Autonome Night Shift, Voice Clone, Build Pipeline">
+          <span class="legend-dot dot-v2"></span>
+          <span class="legend-text"><strong>v2 Next-Gen</strong> (Autonomous Evolution)</span>
+        </div>
+        <div class="legend-pill pill-cp" title="Irreversible Aktionen & Production Impact erfordern 1-Klick Schreibtisch-Freigabe">
+          <span class="pulse-warn"></span>
+          <span class="legend-text"><strong>Human Checkpoint</strong> („Show me, don't tell me“)</span>
+        </div>
+      </div>
+
+      <div class="evolution-filter-controls">
+        <span class="filter-label">Ansichts-Filter:</span>
+        <button id="btn-filter-all" class="btn-filter active" title="Alle Knoten einblenden">Alle</button>
+        <button id="btn-filter-v1" class="btn-filter" title="Nur v1 MVP Knoten hervorheben">v1 MVP</button>
+        <button id="btn-filter-v2" class="btn-filter" title="Nur v2 Next-Gen Knoten hervorheben">v2 Next-Gen</button>
+        <button id="btn-filter-checkpoints" class="btn-filter" title="Nur Checkpoints („Show me, don't tell me“) hervorheben">🛡️ Checkpoints</button>
+      </div>
+    </section>
+
     <!-- Metrics Ribbon -->
     <section class="metrics-ribbon">
       <div class="metric-card">
-        <div class="metric-label">Overnight Swarm Status</div>
+        <div class="metric-label">Overnight Swarm Status (v1)</div>
         <div class="metric-val" id="metric-events-count">6 Events</div>
-        <div class="metric-foot text-amber">3 ungeloeste Blocker</div>
+        <div class="metric-foot text-amber" id="metric-unresolved-foot">3 ungeloeste Blocker</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Commute Voice Call</div>
@@ -71,14 +107,14 @@
         <div class="metric-foot">Gradium Rapid Fire (1.25x)</div>
       </div>
       <div class="metric-card">
-        <div class="metric-label">Graph Resolution</div>
-        <div class="metric-val text-emerald" id="metric-resolution-rate">100%</div>
-        <div class="metric-foot">Alle Agenda-Punkte getaktet</div>
+        <div class="metric-label">Evolution Kontrast</div>
+        <div class="metric-val text-violet" id="metric-evolution-count">v1 ➔ v2</div>
+        <div class="metric-foot text-emerald" id="metric-evolution-foot">MVP Locked &amp; Next-Gen Weichen</div>
       </div>
       <div class="metric-card" id="metric-card-checkpoints">
         <div class="metric-label">Human Checkpoints</div>
         <div class="metric-val text-rose" id="metric-checkpoints-count">2 Ausstehend</div>
-        <div class="metric-foot text-muted">1-Klick Freigabe erforderlich</div>
+        <div class="metric-foot text-rose">„Show me, don't tell me“</div>
       </div>
     </section>
 
@@ -88,7 +124,7 @@
       <section class="graph-panel graph-panel-before" id="panel-before">
         <div class="panel-header">
           <div class="panel-title-wrap">
-            <div class="panel-badge badge-before">KONTEXT DAVOR</div>
+            <div class="panel-badge badge-before">KONTEXT DAVOR • v1 BASELINE</div>
             <h2>Naechtlicher Schwarm-Zustand (Pre-Call)</h2>
           </div>
           <div class="panel-stats">
@@ -97,11 +133,11 @@
           </div>
         </div>
         <p class="panel-desc">
-          Offene PRs, unstrukturierte Agenten-Logs und unentschiedene Architektur-Weichenstellungen vor dem Morgengespraech.
+          Offene PRs, unstrukturierte Agenten-Logs und unentschiedene Architektur-Weichenstellungen vor dem Morgengespraech (v1 Ausgangszustand).
         </p>
         <div class="graph-canvas-container" id="container-before">
           <svg id="svg-before" class="graph-svg"></svg>
-          <div class="canvas-overlay-hint">Tipp: Klicke auf Knoten fuer Detailinspektion</div>
+          <div class="canvas-overlay-hint">Tipp: Klicke auf Knoten fuer Detailinspektion • Filter oben nutzen</div>
         </div>
       </section>
 
@@ -109,20 +145,20 @@
       <section class="graph-panel graph-panel-after" id="panel-after">
         <div class="panel-header">
           <div class="panel-title-wrap">
-            <div class="panel-badge badge-after">KONTEXT DANACH</div>
-            <h2>Aufbereiteter Zielzustand (Post-Call)</h2>
+            <div class="panel-badge badge-after">KONTEXT DANACH • v1 ➔ v2 EVOLUTION</div>
+            <h2>Aufbereiteter Zielzustand (Post-Call &amp; Evolution)</h2>
           </div>
           <div class="panel-stats">
             <span class="stat-pill stat-resolved" id="after-resolved-count">100% Entschieden</span>
-            <span class="stat-pill stat-dispatched">Aktionen Dispatcht</span>
+            <span class="stat-pill stat-dispatched">v2 Roadmap Dispatched</span>
           </div>
         </div>
         <p class="panel-desc">
-          Durch den 60s Ray-Ban Call verknuepfte Entscheidungen, aufgeloeste Kanten und isolierte Human-Checkpoints am Schreibtisch.
+          Durch den 60s Ray-Ban Call verknuepfte Entscheidungen, freigegebene v1 Baselines, getaktete v2 Roadmap und isolierte Human-Checkpoints am Schreibtisch.
         </p>
         <div class="graph-canvas-container" id="container-after">
           <svg id="svg-after" class="graph-svg"></svg>
-          <div class="canvas-overlay-hint">Gruene Knoten: Live per Voice freigegeben</div>
+          <div class="canvas-overlay-hint">Gruen: v1 Freigegeben • Violett: v2 Autonomous Evolution • Rot: Checkpoint</div>
         </div>
       </section>
 
@@ -150,7 +186,24 @@
               <span class="meta-label">Typ:</span>
               <span class="meta-val" id="insp-type">-</span>
             </div>
+            <div class="meta-row">
+              <span class="meta-label">Evolution:</span>
+              <span class="meta-val" id="insp-evolution">-</span>
+            </div>
+            <div class="meta-row" id="insp-checkpoint-row" style="display:none;">
+              <span class="meta-label">Checkpoint:</span>
+              <span class="meta-val text-rose font-bold" id="insp-checkpoint">🛡️ SHOW ME, DON'T TELL ME</span>
+            </div>
           </div>
+
+          <div id="insp-checkpoint-alert" class="checkpoint-banner" style="display:none;">
+            <span class="cp-banner-icon">🛡️</span>
+            <div>
+              <strong>Human Checkpoint Aktiv:</strong>
+              <div>Irreversible Systemaktion mit Production Impact. Verlangt vor Release persoenliche 1-Klick Freigabe am Schreibtisch.</div>
+            </div>
+          </div>
+
           <div class="inspector-desc-block">
             <label>Details & Begruendung:</label>
             <p id="insp-details" class="inspector-desc">Klicke im Graphen auf einen beliebigen Knoten, um dessen Metadaten und Kanten zu sehen.</p>
@@ -172,7 +225,7 @@
             <span class="card-icon">🎙️</span>
             <div>
               <h3>60-Sekunden Commute Call Transcript</h3>
-              <span class="card-sub">Meta Ray-Ban Smart Glasses & Gradium Voice Pipeline</span>
+              <span class="card-sub">Meta Ray-Ban Smart Glasses &amp; Gradium Voice Pipeline</span>
             </div>
           </div>
           <div class="audio-controls">
@@ -203,13 +256,18 @@
             <span class="card-icon">🛡️</span>
             <div>
               <h3>Human Checkpoint Aktionskarten</h3>
-              <span class="card-sub">Irreversible Aktionen & Production Impact ("Show me, don't tell me")</span>
+              <span class="card-sub">Irreversible Aktionen &amp; Production Impact („Show me, don't tell me“)</span>
             </div>
           </div>
           <div class="checkpoint-stats-tag">
             <span class="pulse-warn"></span>
             <span id="checkpoint-tag-text">2 Blockiert</span>
           </div>
+        </div>
+
+        <div class="checkpoint-banner">
+          <span class="cp-banner-icon">🛡️</span>
+          <span><strong>„Show me, don't tell me“:</strong> Irreversible Systemaenderungen (Deployments, Night Shift, Repo Public) verlangen visuelle Evidenz und Schreibtisch-Sign-off.</span>
         </div>
 
         <div class="checkpoints-list" id="checkpoints-list">
@@ -223,7 +281,7 @@
       <div class="footer-left">
         <span>DawnDispatch v1.0.0</span>
         <span class="sep">•</span>
-        <span>Google Cloud & Gemini 3.8 Flash</span>
+        <span>Google Cloud &amp; Gemini 3.8 Flash</span>
         <span class="sep">•</span>
         <span>Gradium Voice Pipeline</span>
         <span class="sep">•</span>
@@ -241,5 +299,13 @@
 
   <!-- Script -->
   <script src="/static/graph.js"></script>
+  <script>
+    // Fallback if /static/graph.js is not loaded
+    if (typeof window.DawnDispatchLoaded === 'undefined') {
+      const s = document.createElement('script');
+      s.src = 'graph.js';
+      document.body.appendChild(s);
+    }
+  </script>
 </body>
 </html>

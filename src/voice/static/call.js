@@ -49,9 +49,13 @@
   const cardStamp = document.getElementById('card-stamp');
   const quickfireCard = document.getElementById('quickfire-card');
   const quickBudgetChips = document.getElementById('quick-budget-chips');
+  const quickfireControls = document.getElementById('quickfire-controls');
   const endedDurationLabel = document.getElementById('ended-duration-label');
+  const endedDesc = document.getElementById('ended-desc');
   const summaryList = document.getElementById('summary-decision-list');
+  const summaryMeta = document.getElementById('summary-meta');
   const waveform = document.getElementById('waveform');
+  const waveformSub = document.getElementById('waveform-sub');
   const audioHint = document.getElementById('audio-hint');
 
   const quickfireButtons = document.querySelectorAll('.qf-btn');
@@ -87,7 +91,7 @@
     const ctx = getAudioContext();
     if (ctx) {
       audioUnlocked = true;
-      if (audioHint) audioHint.style.display = 'none';
+      if (audioHint) audioHint.style.opacity = '0.5';
       if (ringtoneInterval) {
         playRingToneBurst();
       }
@@ -147,6 +151,100 @@
     }
   }
 
+  // Synthesize Sound Effects via Web Audio
+  function playToneAnswer() {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx || ctx.state !== 'running') return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.18);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    } catch (e) {}
+  }
+
+  function playToneDecision(decisionType) {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx || ctx.state !== 'running') return;
+      const now = ctx.currentTime;
+
+      if (decisionType === 'APPROVE') {
+        // Crisp Major Chord blip (C-E-G)
+        [523.25, 659.25, 783.99].forEach(freq => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.22);
+        });
+      } else if (decisionType === 'HOLD') {
+        // Double caution beep
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(440, now);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.setValueAtTime(0.001, now + 0.08);
+        gain.gain.setValueAtTime(0.08, now + 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.22);
+      } else {
+        // Descending reject tone
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(180, now + 0.2);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.22);
+      }
+
+      if (navigator.vibrate) {
+        navigator.vibrate([40]);
+      }
+    } catch (e) {}
+  }
+
+  function playToneHangup() {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx || ctx.state !== 'running') return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, now);
+      osc.frequency.exponentialRampToValueAtTime(293.66, now + 0.25);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.28);
+    } catch (e) {}
+  }
+
   // Waveform state management
   function setWaveformState(state) {
     if (!waveform) return;
@@ -156,17 +254,35 @@
     } else {
       waveform.classList.add('listening');
     }
+
+    if (waveformSub) {
+      if (state === 'agent-speaking') {
+        waveformSub.textContent = 'DawnDispatch Agent Speaking...';
+        waveformSub.style.color = '#38bdf8';
+      } else if (state === 'user-speaking') {
+        waveformSub.textContent = 'Philipp Speaking (Ray-Ban Mic)...';
+        waveformSub.style.color = '#fbbf24';
+      } else {
+        waveformSub.textContent = 'Ray-Ban Hands-Free Audio • Standup Active';
+        waveformSub.style.color = '#38bdf8';
+      }
+    }
   }
 
-  // Spoken voice synthesis helper (Gradium / Ray-Ban simulation)
+  // Spoken voice synthesis helper (Gradium / Ray-Ban simulation with safety fallback)
   function speakAgentText(text, callback) {
     setWaveformState('agent-speaking');
 
+    let called = false;
+    const finish = () => {
+      if (called) return;
+      called = true;
+      setWaveformState('listening');
+      if (callback) callback();
+    };
+
     if (!speechSynth) {
-      setTimeout(() => {
-        setWaveformState('listening');
-        if (callback) callback();
-      }, 1200);
+      setTimeout(finish, 1200);
       return;
     }
 
@@ -181,23 +297,27 @@
       const enVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')));
       if (enVoice) utterance.voice = enVoice;
 
+      // Safety timeout: never hang the interface even if speechSynth fails silently
+      const words = text.split(/\s+/).length;
+      const safetyTime = Math.max(1200, Math.min(4500, words * 280));
+      const safetyTimer = setTimeout(finish, safetyTime);
+
       utterance.onend = () => {
-        setWaveformState('listening');
-        if (callback) callback();
+        clearTimeout(safetyTimer);
+        finish();
       };
       utterance.onerror = () => {
-        setWaveformState('listening');
-        if (callback) callback();
+        clearTimeout(safetyTimer);
+        finish();
       };
 
       speechSynth.speak(utterance);
     } catch (e) {
-      setWaveformState('listening');
-      if (callback) callback();
+      finish();
     }
   }
 
-  // Load agenda items from backend
+  // Load agenda items from backend or rich V1->V2 fallback
   async function loadAgendaData() {
     try {
       const res = await fetch('/api/agenda');
@@ -215,23 +335,23 @@
       agendaItems = [
         {
           item_id: 'agenda-01',
-          topic: 'Swarm Agent Delegation for Subsystems',
-          question_for_lead: 'Should we spin up hack-bau2 and hack-bau3, or assign voice and dashboard to existing agents?',
-          recommended_action: 'APPROVE - assign voice to hack-bau1 and dashboard to hack-chef',
+          topic: 'Version 2: Real Telephony & WhatsApp Calling',
+          question_for_lead: 'Upgrade Version 2 to real WhatsApp Business Calling and cloned lead voice? Yes or no?',
+          recommended_action: 'APPROVE - transitions from simulated web audio to native mobile telephony',
           is_irreversible: false
         },
         {
           item_id: 'agenda-02',
-          topic: 'Parallel Task Execution Pipeline Kickoff',
-          question_for_lead: 'Unblock parallel worker execution following the overnight parallelstart trigger?',
-          recommended_action: 'APPROVE - activate parallel agent task queues immediately',
+          topic: 'Version 2: Autonomous Night Shift & Public Release',
+          question_for_lead: 'Enable autonomous night shift where agents commit directly to main and make repo public at 19:00?',
+          recommended_action: 'APPROVE with Human Checkpoint - irreversible autonomous write access requires desk sign-off',
           is_irreversible: true
         },
         {
           item_id: 'agenda-03',
-          topic: 'Ray-Ban Demo and Schema Baseline',
-          question_for_lead: 'Accept updated data models, Ray-Ban commute script, and web voice specs as current milestone?',
-          recommended_action: 'APPROVE - lock Schritt 0 interface specs and advance to live testing',
+          topic: 'Version 2: Autonomous Build Queue Dispatch',
+          question_for_lead: 'Convert call decisions into direct autonomous build tasks for the agent swarm? Yes or no?',
+          recommended_action: 'APPROVE - "The agent owns the code and the human" autonomous queue',
           is_irreversible: false
         }
       ];
@@ -310,16 +430,23 @@
 
   // Visual Decision Stamp
   function showDecisionStamp(decisionType, callback) {
+    playToneDecision(decisionType);
+
+    if (quickfireCard) {
+      quickfireCard.classList.remove('card-stamped-shake');
+      void quickfireCard.offsetWidth;
+      quickfireCard.classList.add('card-stamped-shake');
+    }
+
     if (!cardStamp) {
       if (callback) callback();
       return;
     }
-    cardStamp.className = 'card-stamp';
-    cardStamp.textContent = decisionType;
 
+    cardStamp.className = 'card-stamp';
     if (decisionType === 'HOLD') {
       cardStamp.classList.add('stamp-hold');
-      cardStamp.textContent = 'HELD';
+      cardStamp.textContent = 'HELD — CHECKPOINT';
     } else if (decisionType === 'REJECT') {
       cardStamp.classList.add('stamp-reject');
       cardStamp.textContent = 'REJECTED';
@@ -340,8 +467,10 @@
     currentAgendaIdx = -1;
     dialogPhaseBadge.textContent = 'OPENING GREETING';
     if (checkpointBadge) checkpointBadge.classList.add('hidden');
+    if (quickfireCard) quickfireCard.classList.remove('card-irreversible');
     if (qfTopic) qfTopic.textContent = 'Overnight Swarm Standup';
     if (quickBudgetChips) quickBudgetChips.classList.remove('hidden');
+    if (quickfireControls) quickfireControls.classList.add('hidden');
     if (qfRecommendation) qfRecommendation.textContent = 'Quick triage: state available commute time to begin';
 
     const greeting = 'Good morning Philipp. Swarm overnight triage ready. How much time do you have?';
@@ -362,6 +491,7 @@
       const qNum = currentAgendaIdx + 1;
 
       if (quickBudgetChips) quickBudgetChips.classList.add('hidden');
+      if (quickfireControls) quickfireControls.classList.remove('hidden');
 
       dialogPhaseBadge.textContent = `QUICK FIRE — ${qNum} OF ${agendaItems.length}`;
       if (qfTopic) qfTopic.textContent = q.topic || `Agenda Item ${qNum}`;
@@ -370,8 +500,10 @@
         if (q.is_irreversible) {
           checkpointBadge.classList.remove('hidden');
           checkpointBadge.textContent = '⚠️ IRREVERSIBLE CHECKPOINT';
+          if (quickfireCard) quickfireCard.classList.add('card-irreversible');
         } else {
           checkpointBadge.classList.add('hidden');
+          if (quickfireCard) quickfireCard.classList.remove('card-irreversible');
         }
       }
 
@@ -379,9 +511,9 @@
         qfRecommendation.textContent = q.recommended_action || 'APPROVE recommendation';
       }
 
-      const promptText = `Rapid fire. ${qNum}: ${q.question_for_lead} Yes or no?`;
+      const promptText = `Rapid fire ${qNum}: ${q.question_for_lead}`;
       agentSpeech.textContent = `"${promptText}"`;
-      userSpeech.textContent = 'Listening for: Yes / Hold / No (or tap above)...';
+      userSpeech.textContent = 'Listening for: Yes / Hold / No (or tap below / press 1, 2, 3)...';
 
       conversationTurns.push({ speaker: 'agent', text: promptText, timestamp: formatTime(callSeconds) });
       triggerCardTransition();
@@ -418,8 +550,8 @@
       const item = agendaItems[currentAgendaIdx];
       let decType = 'APPROVE';
       const clean = text.toLowerCase();
-      if (clean.includes('no') || clean.includes('reject') || clean.includes('deny')) decType = 'REJECT';
-      else if (clean.includes('hold') || clean.includes('checkpoint') || clean.includes('wait')) decType = 'HOLD';
+      if (clean.includes('no') || clean.includes('reject') || clean.includes('deny') || clean === '3') decType = 'REJECT';
+      else if (clean.includes('hold') || clean.includes('checkpoint') || clean.includes('wait') || clean === '2') decType = 'HOLD';
 
       capturedDecisions.push({
         item_id: item.item_id,
@@ -427,7 +559,7 @@
         voice_notes: `Lead decided '${text}' via Ray-Ban glasses during commute triage.`
       });
 
-      // Show Stamp animation, then advance
+      // Show Stamp animation with sound, then advance
       showDecisionStamp(decType, () => {
         setWaveformState('listening');
         advanceToNextQuestion();
@@ -438,17 +570,19 @@
   function finishDialogAndEndCall() {
     dialogPhaseBadge.textContent = 'WRAP-UP';
     if (checkpointBadge) checkpointBadge.classList.add('hidden');
+    if (quickfireCard) quickfireCard.classList.remove('card-irreversible');
+    if (quickfireControls) quickfireControls.classList.add('hidden');
     if (qfTopic) qfTopic.textContent = 'Knowledge Graph Updated';
     if (qfRecommendation) qfRecommendation.textContent = 'Standup sync ready for laptop dashboard';
 
     const wrapup = 'Captured. Knowledge graph updated. See you at your desk.';
     agentSpeech.textContent = `"${wrapup}"`;
-    userSpeech.textContent = 'Triage call complete. Hanging up...';
+    userSpeech.textContent = 'Triage call complete. Transferring to dashboard...';
     conversationTurns.push({ speaker: 'agent', text: wrapup, timestamp: formatTime(callSeconds) });
     triggerCardTransition();
 
     speakAgentText(wrapup, () => {
-      setTimeout(endCallSession, 1200);
+      setTimeout(endCallSession, 1000);
     });
   }
 
@@ -456,6 +590,7 @@
   async function answerCall() {
     stopRingtone();
     unlockAudio();
+    playToneAnswer();
 
     // Request microphone for Ray-Ban Web-Audio activation
     try {
@@ -463,7 +598,7 @@
         await navigator.mediaDevices.getUserMedia({ audio: true });
       }
     } catch (e) {
-      console.log('Mic request proceeded with fallback');
+      // mic request fallback
     }
 
     showScreen(screenActive);
@@ -503,6 +638,7 @@
   // End Call Action
   async function endCallSession() {
     stopRingtone();
+    playToneHangup();
     if (speechSynth) speechSynth.cancel();
     if (callTimerInterval) clearInterval(callTimerInterval);
     if (recognition) {
@@ -515,11 +651,11 @@
       } catch (e) {}
     }
 
-    const durationStr = formatTime(callSeconds || 58);
+    const durationStr = formatTime(callSeconds || 54);
     endedDurationLabel.textContent = `Duration: ${durationStr}`;
 
     // Fill missing decisions if call ended early
-    if (capturedDecisions.length < agendaItems.length) {
+    if (capturedDecisions.length < agendaItems.length && currentAgendaIdx >= 0) {
       for (let i = capturedDecisions.length; i < agendaItems.length; i++) {
         capturedDecisions.push({
           item_id: agendaItems[i].item_id,
@@ -529,10 +665,37 @@
       }
     }
 
-    // Send transcript payload to backend
+    // Populate summary card immediately
+    summaryList.innerHTML = '';
+    if (capturedDecisions.length === 0) {
+      const li = document.createElement('li');
+      li.innerHTML = '<span class="item-name" style="color:#94a3b8;font-style:italic">Call ended before decisions were recorded.</span>';
+      summaryList.appendChild(li);
+    } else {
+      capturedDecisions.forEach(d => {
+        const li = document.createElement('li');
+        const itemObj = agendaItems.find(a => a.item_id === d.item_id) || { topic: d.item_id };
+        const decClass = d.decision_type.toLowerCase();
+        li.innerHTML = `
+          <span class="item-name">${itemObj.topic}</span>
+          <span class="item-dec dec-${decClass}">${d.decision_type}</span>
+        `;
+        summaryList.appendChild(li);
+      });
+    }
+
+    if (summaryMeta) {
+      const count = capturedDecisions.length;
+      summaryMeta.textContent = `${count} Decision${count === 1 ? '' : 's'} Synchronized with Swarm Pipeline`;
+    }
+
+    // Show screen immediately for snappy feel
+    showScreen(screenEnded);
+
+    // Send transcript payload to backend asynchronously
     const payload = {
       call_id: `call-${Date.now()}`,
-      duration_seconds: callSeconds || 58,
+      duration_seconds: callSeconds || 54,
       caller: 'DawnDispatch Voice Agent',
       callee: 'Philipp (Meta Ray-Ban Audio)',
       turns: conversationTurns,
@@ -540,37 +703,24 @@
     };
 
     try {
-      await fetch('/api/end_call', {
+      fetch('/api/end_call', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      });
-    } catch (e) {
-      console.warn('Could not post transcript to backend', e);
-    }
-
-    // Populate summary card
-    summaryList.innerHTML = '';
-    capturedDecisions.forEach(d => {
-      const li = document.createElement('li');
-      const itemObj = agendaItems.find(a => a.item_id === d.item_id) || { topic: d.item_id };
-      const decClass = d.decision_type.toLowerCase();
-      li.innerHTML = `
-        <span class="item-name">${itemObj.topic}</span>
-        <span class="item-dec dec-${decClass}">${d.decision_type}</span>
-      `;
-      summaryList.appendChild(li);
-    });
-
-    showScreen(screenEnded);
+      }).catch(() => {});
+    } catch (e) {}
   }
 
   // Event Listeners
   btnAccept.addEventListener('click', answerCall);
   btnDecline.addEventListener('click', () => {
     stopRingtone();
-    showScreen(screenEnded);
+    playToneHangup();
+    if (endedDesc) endedDesc.textContent = 'Morning standup postponed. Agent swarm continuing autonomous background operations.';
     endedDurationLabel.textContent = 'Call Declined';
+    summaryList.innerHTML = '<li><span class="item-name" style="color:#94a3b8;font-style:italic">No decisions recorded — triage held for desk arrival.</span></li>';
+    if (summaryMeta) summaryMeta.textContent = 'Swarm Status: Idle Waiting';
+    showScreen(screenEnded);
   });
   btnEndCall.addEventListener('click', endCallSession);
 
@@ -609,9 +759,48 @@
     conversationTurns = [];
     capturedDecisions = [];
     currentAgendaIdx = -1;
+    callSeconds = 0;
+    if (callTimer) callTimer.textContent = '00:00';
+    if (endedDesc) endedDesc.textContent = 'Decisions recorded hands-free via Meta Ray-Ban audio during morning walk. Knowledge Graph updated in background.';
     showScreen(screenIncoming);
     renderStepperDots();
     startRingtone();
+  });
+
+  // Keyboard navigation for live demo presentations
+  window.addEventListener('keydown', (e) => {
+    if (screenIncoming.classList.contains('active')) {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        answerCall();
+      } else if (e.key === 'Escape') {
+        btnDecline.click();
+      }
+    } else if (screenActive.classList.contains('active')) {
+      if (currentAgendaIdx === -1) {
+        if (e.key === '1' || e.key === ' ' || e.key === 'Enter') {
+          handleUserSpokenInput('60 seconds');
+        } else if (e.key === '2') {
+          handleUserSpokenInput('30 seconds');
+        } else if (e.key === '3') {
+          handleUserSpokenInput('2 minutes');
+        }
+      } else {
+        if (e.key === '1' || e.key === 'y' || e.key === 'Y' || e.key === 'Enter') {
+          handleUserSpokenInput('Yes');
+        } else if (e.key === '2' || e.key === 'h' || e.key === 'H' || e.key === ' ') {
+          handleUserSpokenInput('Hold');
+        } else if (e.key === '3' || e.key === 'n' || e.key === 'N') {
+          handleUserSpokenInput('No');
+        } else if (e.key === 'Escape') {
+          endCallSession();
+        }
+      }
+    } else if (screenEnded.classList.contains('active')) {
+      if (e.key === 'r' || e.key === 'R') {
+        btnRestart.click();
+      }
+    }
   });
 
   // Initial load

@@ -1,91 +1,30 @@
 {
-  "call_id": "call-20261010-0830",
-  "call_title": "Morning Commute Autonomous Triage",
-  "channel": "Meta Ray-Ban Smart Glasses Web Audio",
-  "lead": "Philipp",
-  "agent": "DawnDispatch",
-  "duration_seconds": 60,
-  "started_at": "2026-10-10T08:30:00Z",
-  "ended_at": "2026-10-10T08:31:00Z",
-  "summary": "3-question rapid-fire completed in 58s. 1 auto-dispatched, 2 queued for laptop dashboard human checkpoints.",
+  "call_id": "test-call-api-999",
+  "caller": "DawnDispatch Voice Agent",
+  "callee": "Philipp (Meta Ray-Ban Audio)",
+  "started_at": "2026-10-10T15:01:50Z",
+  "ended_at": "2026-10-10T15:01:50Z",
+  "duration_seconds": 52,
   "turns": [
     {
-      "index": 1,
-      "time": "00:03",
-      "speaker": "DawnDispatch",
-      "text": "Good morning Philipp. Swarm overnight triage is ready. How much time do you have?",
-      "tag": "Opening",
-      "audio_marker_ms": 3000
+      "speaker": "agent",
+      "text": "Good morning"
     },
     {
-      "index": 2,
-      "time": "00:09",
-      "speaker": "Philipp",
-      "text": "Morning! Got 60 seconds walking down to the office.",
-      "tag": "Cadence Match",
-      "audio_marker_ms": 9000
-    },
-    {
-      "index": 3,
-      "time": "00:15",
-      "speaker": "DawnDispatch",
-      "text": "Rapid fire. Item 1: PR #4 auth schema refactor by hack-bau1 — approve staging migration? Yes or no?",
-      "tag": "Rapid Fire #1",
-      "item_id": "agenda-01",
-      "audio_marker_ms": 15000
-    },
-    {
-      "index": 4,
-      "time": "00:23",
-      "speaker": "Philipp",
-      "text": "Yes, approve staging deployment.",
-      "tag": "Decision: APPROVE",
-      "item_id": "agenda-01",
-      "audio_marker_ms": 23000
-    },
-    {
-      "index": 5,
-      "time": "00:27",
-      "speaker": "DawnDispatch",
-      "text": "Item 2: Purge database state and run irreversible schema migration. Hold for laptop checkpoint?",
-      "tag": "Rapid Fire #2",
-      "item_id": "agenda-02",
-      "audio_marker_ms": 27000
-    },
-    {
-      "index": 6,
-      "time": "00:36",
-      "speaker": "Philipp",
-      "text": "Hold that for laptop checkpoint, I need to see the diff first.",
-      "tag": "Decision: HOLD",
-      "item_id": "agenda-02",
-      "audio_marker_ms": 36000
-    },
-    {
-      "index": 7,
-      "time": "00:41",
-      "speaker": "DawnDispatch",
-      "text": "Item 3: Three brand visual assets from hack-visual — keep solo silhouette as public hero asset?",
-      "tag": "Rapid Fire #3",
-      "item_id": "agenda-03",
-      "audio_marker_ms": 41000
-    },
-    {
-      "index": 8,
-      "time": "00:49",
-      "speaker": "Philipp",
-      "text": "Yes, keep the solo silhouette, but let me do a 1-click sign-off at my desk.",
-      "tag": "Decision: HOLD/CHECKPOINT",
-      "item_id": "agenda-03",
-      "audio_marker_ms": 49000
-    },
-    {
-      "index": 9,
-      "time": "00:54",
-      "speaker": "DawnDispatch",
-      "text": "All 3 items captured. Knowledge graph updated. Human checkpoints queued on your desk dashboard. See you at your desk!",
-      "tag": "Wrap-up",
-      "audio_marker_ms": 54000
+      "speaker": "user",
+      "text": "Yes, approve PR"
     }
-  ]
+  ],
+  "decisions_captured": [
+    {
+      "item_id": "agenda-01",
+      "decision_type": "APPROVE",
+      "voice_notes": "API test approval",
+      "timestamp": "2026-10-10T15:01:50Z",
+      "human_verified": false,
+      "decision_id": "dec-96c2ec6a",
+      "source": "voice_tool"
+    }
+  ],
+  "status": "SYNCED_TO_DASHBOARD"
 }

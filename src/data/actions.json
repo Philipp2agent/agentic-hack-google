@@ -2,38 +2,100 @@
   {
     "action_id": "act-101",
     "item_id": "agenda-01",
-    "action_type": "DEPLOY_VOICE_SERVICE",
+    "action_type": "NOTE",
     "status": "COMPLETED",
     "artifacts": {
-      "port": 8090,
-      "commit": "3cdd23d",
-      "logs": "Service started successfully on ws://0.0.0.0:8090/ws/chat",
-      "dispatch_status": "Auto-dispatched upon morning commute approval"
-    }
+      "note": "Version 1 baseline confirmed: mobile call screen, voice WebSocket, and knowledge graph engine operational",
+      "decision_id": "dec-v1-baseline",
+      "execution_timestamp": "2026-10-10T14:52:10Z"
+    },
+    "description": "Confirmed Version 1 baseline from overnight swarm build",
+    "checkpoint_reason": null,
+    "created_at": "2026-10-10T14:52:10Z",
+    "updated_at": "2026-10-10T14:52:10Z"
   },
   {
     "action_id": "act-102",
     "item_id": "agenda-02",
-    "action_type": "PURGE_STATE_AND_MIGRATE",
-    "status": "BLOCKED_ON_CHECKPOINT",
+    "action_type": "DISPATCH_AGENT",
+    "status": "COMPLETED",
     "artifacts": {
-      "reason": "Irreversible database state purge & schema migration requires Web Dashboard 1-click confirmation",
-      "pending_url": "/dashboard/checkpoint/agenda-02",
-      "scope": "PostgreSQL schema v2 migration & Redis session cache flush",
-      "risk_level": "CRITICAL"
-    }
+      "v2_idea": "v2-opt-a",
+      "title": "Real phone or WhatsApp calling",
+      "file": "src/data/dispatch/hack-bau1.md",
+      "log": "Dispatched Version 2 Option A build task to hack-bau1",
+      "decision_id": "dec-v2-option-a",
+      "execution_timestamp": "2026-10-10T14:52:25Z"
+    },
+    "description": "Auto-dispatched Version 2 autonomous build queue: Option A (Real phone / WhatsApp calling)",
+    "checkpoint_reason": null,
+    "created_at": "2026-10-10T14:52:25Z",
+    "updated_at": "2026-10-10T14:52:25Z"
   },
   {
     "action_id": "act-103",
     "item_id": "agenda-03",
-    "action_type": "PUBLISH_HERO_ASSET",
-    "status": "BLOCKED_ON_CHECKPOINT",
+    "action_type": "DEPLOY",
+    "status": "COMPLETED",
     "artifacts": {
-      "reason": "Public release of brand hero banner asset requires human lead 1-click confirmation",
-      "pending_url": "/dashboard/checkpoint/agenda-03",
-      "asset_preview": "/assets/titelbild-v3.jpg",
-      "target": "Production Hero Banner (assets/brand)",
-      "risk_level": "HIGH"
-    }
+      "pending_url": "/dashboard#act-103",
+      "checkpoint_confirmed": true,
+      "confirmed_by": "Philipp (Lead Web Dashboard 1-Click)",
+      "submission_url": "https://github.com/Philipp2agent/agentic-hack-google",
+      "release_tag": "v1.0.0-hackathon",
+      "decision_id": "dec-checkpoint-submit",
+      "execution_timestamp": "2026-10-10T14:53:15Z"
+    },
+    "description": "Make repo public and submit hackathon entry",
+    "checkpoint_reason": "Irreversible repo publish and hackathon submission requires laptop 1-click confirmation",
+    "created_at": "2026-10-10T14:52:40Z",
+    "updated_at": "2026-10-10T14:53:15Z"
+  },
+  {
+    "action_id": "act-104",
+    "item_id": "agenda-04",
+    "action_type": "UPDATE_BUDGET",
+    "status": "COMPLETED",
+    "artifacts": {
+      "scaled_count": 42,
+      "participant_network": "src/data/participants.json",
+      "note": "Scaled morning dispatch network to all 42 hackathon teams",
+      "decision_id": "dec-scale-network",
+      "execution_timestamp": "2026-10-10T14:52:50Z"
+    },
+    "description": "Expanded morning dispatch network across all 42 hackathon participant teams",
+    "checkpoint_reason": null,
+    "created_at": "2026-10-10T14:52:50Z",
+    "updated_at": "2026-10-10T14:52:50Z"
+  },
+  {
+    "action_id": "act-101",
+    "item_id": "agenda-01",
+    "action_type": "NOTE",
+    "status": "COMPLETED",
+    "artifacts": {
+      "note": "Version 1 baseline confirmed: mobile call screen, voice WebSocket, and knowledge graph engine operational",
+      "decision_id": "dec-v1-baseline",
+      "execution_timestamp": "2026-10-10T14:52:10Z"
+    },
+    "description": "Confirmed Version 1 baseline from overnight swarm build",
+    "checkpoint_reason": null,
+    "created_at": "2026-10-10T14:52:10Z",
+    "updated_at": "2026-10-10T14:52:10Z"
+  },
+  {
+    "action_id": "act-101",
+    "item_id": "agenda-01",
+    "action_type": "NOTE",
+    "status": "COMPLETED",
+    "artifacts": {
+      "note": "Version 1 baseline confirmed: mobile call screen, voice WebSocket, and knowledge graph engine operational",
+      "decision_id": "dec-v1-baseline",
+      "execution_timestamp": "2026-10-10T14:52:10Z"
+    },
+    "description": "Confirmed Version 1 baseline from overnight swarm build",
+    "checkpoint_reason": null,
+    "created_at": "2026-10-10T14:52:10Z",
+    "updated_at": "2026-10-10T14:52:10Z"
   }
 ]

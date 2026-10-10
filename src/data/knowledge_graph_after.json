@@ -1,172 +1,239 @@
 {
+  "phase": "before",
   "stage": "AFTER",
-  "generated_at": "2026-10-10T14:27:22Z",
   "nodes": [
     {
       "id": "agent-hack-chef",
       "label": "hack-chef",
-      "type": "agent",
-      "status": "ACTIVE",
-      "details": "Swarm agent: hack-chef",
-      "metadata": {}
+      "kind": "agent",
+      "type": "",
+      "status": "info",
+      "details": "",
+      "metadata": {},
+      "data": {
+        "role": "hack-chef"
+      }
     },
     {
       "id": "evt-001",
-      "label": "Swarm assignment & role coordination question",
-      "type": "event",
-      "status": "RESOLVED",
-      "details": "Open items in STAND.md: - hack-bau2 und hack-bau3 anlegen oder Pakete voice/dashboard an hack-bau1 bzw. hack-chef uebergeben?",
-      "metadata": {
-        "severity": "WARNING",
-        "source": "STAND.md / swarm coordination"
+      "label": "Version 1 MVP Deployed: Web Audio & Meta Ray-",
+      "kind": "event",
+      "type": "",
+      "status": "info",
+      "details": "",
+      "metadata": {},
+      "data": {
+        "severity": "INFO",
+        "source": "Infrastructure Chat / 15:35",
+        "ref": "context/hackathon-day.md:15:35"
+      }
+    },
+    {
+      "id": "agent-hack-bau1",
+      "label": "hack-bau1",
+      "kind": "agent",
+      "type": "",
+      "status": "info",
+      "details": "",
+      "metadata": {},
+      "data": {
+        "role": "hack-bau1"
       }
     },
     {
       "id": "evt-002",
-      "label": "feat: Schritt 0 Datenmodelle, Schnittstellendokume",
-      "type": "event",
-      "status": "RESOLVED",
-      "details": "Commit 8ead13b by hack-chef: feat: Schritt 0 Datenmodelle, Schnittstellendokumentation & Lagebrett aktualisiert",
-      "metadata": {
-        "severity": "INFO",
-        "source": "git commit 8ead13b"
+      "label": "Autonomous Night Shift Pipeline & Production ",
+      "kind": "event",
+      "type": "",
+      "status": "open",
+      "details": "",
+      "metadata": {},
+      "data": {
+        "severity": "WARNING",
+        "source": "Git Swarm Pipeline / 16:20",
+        "ref": "context/hackathon-day.md:21"
       }
     },
     {
-      "id": "agent-hack-swarm",
-      "label": "hack-swarm",
-      "type": "agent",
-      "status": "ACTIVE",
-      "details": "Swarm agent: hack-swarm",
-      "metadata": {}
+      "id": "agent-hack-bau2",
+      "label": "hack-bau2",
+      "kind": "agent",
+      "type": "",
+      "status": "info",
+      "details": "",
+      "metadata": {},
+      "data": {
+        "role": "hack-bau2"
+      }
     },
     {
       "id": "evt-003",
-      "label": "auftraege: parallelstart",
-      "type": "event",
-      "status": "RESOLVED",
-      "details": "Commit 2085b70 by hack-agents (buzzagent): auftraege: parallelstart",
-      "metadata": {
+      "label": "Voice Cloning & WhatsApp Business Calling Eng",
+      "kind": "event",
+      "type": "",
+      "status": "info",
+      "details": "",
+      "metadata": {},
+      "data": {
         "severity": "INFO",
-        "source": "git commit 2085b70"
+        "source": "Gradium Voice Lab / 15:55",
+        "ref": "context/hackathon-day.md:24"
+      }
+    },
+    {
+      "id": "agent-claude-cloud",
+      "label": "claude-cloud",
+      "kind": "agent",
+      "type": "",
+      "status": "info",
+      "details": "",
+      "metadata": {},
+      "data": {
+        "role": "claude-cloud"
       }
     },
     {
       "id": "evt-004",
-      "label": "feat(dawndispatch): update IDEE.md, AGENTEN.md, ST",
-      "type": "event",
-      "status": "RESOLVED",
-      "details": "Commit 3cdd23d by hack-chef: feat(dawndispatch): update IDEE.md, AGENTEN.md, STAND.md and claude-02 for web voice",
-      "metadata": {
+      "label": "claude-03: E2E Backend MVP & Video Generation",
+      "kind": "event",
+      "type": "",
+      "status": "info",
+      "details": "",
+      "metadata": {},
+      "data": {
         "severity": "INFO",
-        "source": "git commit 3cdd23d"
+        "source": "STAND.md / 16:40",
+        "ref": "auftraege/claude-03.md"
+      }
+    },
+    {
+      "id": "agent-hack-visual",
+      "label": "hack-visual",
+      "kind": "agent",
+      "type": "",
+      "status": "info",
+      "details": "",
+      "metadata": {},
+      "data": {
+        "role": "hack-visual"
       }
     },
     {
       "id": "evt-005",
-      "label": "feat(idee): update IDEE.md with Ray-Ban demo scrip",
-      "type": "event",
-      "status": "RESOLVED",
-      "details": "Commit df4339d by hack-chef: feat(idee): update IDEE.md with Ray-Ban demo script, claude-02 and STAND.md",
-      "metadata": {
+      "label": "Visual Branding Suite & Bee Swarm Commander I",
+      "kind": "event",
+      "type": "",
+      "status": "info",
+      "details": "",
+      "metadata": {},
+      "data": {
         "severity": "INFO",
-        "source": "git commit df4339d"
+        "source": "assets/brand / 14:20",
+        "ref": "assets/titelbild-v3.jpg"
+      }
+    },
+    {
+      "id": "evt-006",
+      "label": "Google DeepMind Interactions Quota Headroom a",
+      "kind": "event",
+      "type": "",
+      "status": "open",
+      "details": "",
+      "metadata": {},
+      "data": {
+        "severity": "WARNING",
+        "source": "Google GenAI Interactions API / 14:50",
+        "ref": "gemini-3.8-flash:quota"
       }
     },
     {
       "id": "agenda-01",
-      "label": "Swarm Agent Delegation for Subsystems",
-      "type": "agenda",
+      "label": "Status Version 1: Overnight Swarm Build Baseline",
+      "kind": "agenda",
+      "type": "",
       "status": "DECIDED_APPROVE",
-      "details": "Should we spin up hack-bau2 and hack-bau3, or assign voice and dashboard to existing agents?",
-      "metadata": {
-        "recommended_action": "APPROVE - assign voice to hack-bau1 and dashboard to hack-chef to reduce swarm overhead",
-        "is_irreversible": false
+      "details": "",
+      "metadata": {},
+      "data": {
+        "is_irreversible": false,
+        "question": "Overnight your agents kept building DawnDispatch. Anything you want me to flag?",
+        "recommended_action": "APPROVE - Confirm Version 1 baseline (voice pipeline, mobile call screen, before/after knowledge graph)",
+        "action_type": "NOTE",
+        "priority": 1
       }
     },
     {
       "id": "agenda-02",
-      "label": "Parallel Task Execution Pipeline Kickoff",
-      "type": "agenda",
-      "status": "DECIDED_HOLD",
-      "details": "Unblock parallel worker execution following the overnight parallelstart trigger?",
-      "metadata": {
-        "recommended_action": "APPROVE - activate parallel agent task queues immediately",
-        "is_irreversible": false
+      "label": "Decision Version 2: Roadmap Options (A/B/C)",
+      "kind": "agenda",
+      "type": "",
+      "status": "open",
+      "details": "",
+      "metadata": {},
+      "data": {
+        "is_irreversible": false,
+        "question": "Which Version 2 feature should the swarm prioritize: Option A real phone or WhatsApp calling, Option B autonomous night shift, or Option C cloned voice?",
+        "recommended_action": "APPROVE - Select Version 2 priority candidate and branch autonomous build queue",
+        "action_type": "DISPATCH_AGENT",
+        "priority": 2
       }
     },
     {
       "id": "agenda-03",
-      "label": "Ray-Ban Demo and Schema Baseline",
-      "type": "agenda",
-      "status": "PENDING_TRIAGE",
-      "details": "Accept updated data models, Ray-Ban commute script, and web voice specs as current milestone?",
-      "metadata": {
-        "recommended_action": "APPROVE - lock Schritt 0 interface specs and advance to live testing",
-        "is_irreversible": false
+      "label": "Irreversible Checkpoint: Make Repo Public & Submit Hackathon Entry",
+      "kind": "agenda",
+      "type": "",
+      "status": "blocked",
+      "details": "",
+      "metadata": {},
+      "data": {
+        "is_irreversible": true,
+        "question": "Shall I make the repo public and submit the hackathon entry?",
+        "recommended_action": "APPROVE with Human Checkpoint - Irreversible repo publish and hackathon submission waits for laptop confirmation",
+        "action_type": "DEPLOY",
+        "priority": 3
+      }
+    },
+    {
+      "id": "agenda-04",
+      "label": "Scale: Hackathon Participant Network Expansion",
+      "kind": "agenda",
+      "type": "",
+      "status": "open",
+      "details": "",
+      "metadata": {},
+      "data": {
+        "is_irreversible": false,
+        "question": "Should I offer this morning call to every other team at the hackathon?",
+        "recommended_action": "APPROVE - Scale morning triage network across all 42 hackathon participant teams",
+        "action_type": "UPDATE_BUDGET",
+        "priority": 4
       }
     },
     {
       "id": "dec-agenda-01",
       "label": "Decision: APPROVE",
+      "kind": "agenda",
       "type": "decision",
       "status": "RECORDED",
-      "details": "Lead approved via Ray-Ban glasses audio call during morning walk.",
+      "details": "Approved by lead via Meta Ray-Ban audio: 'yes'",
       "metadata": {
-        "human_verified": true,
-        "timestamp": "2026-10-10T16:10:00Z"
-      }
+        "human_verified": false,
+        "timestamp": "2026-10-10T15:01:50Z"
+      },
+      "data": {}
     },
     {
-      "id": "dec-agenda-02",
-      "label": "Decision: HOLD",
-      "type": "decision",
-      "status": "RECORDED",
-      "details": "Lead requested manual dashboard checkpoint confirmation before wiping database.",
-      "metadata": {
-        "human_verified": true,
-        "timestamp": "2026-10-10T16:10:45Z"
-      }
-    },
-    {
-      "id": "act-101",
-      "label": "DEPLOY_VOICE_SERVICE",
+      "id": "act-79a9defd",
+      "label": "NOTE",
+      "kind": "agenda",
       "type": "action",
       "status": "COMPLETED",
-      "details": "Auto-dispatched upon morning commute approval",
+      "details": "COMPLETED",
       "metadata": {
-        "port": 8090,
-        "commit": "3cdd23d",
-        "logs": "Service started successfully on ws://0.0.0.0:8090/ws/chat",
-        "dispatch_status": "Auto-dispatched upon morning commute approval"
-      }
-    },
-    {
-      "id": "act-102",
-      "label": "PURGE_STATE_AND_MIGRATE",
-      "type": "action",
-      "status": "BLOCKED_ON_CHECKPOINT",
-      "details": "Irreversible database state purge & schema migration requires Web Dashboard 1-click confirmation",
-      "metadata": {
-        "reason": "Irreversible database state purge & schema migration requires Web Dashboard 1-click confirmation",
-        "pending_url": "/dashboard/checkpoint/agenda-02",
-        "scope": "PostgreSQL schema v2 migration & Redis session cache flush",
-        "risk_level": "CRITICAL"
-      }
-    },
-    {
-      "id": "act-103",
-      "label": "PUBLISH_HERO_ASSET",
-      "type": "action",
-      "status": "BLOCKED_ON_CHECKPOINT",
-      "details": "Public release of brand hero banner asset requires human lead 1-click confirmation",
-      "metadata": {
-        "reason": "Public release of brand hero banner asset requires human lead 1-click confirmation",
-        "pending_url": "/dashboard/checkpoint/agenda-03",
-        "asset_preview": "/assets/titelbild-v3.jpg",
-        "target": "Production Hero Banner (assets/brand)",
-        "risk_level": "HIGH"
-      }
+        "executed": true
+      },
+      "data": {}
     }
   ],
   "edges": [
@@ -174,79 +241,128 @@
       "source": "agent-hack-chef",
       "target": "evt-001",
       "relation": "PRODUCED",
+      "label": "PRODUCED",
       "status": "PENDING"
     },
     {
-      "source": "agent-hack-chef",
+      "source": "agent-hack-bau1",
       "target": "evt-002",
       "relation": "PRODUCED",
+      "label": "PRODUCED",
       "status": "PENDING"
     },
     {
-      "source": "agent-hack-swarm",
+      "source": "agent-hack-bau2",
       "target": "evt-003",
       "relation": "PRODUCED",
+      "label": "PRODUCED",
       "status": "PENDING"
     },
     {
-      "source": "agent-hack-chef",
+      "source": "agent-claude-cloud",
       "target": "evt-004",
       "relation": "PRODUCED",
+      "label": "PRODUCED",
+      "status": "PENDING"
+    },
+    {
+      "source": "agent-hack-visual",
+      "target": "evt-005",
+      "relation": "PRODUCED",
+      "label": "PRODUCED",
       "status": "PENDING"
     },
     {
       "source": "agent-hack-chef",
-      "target": "evt-005",
+      "target": "evt-006",
       "relation": "PRODUCED",
+      "label": "PRODUCED",
+      "status": "PENDING"
+    },
+    {
+      "source": "evt-005",
+      "target": "agenda-01",
+      "relation": "TRIGGERS",
+      "label": "TRIGGERS",
+      "status": "PENDING"
+    },
+    {
+      "source": "evt-006",
+      "target": "agenda-01",
+      "relation": "TRIGGERS",
+      "label": "TRIGGERS",
+      "status": "PENDING"
+    },
+    {
+      "source": "evt-008",
+      "target": "agenda-01",
+      "relation": "TRIGGERS",
+      "label": "TRIGGERS",
       "status": "PENDING"
     },
     {
       "source": "evt-001",
-      "target": "agenda-01",
+      "target": "agenda-02",
       "relation": "TRIGGERS",
+      "label": "TRIGGERS",
+      "status": "PENDING"
+    },
+    {
+      "source": "evt-007",
+      "target": "agenda-02",
+      "relation": "TRIGGERS",
+      "label": "TRIGGERS",
+      "status": "PENDING"
+    },
+    {
+      "source": "evt-009",
+      "target": "agenda-03",
+      "relation": "TRIGGERS",
+      "label": "TRIGGERS",
+      "status": "PENDING"
+    },
+    {
+      "source": "evt-010",
+      "target": "agenda-03",
+      "relation": "TRIGGERS",
+      "label": "TRIGGERS",
       "status": "PENDING"
     },
     {
       "source": "evt-002",
-      "target": "agenda-02",
+      "target": "agenda-04",
       "relation": "TRIGGERS",
+      "label": "TRIGGERS",
       "status": "PENDING"
     },
     {
       "source": "evt-003",
-      "target": "agenda-03",
+      "target": "agenda-04",
       "relation": "TRIGGERS",
+      "label": "TRIGGERS",
+      "status": "PENDING"
+    },
+    {
+      "source": "evt-004",
+      "target": "agenda-04",
+      "relation": "TRIGGERS",
+      "label": "TRIGGERS",
       "status": "PENDING"
     },
     {
       "source": "agenda-01",
       "target": "dec-agenda-01",
       "relation": "DECIDED_BY",
-      "status": "RESOLVED"
-    },
-    {
-      "source": "agenda-02",
-      "target": "dec-agenda-02",
-      "relation": "DECIDED_BY",
+      "label": "",
       "status": "RESOLVED"
     },
     {
       "source": "dec-agenda-01",
-      "target": "act-101",
+      "target": "act-79a9defd",
       "relation": "DISPATCHES",
+      "label": "",
       "status": "RESOLVED"
-    },
-    {
-      "source": "dec-agenda-02",
-      "target": "act-102",
-      "relation": "DISPATCHES",
-      "status": "BLOCKED"
-    },
-    {
-      "source": "agenda-03",
-      "target": "act-103",
-      "relation": "DISPATCHES",
-      "status": "BLOCKED"
     }
-  ]
+  ],
+  "generated_at": "2026-10-10T15:01:50Z"
 }
