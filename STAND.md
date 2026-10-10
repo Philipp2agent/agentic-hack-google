@@ -13,7 +13,7 @@
 | claude-02 | docs/ARCHITEKTUR.md, state.py & Baupakete | Claude-Cloud | main | fertig, gemerged | - |
 | P-CORE | src/core: Aggregator, Agenda-Synthese & Graph Engine | hack-bau1 | main | fertig, gemerged | - |
 | P-VOICE-UI | Mobile Call Screen (/call) autarker Demo-Flow | hack-bau2 | main | fertig, gemerged | E2E Integration in claude-03 |
-| P-DASHBOARD-UI | Vorher-Nachher Graph (/dashboard) statische UI | hack-bau3 | main | fertig, gemerged | E2E Integration in claude-03 |
+| P-DASHBOARD-UI | Vorher-Nachher Graph (/dashboard) v1/v2 Kontrast & Checkpoint-Pulse | hack-bau3 | main | fertig, gemerged | E2E Integration in claude-03 |
 | gemini-01 | Demo-Szenario v1->v2 (context/hackathon-day.md) in src/data | hack-bau1 | main | fertig, gemerged | E2E Integration in claude-03 |
 | claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools (Deadline 17:10) | Claude-Cloud | claude/... | laeuft in Cloud | Warten auf PR bis 17:10 |
 | P-VISUAL | assets/brand: Graph Icons, Call Avatar, Banner (Nano Banana) | hack-visual | agent/hack-visual | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
@@ -36,7 +36,7 @@ gantt
   section Parallele Spuren
   P-CORE Knowledge Graph Inferenz   :done, p_core, 16:15, 16:20
   P-VOICE-UI Mobile Call Screen     :done, p_vui, 16:35, 16:56
-  P-DASHBOARD-UI Graph Split-View   :done, p_dui, 16:35, 16:43
+  P-DASHBOARD-UI Graph Split-View   :done, p_dui, 16:35, 16:58
   gemini-01 Szenario v1->v2         :done, p_gem1, 16:35, 16:50
   claude-03 E2E MVP & Video-Tools   :crit, active, p_cl3, 16:40, 17:10
   Probelauf Ray-Ban Brille          :crit, p_probe, 17:10, 17:30
