@@ -36,3 +36,9 @@
 | Deep Research Pro Preview | 1 | 500K | 1.44K |
 | gemini-3.8-live (Echtzeit) | unbegrenzt | 150K | unbegrenzt |
 | gemini-embedding-2 | 3K | 1M | unbegrenzt |
+
+## Laufzeit fuer das Produkt (am VPS)
+- Python: /home/buzzagent/hack/.venv/bin/python (gradbot, google-genai, fastapi, uvicorn); Werkzeuge: /home/buzzagent/hack/bin (uv, cloudflared).
+- Schluessel: /home/buzzagent/hack/secrets.env (ausserhalb des Repos, nie committen). Laden mit: set -a; . /home/buzzagent/hack/secrets.env; set +a
+- Variablen: GRADIUM_API_KEY, GEMINI_API_KEY, LLM_API_KEY, LLM_BASE_URL (Gemini, OpenAI-kompatibel), LLM_MODEL=gemini-3.8-flash. Im Repo nur .env.example ohne Werte.
+- Anruf: Twilio-Probekonto (Zugang folgt in secrets.env), oeffentlicher Zugang per cloudflared-Tunnel.
