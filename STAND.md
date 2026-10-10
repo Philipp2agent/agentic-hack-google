@@ -1,11 +1,12 @@
 # STAND agentic-hack-google
 
 ## FRAGEN AN PHILIPP
-- 1. Modell-Konfiguration fuer hack-visual, hack-marketing & hack-review in Buzz: Alle 3 Agenten melden "the configured model wasn't found at the provider's endpoint". Bitte in Buzz Desktop unter Agent-Settings fuer diese 3 Agenten ein aktives Modell waehlen und neu starten. -> Empfehlung: 1A
+- 1. claude-03 Tonbestaetigung: PR #3 liegt vor – Mergen erst wenn claude-03 Audio-Funktion bestaetigt? -> Empfehlung: 1A (Ja, warten auf Ton-Bestaetigung gemaess sprint-1830)
+- 2. Produktname: Top 3 Auswahl folgt unmittelbar sobald hack-ideen die 15 Namen geliefert hat.
 
 ## CLAUDE-LINKS ZUM KLICKEN
-- [claude-03: Lauffaehiges MVP E2E Backend, Integration & Video-Tools (Deadline 17:10)](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-03.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
-- [claude-04: Live-Visualisierung /src/live Mission Control (Deadline 17:30)](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-04.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
+- [claude-05: Plug-and-Play fuer jedes Repo (setup.sh, from_repo.py, start.sh, Deadline 18:20)](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-05.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
+- [claude-03: Lauffaehiges MVP E2E Backend, Integration & Video-Tools (PR #3 bereit, Ton-Check)](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-03.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
 
 | ID | Auftrag | Wer | Branch | Status | Naechster Schritt |
 |---|---|---|---|---|---|
@@ -13,16 +14,22 @@
 | IDEE | Schaerfung: Phone Call UI, Quick Fire, Before/After Graph | hack-chef | main | fertig, gemerged | - |
 | claude-02 | docs/ARCHITEKTUR.md, state.py & Baupakete | Claude-Cloud | main | fertig, gemerged | - |
 | P-CORE | src/core: Aggregator, Agenda-Synthese & Graph Engine | hack-bau1 | main | fertig, gemerged | - |
-| P-VOICE-UI | Mobile Call Screen (/call) autarker Demo-Flow | hack-bau2 | main | fertig, gemerged | E2E Integration in claude-03 |
-| P-DASHBOARD-UI | Vorher-Nachher Graph (/dashboard) v1/v2 Kontrast & Checkpoint-Pulse | hack-bau3 | main | fertig, gemerged | E2E Integration in claude-03 |
-| gemini-01 | Demo-Szenario v1->v2 (85 echte Repo-Events) in src/data | hack-bau1 | main | fertig, gemerged | 85 Overnight-Events & 41 Tests gruen |
-| P-LIVE-SIM | Live-Demo-Events-Simulator & Vertragstests (docs/LIVE-EVENTS.md) | hack-bau2 | main | fertig, gemerged | Simulator fuer /live & tests |
-| P-DEMO-DATA | Demo-Agenda-Daten gemaess docs/LIVE-EVENTS.md (v1, v2, Checkpoint, 42 Teams) | hack-bau1 | main | fertig, gemerged | Datenbasis fuer claude-03 & claude-04 bereit |
-| claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools (Deadline 17:10) | Claude-Cloud | claude/auftraege-claude-03-jh0o10 | PR #3 bereit | Merge nach Philipps Freigabe |
-| claude-04 | Live-Visualisierung /src/live Mission Control (Deadline 17:30) | Claude-Cloud | claude/auftraege-claude-04-r4smic | PR #4 bereit | Merge nach Philipps Freigabe |
-| P-VISUAL | Brand-Assets (Banner, Call-Avatar, Graph-Icons) | hack-bau1 | main | fertig, gemerged | assets/brand/* & docs/VISUALS.md bereit |
-| P-MARKETING | 2-Minuten-Video-Skript & README-Erzaehlung | hack-bau1 | main | fertig, gemerged | README, VIDEO_SCRIPT & docs/META bereit |
-| P-REVIEW | Testplan & Validierung fuer E2E-Test 17:15 | hack-bau1 | main | fertig, gemerged | 55/55 Checks & docs/TESTPLAN.md bereit |
+| P-VOICE-UI | Mobile Call Screen (/call) autarker Demo-Flow | hack-bau2 | main | fertig, gemerged | - |
+| P-DASHBOARD-UI | Vorher-Nachher Graph (/dashboard) v1/v2 Kontrast & Checkpoint-Pulse | hack-bau3 | main | fertig, gemerged | - |
+| gemini-01 | Demo-Szenario v1->v2 (85 echte Repo-Events) in src/data | hack-bau1 | main | fertig, gemerged | 85 Events & 56 Tests gruen |
+| P-LIVE-SIM | Live-Demo-Events-Simulator & Vertragstests (docs/LIVE-EVENTS.md) | hack-bau2 | main | fertig, gemerged | - |
+| P-DEMO-DATA | Demo-Agenda-Daten gemaess docs/LIVE-EVENTS.md | hack-bau1 | main | fertig, gemerged | - |
+| P-VISUAL | Brand-Assets (Banner, Call-Avatar, Graph-Icons) | hack-bau1 | main | fertig, gemerged | assets/brand/* live |
+| claude-04 | Live-Visualisierung /src/live Mission Control | Claude-Cloud | main | fertig, gemerged | PR #4 gemerged auf main |
+| claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools | Claude-Cloud | claude/auftraege-claude-03-jh0o10 | PR #3 bereit | Merge nach Ton-Bestaetigung |
+| claude-05 | Plug-and-Play fuer jedes Repo (setup.sh, start.sh) | Claude-Cloud | claude/claude-05 | vergeben | Claude-Link klicken |
+| S-IDEEN | 15 Produktnamen (Agent promptet Menschen, merkbar) | hack-ideen | agent/hack-ideen | vergeben | Top 3 als FRAGE nach STAND.md |
+| S-MKTG | Video-2-Skript (2 Min) & README-Erzaehlung "Try in 3 min" | hack-marketing | agent/hack-marketing | vergeben | docs/VIDEO_SCRIPT_V2.md |
+| S-VISUAL | Neutrale Titelkarte & Abspann ("8 Gemini agents + Claude") | hack-visual | agent/hack-visual | vergeben | assets/brand/video2_* |
+| S-LIVE-UI | Live-Ansicht verfeinern (Fokus zentriert, Rest gedimmt) | hack-bau2 | agent/hack-bau2 | vergeben | src/live/static/ |
+| S-NACHHER | Nachher-Ansicht Live-Seite ("Das hat das Gespraech gebracht") | hack-bau3 | agent/hack-bau3 | vergeben | src/live/static/ / /dashboard |
+| S-EXAMPLE | Realistic Example Repo unter examples/ fuer Plug-and-Play | hack-bau1 | agent/hack-bau1 | vergeben | examples/ |
+| S-REVIEW | Frischer Klon E2E Test fuer claude-05 (setup.sh/start.sh) | hack-review | agent/hack-review | wartet | wartet auf claude-05 PR |
 
 ## ZEITPLAN
 ```mermaid
@@ -33,18 +40,19 @@ gantt
   section Phasen
   Phase 1 Rahmen & Setup         :done, p1, 14:00, 15:00
   Phase 2 Idee DawnDispatch      :done, p2, 15:00, 16:15
-  Phase 3 Paralleler Bau         :crit, active, p3, 16:15, 17:10
-  Phase 4 Probelauf mit Brille   :crit, p4, 17:10, 17:30
-  Phase 5 Feature-Freeze & Video :p5, 18:00, 18:40
-  Phase 6 Politur & Abgabe       :p6, 18:40, 19:00
-  section Parallele Spuren
-  P-CORE Knowledge Graph Inferenz   :done, p_core, 16:15, 16:20
-  P-VOICE-UI Mobile Call Screen     :done, p_vui, 16:35, 16:56
-  P-DASHBOARD-UI Graph Split-View   :done, p_dui, 16:35, 16:58
-  gemini-01 Szenario v1->v2         :done, p_gem1, 16:35, 16:50
-  P-LIVE-SIM Live Events Simulator  :done, p_sim, 16:50, 16:57
-  P-DEMO-DATA Live Agenda Daten     :done, p_data, 16:50, 17:02
-  claude-03 E2E MVP & Video-Tools   :crit, active, p_cl3, 16:40, 17:10
-  claude-04 Live Visualisierung     :active, p_cl4, 16:50, 17:30
-  Probelauf Ray-Ban Brille          :crit, p_probe, 17:10, 17:30
+  Phase 3 Paralleler Bau         :done, p3, 16:15, 17:10
+  Phase 4 Probelauf mit Brille   :done, p4, 17:10, 17:50
+  Phase 5 Sprint 18:20 Video 2   :crit, active, p5, 17:50, 18:20
+  Phase 6 Feature-Freeze & Politur :p6, 18:20, 18:45
+  Phase 7 Abgabe                 :p7, 18:45, 19:00
+  section Parallele Spuren Sprint 18:20
+  claude-04 Live Mission Control :done, p_cl4, 17:00, 17:55
+  claude-05 Plug-and-Play Repo   :crit, active, p_cl5, 17:55, 18:20
+  S-IDEEN 15 Produktnamen        :active, p_ide, 17:55, 18:10
+  S-MKTG Video-2-Skript & Story  :active, p_mkt, 17:55, 18:15
+  S-VISUAL Titelkarte & Abspann  :active, p_vis, 17:55, 18:15
+  S-LIVE-UI Brillen-Fokus Screen :active, p_b2, 17:55, 18:15
+  S-NACHHER Nachher-Ansicht      :active, p_b3, 17:55, 18:15
+  S-EXAMPLE Example Target Repo  :active, p_b1, 17:55, 18:10
+  S-REVIEW Klon & Setup Test     :p_rev, 18:15, 18:25
 ```
