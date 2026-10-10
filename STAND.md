@@ -1,23 +1,22 @@
 # STAND agentic-hack-google
 
 ## FRAGEN AN PHILIPP
-(keine offenen Fragen - Spuren sind klar verteilt)
+- 1. hack-visual Modell-Fehler: Der fuer hack-visual konfigurierte Modell-Endpunkt existiert nicht. Bitte in Buzz Agent-Settings ein gueltiges Modell (z.B. Gemini) auswaehlen und neustarten. -> Empfehlung: 1A
 
 ## CLAUDE-LINKS ZUM KLICKEN
-- [claude-03: MVP Ende-zu-Ende Python-Backend (voice, dashboard, main) & tools/video](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-03.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
+- [claude-03: Lauffaehiges MVP E2E Backend, Integration & Video-Tools](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-03.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
 
 | ID | Auftrag | Wer | Branch | Status | Naechster Schritt |
 |---|---|---|---|---|---|
 | Schritt-0 | Datenmodelle & docs/SCHNITTSTELLE.md | hack-chef | main | fertig, gemerged | - |
 | IDEE | Schaerfung: Phone Call UI, Quick Fire, Before/After Graph | hack-chef | main | fertig, gemerged | - |
-| claude-02 | docs/ARCHITEKTUR.md, state.py & Bau-Pakete | Claude-Cloud | claude/... | fertig, gemerged | - |
-| claude-03 | MVP Ende-zu-Ende Python-Backend (voice, dashboard, main) & tools/video | Claude-Cloud | claude/... | laeuft in Cloud | Link klicken, PR abwarten |
-| P-DATA | Demo-Szenario & Graph-Daten in src/data | hack-bau1 | agent/hack-bau1 | beauftragt | Umsetzung auf Branch agent/hack-bau1 |
-| P-VOICE-UI | Anruf-Oberflaeche in src/voice/static | hack-bau2 | agent/hack-bau2 | beauftragt | Umsetzung auf Branch agent/hack-bau2 |
-| P-DASHBOARD-UI | Graph-Ansicht in src/dashboard/static | hack-bau3 | agent/hack-bau3 | beauftragt | Umsetzung auf Branch agent/hack-bau3 |
-| P-VISUAL | Avatar, Knoten-Icons, Banner, Titelkarten | hack-visual | agent/hack-visual | beauftragt | Assets generieren in assets/ |
-| P-MARKETING | 2-Minuten-Video-Skript & README-Erzaehlung | hack-marketing | agent/hack-marketing | beauftragt | Skript & Text schreiben |
-| P-REVIEW | Testplan & Ende-zu-Ende-Test um 17:15 | hack-review | agent/hack-review | vorbereitet | Testplan erstellen |
+| claude-02 | docs/ARCHITEKTUR.md, state.py & Baupakete | Claude-Cloud | main | fertig, gemerged | - |
+| P-CORE | src/core: Aggregator, Agenda-Synthese & Graph Engine | hack-bau1 | agent/hack-bau1 | fertig, gemerged | - |
+| P-VOICE | src/voice: Mobile Call Screen (/call) & Gradium Web Audio | hack-bau2 / hack-bau1 | main | fertig, gemerged | E2E Integration |
+| P-DASHBOARD | src/dashboard: Vorher-Nachher Graph (/dashboard) & Checkpoints | hack-bau3 | main | fertig, gemerged | E2E Integration |
+| gemini-01 | Demo-Szenario, Live Repo Events & State-Integration | hack-bau1 | agent/hack-bau1 | vergeben, laeuft | auftraege/gemini-01.md umsetzen |
+| claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools | Claude-Cloud | claude/... | vergeben | Klick durch Philipp |
+| P-VISUAL | assets/brand: Graph Icons, Call Avatar, Banner (Nano Banana) | hack-visual | agent/hack-visual | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
 
 ## ZEITPLAN
 ```mermaid
@@ -32,11 +31,10 @@ gantt
   Phase 4 Feature-Freeze & Video :p4, 18:00, 18:40
   Phase 5 Politur & Abgabe       :p5, 18:40, 19:00
   section Parallele Spuren
-  claude-02 Architektur & State   :done, c2, 16:15, 16:35
-  claude-03 Backend MVP & Video   :crit, active, c3, 16:35, 17:15
-  P-DATA Demo-Daten (hack-bau1)   :active, p_dat, 16:35, 17:15
-  P-VOICE-UI Call Screen (hack-bau2) :active, p_vui, 16:35, 17:15
-  P-DASH-UI Graph UI (hack-bau3)  :active, p_dui, 16:35, 17:15
-  P-VISUAL Icons & Banner         :active, p_vis, 16:35, 17:15
-  P-REVIEW E2E-Test               :p_rev, 17:15, 17:45
+  P-CORE Knowledge Graph Inferenz   :done, p_core, 16:15, 16:20
+  P-VOICE Mobile Call & Gradium     :done, p_voi, 16:20, 16:32
+  P-DASHBOARD Vorher-Nachher UI     :done, p_dash, 16:20, 16:30
+  gemini-01 Live Events & State     :crit, active, p_gem1, 16:35, 17:30
+  claude-03 E2E Integration & Video :crit, active, p_cl3, 16:35, 17:15
+  P-VISUAL Graph Icons & Banner     :active, p_vis, 16:15, 17:15
 ```
