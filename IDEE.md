@@ -1,60 +1,66 @@
-# IDEE: DawnDispatch – Autonomous Morning Commute Voice Dispatcher & Action Dashboard
+# IDEE: DawnDispatch – Autonomous Commute Voice Dispatcher & Knowledge Graph Dashboard
 
-> **Core in one sentence:** An autonomous morning voice agent that connects via mobile web audio hands-free over Meta Ray-Ban smart glasses during your morning walk, conducts an agenda-driven triage over overnight agent outputs from this repo, and reveals completed, personalized work and irreversible checkpoints on your laptop dashboard ("Show me, don't tell me").
-
----
-
-## 1. User & Problem (Persona)
-**User:** Philipp, Tech Lead / Founding Engineer in Zurich walking to the office.  
-**The Problem:**
-- While commuting (walking through Zurich streets), overnight autonomous agent runs, test alerts, PRs, and decisions pile up in the repo.
-- Typing on a phone while walking is clumsy, slow, and dangerous; reading dense pull requests or dashboard logs on mobile screens is painful.
-- Critical blockers sit idle until the engineer sits down at their desk, delaying team standup and blocking morning deployments.
-
-**The Solution:**
-- During the morning walk, Philipp opens the mobile web page on his phone.
-- Audio streams seamlessly hands-free over **Meta Ray-Ban smart glasses** via Bluetooth (no Twilio, no WhatsApp).
-- Powered by **gradbot + Gradium Voice** (low-latency STT/TTS, custom voice design) and **Gemini 3.8 Flash**, the agent leads an agenda-driven standup triage over the overnight agent swarm activity in `Philipp2agent/agentic-hack-google`.
-- In under 90 seconds of hands-free conversation, Philipp makes 2–3 high-leverage decisions.
-- **"Show me, don't tell me":** When Philipp sits down at his laptop, the Web Dashboard immediately displays the fully executed, personalized work—live action cards, generated PR diffs, and irreversible actions waiting for his explicit checkpoint click.
+> **Kern in einem Satz:** Ein autonomer morgendlicher Voice-Dispatcher, der auf dem Weg ins Office per Mobile Web Audio hands-free über Meta Ray-Ban Smart Glasses einen simulierten Telefonanruf startet, im Schnellfeuer ("How much time do you have?") unklare nächtliche Code- und Repo-Entscheidungen abtaktet und auf dem Laptop-Dashboard einen interaktiven Vorher-Nachher Knowledge Graph samt Human Checkpoints ("Show me, don't tell me") enthüllt.
 
 ---
 
-## 2. 2-Minute Demo Script (Video & Live Jury Presentation)
+## 1. Persona & Use Case
+**User:** Philipp, Tech Lead / Founding Engineer unterwegs zum Office (Pendeln / Gehen mit Meta Ray-Ban Brille).  
+**Das Problem:**  
+Über Nacht haben autonome Agenten im Repo Hunderte Zeilen Code geschrieben, PRs geöffnet und Branch-Zweige erzeugt. Auf dem Gehweg das Handy zum Tippen herauszuholen ist umständlich und gefährlich. Ein riesiges Logfile liest niemand beim Gehen.  
+**Die Lösung:**
+1. **Simulierter Anruf via Mobile Web:** Philipp öffnet eine mobile Web-URL. Das Handy simuliert einen echten Anruf-Screen ("DawnDispatch Incoming Call..."). Er hebt ab bzw. tippt auf den Ray-Bans an.
+2. **Hands-free Inferenz-Gespräch via Meta Ray-Ban:** 
+   - Das Mikrofon und die offenen Lautsprecher der Ray-Bans verbinden sich direkt per Web Audio.
+   - Der Agent hat vorab einen **Knowledge Graph** aus dem nächtlichen Repo-Zustand aufgebaut (Agenda).
+   - Er fragt zu Beginn: *"Good morning Philipp. How much time do you have?"* (z.B. "1 minute").
+   - Dynamisches Schnellfeuer (*Rapid Quick Fire of Questions* / Yes-or-No) mit hoher Sprachkadenz (Gradium Voice) klärt Unklarheiten ("Did you mean X or Y?", "Approve PR #4?").
+3. **Laptop Reveal – Vorher-Nachher Knowledge Graph ("Show me, don't tell me"):**
+   - Am Schreibtisch angekommen (nach ~60 Sekunden Telefonat) öffnet Philipp das Dashboard am Laptop.
+   - **Vorher-Nachher-Ansicht:**
+     - **Kontext Davor:** Knowledge Graph mit roten/gelben offenen Knoten, Blockern, unklaren PRs und unaufbereiteten Code-Änderungen.
+     - **Kontext Danach:** Aktualisierter Knowledge Graph durch den Anruf: gelöste Knoten sind grün, Entscheidungen sind verknüpft, konkrete Folgeaufträge laufen.
+   - **Human Checkpoints:** Irreversible Aktionen (Production-Deploy, Public Release) warten mit visualisiertem Diff auf den Klick am Laptop.
 
-| Time | Actor / Scene | Interaction / Action | Visible / Audible Output |
+---
+
+## 2. 2-Minuten Video- & Demo-Skript
+
+| Zeit | Szene & Darsteller | Aktion & Dialog | Audio / Visuell |
 |---|---|---|---|
-| **0:00 - 0:25** | Hands-free Commute Audio Link | Philipp is walking to work with Meta Ray-Ban glasses on. He starts the web voice call on mobile. Audio connects via Bluetooth. | **Gradium Voice (custom voice, natural audio streaming):**<br>*"Good morning Philipp. Overnight agent swarm triage in agentic-hack-google completed. 3 items require your decision before standup: 1) PR #4 schema migration, 2) Visual asset approval for DawnDispatch, 3) Compute budget allocation for Gemini 3.8. Item 1: hack-bau1 completed the schema migration, but requires approval to deploy to staging. Approve or hold?"* |
-| **0:25 - 0:55** | Hands-free Voice Decisions | Philipp speaks naturally via Ray-Ban glasses microphone.<br>Agent extracts decisions, notes checkpoints, and executes downstream tasks. | **Philipp:** *"Approve staging deployment, and dispatch hack-bau2 to run smoke tests."*<br>**Agent:** *"Confirmed. Staging deployment triggered, smoke tests dispatched. Item 2: hack-visual generated 3 hero banners. Two are finalized; one irreversible publishing step awaits your laptop click. Item 3: Gemini 3.8 budget headroom is at 85%. Requesting 50k token buffer."*<br>**Philipp:** *"Granted for today's hackathon."*<br>**Agent:** *"Recorded. All decisions processed. See you at your desk."* |
-| **0:55 - 1:35** | Laptop Reveal: "Show me, don't tell me" | Philipp arrives at office desk, opens laptop, shares Web Dashboard screen. | **Dashboard instantly displays live executed state:**<br>1. **Commute Voice Call Card:** Audio waveform playback & synced transcript of the Ray-Ban conversation.<br>2. **Personalized Executed Actions:** Live status of staging deploy, smoke test results, token quota update.<br>3. **Human Checkpoint (Irreversible Action):** Distinct action card waiting for Philipp's click: `[Publish Hero Asset to Public Repo]` with instant visual diff.<br>4. **Standup Briefing:** 3-bullet personalized summary ready for 09:00 team standup. |
-| **1:35 - 2:00** | DeepMind Criteria & Architecture Pitch | Presenter recaps the solution against hackathon criteria. | Highlights: (1) **Autonomous Action:** overnight triage + automated task dispatch, (2) **Real Persona:** solves commute bottleneck with Ray-Ban glasses, (3) **Human Checkpoint:** irreversible actions strictly gated on laptop click, (4) **Live Tech:** gradbot + Gradium Voice + Gemini 3.8 Flash Interactions API + FastAPI Dashboard. |
+| **0:00 - 0:20** | **Simulierter Anruf auf dem Weg** | Philipp geht mit Meta Ray-Ban Brille. Handy-Screen zeigt realistischen eingehenden Anruf: *"Incoming Call: DawnDispatch Agent"*. Philipp nimmt hands-free an. | Klingelton / Call-Chime.<br>Agent: *"Morning Philipp. Swarm overnight triage ready. How much time do you have?"*<br>Philipp: *"Got 60 seconds."* |
+| **0:20 - 0:50** | **Rapid Quick-Fire Standup (Gradium + Gemini)** | Agent schaltet auf schnelle Kadenz. Gezielte Fragen zur Overnight-Agenda. | Agent (schnell): *"Rapid fire. 1: PR #4 auth schema refactor by hack-bau1 — approve staging migration? Yes or no?"*<br>Philipp: *"Yes."*<br>Agent: *"2: Three visual assets generated by hack-visual — keep solo silhouette as hero? Yes or no?"*<br>Philipp: *"Yes, keep solo."*<br>Agent: *"3: Gemini 3.8 headroom at 85%. Buffer needed?"*<br>Philipp: *"Grant 50k tokens."*<br>Agent: *"Captured. Knowledge graph updated. See you at your desk."* (Auflegen-Ton) |
+| **0:50 - 1:40** | **Laptop Reveal: Vorher-Nachher Knowledge Graph** | Philipp setzt sich an den Laptop, öffnet das Dashboard. Split-View / Toggle: **Before Call vs. After Call**. | **Live Web-Dashboard:**<br>1. **Vorher-Graph:** Ungelöste Knoten (gelb/rot), unstrukturierter Repo-Zustand.<br>2. **Nachher-Graph:** Strukturierter Graph mit aufgelösten Kanten, Audio-Transcript und zugewiesenen Tasks.<br>3. **Human Checkpoint Card:** `[Deploy Staging]` und `[Publish Hero Banner]` mit Diff warten auf seinen Bestätigungs-Klick. |
+| **1:40 - 2:00** | **Architektur & DeepMind-Kriterien** | Kurzes Fazit über Partner-Tech und Agentic Design. | Zeigt: Gradium Voice (low-latency, speed control, Web Audio), Gemini 3.8 Flash (Knowledge Graph Inferenz & Interactions API), Meta Ray-Bans (Hands-free Persona). |
 
 ---
 
-## 3. System Components & Tech Stack
-- **Voice Front Door (Web Audio & Dialog):**
-  - **gradbot Framework & Gradium:** Minimal FastAPI + WebSocket voice chat (`simple_chat` baseline running on VPS), ultra-low latency STT, semantic end-of-turn pause detection, Gradium TTS audio streaming with custom voice design.
-  - **Meta Ray-Ban Glasses:** Bluetooth audio endpoint (mic & open-ear speakers) connected to mobile web browser. Direct web audio—no third-party telephony services (no Twilio, no WhatsApp).
-- **Orchestration & Reasoning:**
-  - **Gemini 3.8 Flash (Google Interactions API):**
-    - Overnight Agent Activity Aggregator: synthesizes raw agent logs and git events from `Philipp2agent/agentic-hack-google` into a prioritized 3-item voice agenda.
-    - Real-time conversational agent driving the voice call.
-    - Post-call interaction processor: extracts structured decisions and downstream tool dispatches.
-- **Action Engine & Human Checkpoint:**
-  - Fast execution for reversible actions (dispatching tests, updating status).
-  - Explicit Human Checkpoint gating for irreversible actions (e.g. production/public publish, deletions, permanent deployments).
-- **Web Dashboard ("Show me, don't tell me"):**
-  - FastAPI + modern Tailwind/HTML frontend.
-  - Displays audio replay, live decision audit trail, and interactive checkpoint buttons.
+## 3. Bausteine & Architektur (Aufteilung für 2 Stunden Bauzeit)
+
+1. **Baustein CORE (Graph & Agenda-Inferenz):**
+   - Pre-Call State Generator: Baut aus Repo-Daten (Issues, PRs, Logs) den initialen Knowledge Graph (`knowledge_graph_before.json`) und die Agenda.
+   - Post-Call Processor: Nimmt Transcript/Entscheidungen, wendet sie an und erzeugt `knowledge_graph_after.json` sowie Action Cards (`actions.json`).
+   - Zuständig: `hack-bau1`
+
+2. **Baustein VOICE (Mobile Incoming Call Screen & Gradium Web Audio):**
+   - Mobile-optimierte HTML5-Seite (`/call`): Simuliert eingehenden Anruf (Klingelton, "Accept"-Button, Call-Timer, Ray-Ban Bluetooth-Audio kompatibel).
+   - Gradium Voice Streaming (FastAPI + WebSocket / REST) mit schneller Sprachausgabe für Yes/No Quick Fire.
+   - Zuständig: `hack-bau2`
+
+3. **Baustein DASHBOARD (Laptop Vorher-Nachher Knowledge Graph & Checkpoints):**
+   - Laptop-Dashboard (`/dashboard`): Interaktiver visueller Graph (vis.js oder Cytoscape/SVG), Umschalter/Vergleich Vorher vs. Nachher.
+   - Audio-Playback des 60s-Calls mit synchronem Transcript.
+   - Checkpoint Action Cards mit Klick-Event (Human in the loop).
+   - Zuständig: `hack-bau3`
+
+4. **Baustein VISUAL (Assets & UI Polish):**
+   - Icons für Graph-Knoten, Brand-Banner, Wallpaper für den Call-Screen.
+   - Zuständig: `hack-visual` (über Nano Banana)
 
 ---
 
-## 4. DeepMind & Hackathon Criteria Matrix
-
-| Criterion | Implementation in DawnDispatch |
-|---|---|
-| **Acts autonomously** | Swarm agents run overnight in repo; Morning agent synthesizes agenda and triggers actions immediately upon voice input. |
-| **Solves a real problem for a real person** | Philipp commutes hands-free with Meta Ray-Ban glasses; unblocks team before arriving at the office without looking at a screen. |
-| **Human in control (Checkpoints)** | High-leverage choices decided by voice; irreversible actions held for explicit laptop confirmation. |
-| **Runs live with real inputs** | Live Gradium Web Audio + live Gemini 3.8 Flash + real repo events from `Philipp2agent/agentic-hack-google`. |
-| **Partner Technologies** | **Google Gemini 3.8 Flash** (Interactions API / Reasoning) + **Gradium** (gradbot, STT, TTS, Custom Voice Design). |
+## 4. Machbarkeit & Risikominimierung (Zeitbudget: 1h 45m bis Feature Freeze)
+- **Größtes Risiko:** Latenz oder Audio-Verbindungsabbruch bei Live-WebSockets im Video.
+- **Absicherung:**
+  - Standardisierter Fallback-Modus im UI: Call-Simulation kann sowohl voll live über Gradium WebSocket laufen als auch über vorberechnete Audio-Snippets bei Netzschwankungen.
+  - Datenformat ist reines JSON (`knowledge_graph_before.json`, `transcript.json`, `knowledge_graph_after.json`, `actions.json`) — alle Komponenten können völlig unabhängig voneinander gebaut und getestet werden.
