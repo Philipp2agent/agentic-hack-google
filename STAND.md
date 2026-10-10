@@ -1,7 +1,7 @@
 # STAND agentic-hack-google
 
 ## FRAGEN AN PHILIPP
-- 1. hack-visual Modell-Fehler: Der fuer hack-visual konfigurierte Modell-Endpunkt existiert nicht. Bitte in Buzz Agent-Settings ein gueltiges Modell (z.B. Gemini) auswaehlen und neustarten. -> Empfehlung: 1A
+- 1. Modell-Konfiguration fuer hack-visual, hack-marketing & hack-review in Buzz: Alle 3 Agenten melden 'the configured model wasn't found at the provider's endpoint'. Bitte in Buzz Desktop unter Agent-Settings fuer hack-visual, hack-marketing und hack-review ein aktives Modell waehlen und neu starten. -> Empfehlung: 1A
 
 ## CLAUDE-LINKS ZUM KLICKEN
 - [claude-03: Lauffaehiges MVP E2E Backend, Integration & Video-Tools](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-03.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
@@ -12,11 +12,13 @@
 | IDEE | Schaerfung: Phone Call UI, Quick Fire, Before/After Graph | hack-chef | main | fertig, gemerged | - |
 | claude-02 | docs/ARCHITEKTUR.md, state.py & Baupakete | Claude-Cloud | main | fertig, gemerged | - |
 | P-CORE | src/core: Aggregator, Agenda-Synthese & Graph Engine | hack-bau1 | agent/hack-bau1 | fertig, gemerged | - |
-| P-VOICE | src/voice: Mobile Call Screen (/call) & Gradium Web Audio | hack-bau2 / hack-bau1 | main | fertig, gemerged | E2E Integration |
-| P-DASHBOARD | src/dashboard: Vorher-Nachher Graph (/dashboard) & Checkpoints | hack-bau3 | main | fertig, gemerged | E2E Integration |
+| P-VOICE | src/voice: Mobile Call Screen (/call) & Gradium Web Audio | hack-bau2 / hack-bau1 | main | fertig, gemerged | E2E Integration in claude-03 |
+| P-DASHBOARD | src/dashboard: Vorher-Nachher Graph (/dashboard) & Checkpoints | hack-bau3 | main | fertig, gemerged | E2E Integration in claude-03 |
 | gemini-01 | Demo-Szenario, Live Repo Events & State-Integration | hack-bau1 | agent/hack-bau1 | vergeben, laeuft | auftraege/gemini-01.md umsetzen |
 | claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools | Claude-Cloud | claude/... | vergeben | Klick durch Philipp |
 | P-VISUAL | assets/brand: Graph Icons, Call Avatar, Banner (Nano Banana) | hack-visual | agent/hack-visual | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
+| P-MARKETING | 2-Minuten-Video-Skript & README-Erzaehlung | hack-marketing | agent/hack-marketing | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
+| P-REVIEW | Testplan & Vorbereitung fuer E2E-Test 17:15 | hack-review | agent/hack-review | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
 
 ## ZEITPLAN
 ```mermaid
