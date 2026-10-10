@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "generated_at": "2026-10-10T14:00:00+00:00",
+  "events": [
+    {
+      "id": "ev-0001",
+      "source": "git_commit",
+      "agent_id": "hack-visual",
+      "title": "Title image v3 merged (commander & bee-swarm agents)",
+      "details": "merge: Titelbild v3 von agent/hack-visual; three candidates now in assets/: titelbild.jpg, titelbild-v2.jpg, titelbild-v3.jpg",
+      "severity": "medium",
+      "proposed_action": "Pick the final title image and delete the superseded drafts",
+      "timestamp": "2026-10-10T12:40:00+00:00",
+      "ref": "5ec3ff0"
+    },
+    {
+      "id": "ev-0002",
+      "source": "pull_request",
+      "agent_id": "claude-cloud",
+      "title": "claude-01: tools/ton.py (Gemini TTS) merged into main",
+      "details": "PR #1 closed after manual merge f3d65f4; tool reads the key only from OPENAI_COMPAT_API_KEY",
+      "severity": "info",
+      "proposed_action": "None, informational",
+      "timestamp": "2026-10-10T11:55:00+00:00",
+      "ref": "https://github.com/Philipp2agent/agentic-hack-google/pull/1"
+    },
+    {
+      "id": "ev-0003",
+      "source": "board",
+      "agent_id": "hack-chef",
+      "title": "STAND.md: gemini-01..04 waiting on claude-02 architecture",
+      "details": "Four builder packages blocked until docs/ARCHITEKTUR.md and auftraege/gemini-01..04.md are merged",
+      "severity": "high",
+      "proposed_action": "Merge claude-02 branch and dispatch the four builders",
+      "timestamp": "2026-10-10T13:58:00+00:00",
+      "ref": "STAND.md"
+    },
+    {
+      "id": "ev-0004",
+      "source": "agent_log",
+      "agent_id": "hack-bau1",
+      "title": "docs/STRUKTUR.md proposed src/api, src/core, src/ui layout",
+      "details": "Superseded by docs/ARCHITEKTUR.md (src/voice, src/core, src/dashboard, src/data)",
+      "severity": "low",
+      "proposed_action": "Note the new layout in STRUKTUR.md after the freeze",
+      "timestamp": "2026-10-10T11:20:00+00:00",
+      "ref": "3d6532c"
+    },
+    {
+      "id": "ev-0005",
+      "source": "manual",
+      "agent_id": "philipp",
+      "title": "Gemini quota: Nano Banana Pro capped at 250 images/day",
+      "details": "hack-visual renders finals with models/gemini-3-pro-image; drafts with gemini-3.1-flash-image (1K/day)",
+      "severity": "medium",
+      "proposed_action": "Set a daily budget of final renders for hack-visual",
+      "timestamp": "2026-10-10T12:00:00+00:00",
+      "ref": "docs/SETUP.md"
+    }
+  ],
+  "agenda": [
+    {
+      "item_id": "ag-01",
+      "topic": "Architecture merge and builder dispatch",
+      "question_for_lead": "The claude-02 architecture branch is ready. Approve merging it into main and dispatching the four builders?",
+      "recommended_action": "Merge claude/auftraege-claude-02 into main, then dispatch hack-bau1, hack-bau2, hack-bau3 and hack-visual",
+      "is_irreversible": false,
+      "action_type": "MERGE_BRANCH",
+      "event_ids": ["ev-0003"],
+      "priority": 1
+    },
+    {
+      "item_id": "ag-02",
+      "topic": "Title image drafts",
+      "question_for_lead": "hack-visual delivered three title images. Keep v3 and delete v1 and v2 from the repo?",
+      "recommended_action": "Keep assets/titelbild-v3.jpg; delete assets/titelbild.jpg and assets/titelbild-v2.jpg",
+      "is_irreversible": true,
+      "action_type": "DELETE_FILES",
+      "event_ids": ["ev-0001"],
+      "priority": 2
+    },
+    {
+      "item_id": "ag-03",
+      "topic": "Image render budget",
+      "question_for_lead": "Nano Banana Pro is capped at 250 images per day. Grant hack-visual up to 40 final renders for today?",
+      "recommended_action": "Set the daily final-render budget for hack-visual to 40",
+      "is_irreversible": false,
+      "action_type": "UPDATE_BUDGET",
+      "event_ids": ["ev-0005"],
+      "priority": 3
+    }
+  ],
+  "decisions": [],
+  "actions": [],
+  "call": {
+    "status": "idle",
+    "started_at": null,
+    "ended_at": null,
+    "language": "en",
+    "voice_id": null,
+    "transcript": [],
+    "audio_url": null,
+    "briefing": []
+  }
+}
