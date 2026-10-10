@@ -1,0 +1,30 @@
+a3f91c2 (Alex Rivera, 2026-10-10 14:32:00) feat(dlq): add dead-letter-queue redrive CLI command skeleton
+b7e42d1 (Maya Chen, 2026-10-10 13:15:22) fix(retry): handle exponential backoff edge case on 503 responses
+c2d89a4 (Alex Rivera, 2026-10-10 11:45:10) feat(paypal): add schema validation for payment.capture.completed
+d4b12f7 (Sam Miller, 2026-10-10 10:20:05) docs(stand): update morning standup status and sprint deliverables
+e8a33c1 (Maya Chen, 2026-10-10 09:05:40) test(webhooks): add concurrent webhook replay test cases
+f1c78e9 (Alex Rivera, 2026-10-09 17:40:12) refactor(ledger): streamline double-entry balancing assertion
+10a24b8 (Sam Miller, 2026-10-09 16:12:33) feat(metrics): register prometheus latency summary
+21b35c9 (Maya Chen, 2026-10-09 14:50:18) fix(security): sanitize incoming header logs for webhook signature
+32c46d0 (Alex Rivera, 2026-10-09 11:22:01) feat(stripe): add support for account.updated webhook payload
+43d57e1 (Sam Miller, 2026-10-09 09:30:45) chore(deps): bump redis-py from 5.0.1 to 5.0.2
+54e68f2 (Alex Rivera, 2026-10-08 18:10:00) release: bump version to 0.2.1
+65f7903 (Maya Chen, 2026-10-08 16:45:12) perf(idempotency): reduce redis key lookup latency via pipeline
+76a8014 (Sam Miller, 2026-10-08 14:15:20) fix(config): allow setting max_retry_attempts via environment
+87b9125 (Alex Rivera, 2026-10-08 11:05:50) feat(ledger): implement multi-currency account validation
+98ca236 (Maya Chen, 2026-10-08 09:20:30) test(ledger): cover zero-sum balance requirement across legs
+a9db347 (Sam Miller, 2026-10-07 17:35:14) docs(readme): add sequence diagram for webhook ingestion
+baec458 (Alex Rivera, 2026-10-07 15:10:05) feat(webhooks): add HMAC signature timing-safe comparison
+cbfd569 (Maya Chen, 2026-10-07 13:40:22) refactor(storage): separate raw payload store from parsed events
+dc0e670 (Sam Miller, 2026-10-07 10:15:18) fix(timeout): increase downstream webhook forward timeout to 5s
+ed1f781 (Alex Rivera, 2026-10-07 08:50:00) feat(dlq): persist unparseable payloads with quarantine flag
+fe2a892 (Maya Chen, 2026-10-06 18:00:10) test(api): mock external webhook sender for integration tests
+0f3b9a3 (Sam Miller, 2026-10-06 16:25:44) ci: add github action workflow for pytest and ruff
+1e4ca04 (Alex Rivera, 2026-10-06 14:10:30) feat(models): define Transaction and Entry domain dataclasses
+2d5db15 (Maya Chen, 2026-10-06 11:35:12) refactor(config): use pydantic-settings for typed environment vars
+3c6ec26 (Alex Rivera, 2026-10-05 17:50:00) release: bump version to 0.2.0
+4b7fd37 (Sam Miller, 2026-10-05 15:20:19) feat(idempotency): implement redis setnx based mutex lock
+5a80e48 (Maya Chen, 2026-10-05 11:45:00) feat(stripe): verify stripe-signature timestamp freshness
+6b91f59 (Alex Rivera, 2026-10-04 16:30:10) feat(ledger): add basic in-memory append ledger engine
+7ca206a (Sam Miller, 2026-10-04 14:10:00) feat(api): create basic webhook router with /health and /events
+8db317b (Alex Rivera, 2026-10-04 10:00:00) init: initial project scaffolding with pyproject.toml and README
