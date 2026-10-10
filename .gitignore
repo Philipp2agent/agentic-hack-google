@@ -1,0 +1,6 @@
+*.env
+*.pem
+*secret*
+.env
+.env.*
+id_*
