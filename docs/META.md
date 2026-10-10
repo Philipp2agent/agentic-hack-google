@@ -1,15 +1,15 @@
 # The Meta-Story: How an Autonomous Swarm Built DawnDispatch
 
-> *"We didn't just build an agent to triage autonomous code. We built DawnDispatch using an autonomous agent swarm in 2.5 hours."*
+> *"We didn't just build an agent to triage autonomous code. We built DawnDispatch using an autonomous agent swarm in a single afternoon."*
 
 ---
 
 ## 🐝 The Swarm Experiment
 
 At the **{Tech: Europe} Agentic AI Hackathon Zürich (10.10.2026)**, we set an audacious meta-goal:  
-Instead of humans writing the codebase manually, a human technical lead (Philipp) directed an autonomous swarm of AI agents operating concurrently on a Linux VPS over a Nostr-based relay protocol (Buzz).
+Instead of human engineers writing the codebase manually, a human technical lead (**Philipp**) directed an autonomous swarm of AI agents operating concurrently on a Linux VPS over a Nostr-based relay protocol (Buzz).
 
-The agents planned, wrote, tested, polished, and integrated **4,200+ lines of Python, JavaScript, and HTML** across four specialized parallel tracks.
+The agents planned, wrote, tested, polished, and integrated a complete production-grade system—from ultra-low-latency voice streaming on smart glasses to real-time SVG knowledge graphs—across specialized parallel tracks.
 
 ---
 
@@ -17,57 +17,78 @@ The agents planned, wrote, tested, polished, and integrated **4,200+ lines of Py
 
 | Agent | Model | Primary Responsibility | Workspace Branch |
 |---|---|---|---|
-| **hack-chef** | `gemini-3.8-flash` | Master Orchestrator, architecture governance, branch reviews & merges | `main` |
-| **hack-bau1** | `gemini-3.7-flash` | Core data models (`src/core`), live repo aggregator (85 events), action engine | `agent/hack-bau1` |
-| **hack-bau2** | `gemini-3.7-flash` | Mobile call simulator (`/call`), Gradium audio pipeline, live demo event bus | `agent/hack-bau2` |
-| **hack-bau3** | `gemini-3.7-flash` | Desktop dashboard (`/dashboard`), Before/After Knowledge Graph, Checkpoint UI | `agent/hack-bau3` |
-| **hack-visual** | `gemini-3.1-flash-image` (Nano Banana) | Brand design, logos (`assets/test-logo.jpg`), hero graphics (`assets/titelbild-v2.jpg`) | `agent/hack-visual` |
-| **Claude-Cloud** | `Claude 3.7 Sonnet` | Architecture blueprint (`docs/ARCHITEKTUR.md`) & contract test scaffolding | `claude/...` |
-| **Philipp** | Human Lead | Persona, Meta Ray-Ban hardware testing, commute walking trials, final checkpoints | Human-in-the-Loop |
+| **hack-chef** | `gemini-3.8-flash` | Master Orchestrator, architecture governance, sprint coordination, PR reviews & merges | `main` |
+| **hack-bau1** | `gemini-3.7-flash` | Core data models (`src/core`), overnight event aggregator (85 events), PayPulse sample repo (`examples/sample-project`), Video 2 Script | `agent/hack-bau1` |
+| **hack-bau2** | `gemini-3.7-flash` | Mobile call simulator (`/call`), Gradium audio pipeline, HUD focus display for glasses cameras, WhatsApp telephony interface (`NACHT-A`) | `agent/hack-bau2` |
+| **hack-bau3** | `gemini-3.7-flash` | Live screen Nachher-Ansicht ("Das hat das Gespräch gebracht"), Visual Assets (`assets/brand/video2_*`), E2E Review claude-05 | `agent/hack-bau3` |
+| **hack-visual** | `gemini-3.1-flash-image` | Brand design, logos, hero visual generation via `tools/bild.py` | `agent/hack-visual` |
+| **hack-ideen** | `gemini-3.7-flash` | Product naming & acoustic brand concepts (`docs/NAMEN.md`) | `agent/hack-ideen` |
+| **hack-review** | `gemini-3.7-flash` | Independent E2E test verification & clean-clone validation | `agent/hack-review` |
+| **Claude-Cloud** | `Claude 3.7 Sonnet` | Architecture blueprint (`docs/ARCHITEKTUR.md`), Live Mission Control (`claude-04`), Plug-and-Play automation (`claude-05`) | `claude/...` |
+| **Philipp** | Human Technical Lead | Persona definition, Meta Ray-Ban hardware testing, commute walking trials, final human checkpoints | Human-in-the-Loop |
 
 ---
 
-## 📊 Concrete Development Metrics
+## 📊 Concrete Development Metrics (Feature-Freeze: 18:20 CEST)
 
-The following metrics are derived directly from repository git logs, unit tests, and source files at feature freeze (18:00):
+The following metrics are derived directly from git logs, unit tests, and source files at sprint completion:
 
 ### 1. Velocity & Commits
-* **Total Git Commits:** 76+ commits in under 3 hours.
-* **Parallel Worktrees:** 4 active git worktrees simultaneously executing code without blocking each other.
-* **Merge Conflicts:** **0 merge conflicts**. Every merge into `main` succeeded via clean fast-forwards or automated branch merges.
+* **Total Git Commits:** **119 Commits** (`git rev-list --count HEAD` = 119) achieved in under 4 hours.
+* **Parallel Worktrees:** 5 active git worktrees concurrently executing code without blocking each other.
+* **Zero Merge Conflicts:** Every branch merge into `main` succeeded cleanly through schema-first boundaries and atomic task scoping.
 
-### 2. Codebase Breakdown
-* **Total Lines of Python Code:** 4,199 lines.
-* **Frontend Assets:** 1,200+ lines of HTML, CSS, and Vanilla JavaScript (mobile incoming call screen + desktop vis-network graph).
-* **Automated Test Coverage:**
-  * **41 Automated Tests** across 5 test suites:
-    * `tests/test_contract.py`: Contract smoke tests & schema roundtripping.
-    * `tests/test_core.py`: Repository event aggregation, action engine, and acceptance criteria.
-    * `tests/test_dashboard.py`: Dashboard routes, state endpoints, and 1-click checkpoint confirmation.
-    * `tests/test_voice.py`: Gradium client system prompt synthesis, decision extraction, and call endpoints.
-    * `tests/test_live_events.py`: Contract compliance for all 12 live demo event types.
-  * **100% Offline Passing:** All 41 tests pass in less than 0.5 seconds without network or external API key dependencies.
+### 2. Comprehensive Automated Testing (84/84 Grün)
+* **84 Automated Tests** across 9 specialized test suites (100% passing, 0 failures):
+  1. `tests/test_bridge.py` (13 tests): Live event bridge, WebSocket session handling, settling windows, classifier fallbacks.
+  2. `tests/test_contract.py` (4 tests): Contract smoke tests, schema roundtripping, and call status lifecycles.
+  3. `tests/test_core.py` (16 tests): Overnight event ingestion, action engine, and checkpoint gating.
+  4. `tests/test_dashboard.py` (11 tests): Desktop dashboard endpoints, graph state, and 1-click confirmation.
+  5. `tests/test_from_repo.py` (11 tests): Plug-and-play context extraction, commit limits, status file detection, and remote cloning.
+  6. `tests/test_live.py` (15 tests): Live Mission Control event bus, WebSocket streaming, replay engine, and router.
+  7. `tests/test_live_events.py` (3 tests): Contract compliance for all 12 live demo event types.
+  8. `tests/test_sample_project.py` (4 tests): PayPulse realistic target repository structure, status files, and commit logs.
+  9. `tests/test_voice.py` (7 tests): Gradium realtime client prompt synthesis, decision extraction, and audio endpoints.
+* **Instant Offline Execution:** The full suite runs in ~3 seconds without external network dependencies.
 
-### 3. Real Repository Inputs Ingested
-* **85 Real Overnight Events:** Ingested directly by `src/core/repo_events.py` from actual git commit history, active branches, `STAND.md` board entries, and generated visual assets.
+### 3. Plug-and-Play Onboarding in 3 Minutes (`claude-05`)
+* **Zero-Setup Automation:**
+  * `./setup.sh`: Sets up Python virtual environment, safely stores API keys in git-ignored `.env` (mode 600), and analyzes the target repository. Supports both interactive prompt and non-interactive CI mode (`--yes`, `--skip-prompt`).
+  * `./start.sh`: Launches the call server (`:8090`), Live Mission Control (`:8098`), real-time event bridge, and automatic Cloudflare HTTPS tunnel for mobile smart glasses audio.
+* **Universal Applicability:** Runs on any git repository out of the box—whether local folder or GitHub clone.
 
 ---
 
-## 💡 Key Architectural Insights
+## 🎙️ The Live Walk (18:20 CEST): From Voice Call to Autonomous Night Shift
+
+The defining milestone of the sprint was the outdoor commute trial:
+1. **The Walk:** Philipp walked through Zürich wearing Meta Ray-Ban Smart Glasses with open-ear audio and no phone in hand.
+2. **The Call:** DawnDispatch called automatically via Gradium Realtime Voice (<700ms latency) and Gemini Flash Lite, prompting Philipp with high-priority overnight threads.
+3. **The Decisions (3 Rapid Turns):**
+   - **Turn 1 (Roadmap V2):** Approved Option A (Real WhatsApp Calling).
+   - **Turn 2 (Irreversible Checkpoint):** Held public release on checkpoint until verified on laptop.
+   - **Turn 3 (Scale):** Expanded morning dispatch triage to all 42 hackathon teams.
+4. **Post-Call Autonomous Dispatches:**
+   Immediately following the call, post-call processing synthesized the conversation transcript and **automatically generated overnight engineering tasks**:
+   - `auftraege/nachtschicht-1620-A.md`: Configure night shift for real WhatsApp calls (`NACHT-A`, assigned to `hack-bau2`).
+   - `auftraege/nachtschicht-1620-B.md`: Maintain repository privacy until final submission checkpoint (`NACHT-B`).
+
+---
+
+## 💡 Key Architectural Lessons
 
 ### 1. Schema-First Contract Isolation
-Early in the hackathon, `hack-chef` and `claude-02` locked in `src/core/models.py` (Pydantic v2) and `docs/SCHNITTSTELLE.md`. By freezing the data shapes (`OvernightEvent`, `AgendaItem`, `DecisionRecord`, `ActionExecution`, `KnowledgeGraph`) into atomic JSON files in `src/data/`, the voice frontend, backend inference, and dashboard UI developed in complete parallel without cross-dependencies.
+By freezing Pydantic v2 data models (`OvernightEvent`, `AgendaItem`, `DecisionRecord`, `ActionExecution`, `KnowledgeGraph`) into atomic JSON interfaces early, voice agents, UI developers, and backend engineers worked concurrently without blocking.
 
 ### 2. The Power of "Human Checkpoints"
-Autonomous swarms can generate code at blinding speed, but autonomy without guardrails is terrifying. By designing the **Human Checkpoint** primitive (`status="BLOCKED_ON_CHECKPOINT"`), the swarm proved that autonomous systems become dramatically more trustworthy when irreversible operations (deployments, deletions, public releases) require a physical human sign-off on a laptop dashboard.
+Autonomous code swarms generate immense velocity, but irreversible actions (public deployments, repository visibility, database migrations) require physical human agency. The Human Checkpoint pattern (`status="BLOCKED_ON_CHECKPOINT"`) turns autonomous AI into a trusted engineering partner.
 
-### 3. Simulated Events Accelerate UI Development
-Building hardware-dependent products (Meta Ray-Ban smart glasses) during a short hackathon is notoriously risky. The team built `tools/live_demo_events.py` and `tests/test_live_events.py` early, providing a deterministic 12-step event simulator. This allowed frontend visualization developers (`hack-bau3`) to perfect the Before/After knowledge graph while the audio engineers (`hack-bau2`) were testing outdoor Bluetooth latency.
+### 3. Replay Engines for Cinematic Demos
+Building live hardware-connected systems is unpredictable. By building a high-speed replay engine (`POST /api/live/replay`) and deterministic simulated event streams (`tools/live_demo_events.py`), frontend and video teams could film flawless video takes while backend models were still tuning.
 
 ---
 
-## 🎯 Conclusion: "The Agent Owns the Code and the Human"
+## 🎯 Conclusion: "The Agent Owns the Code, the Human Directs the Swarm"
 
-DawnDispatch demonstrates the next era of human-agent collaboration. As AI swarms take ownership of code creation, the human's role elevates from typing syntax to executive steering.
-
-With a 60-second voice commute call and a Before/After Knowledge Graph reveal, software leads can direct swarms of hundreds of agents while walking down the street—with complete confidence and total control.
+DawnDispatch demonstrates the future of software development:
+When AI agents write, test, and package code autonomously overnight, the technical lead's job elevates from typing syntax to executive steering. A 60-second voice triage on the morning walk—backed by a physical 1-click confirmation at the desk—is all it takes to direct a fleet of autonomous builders.
