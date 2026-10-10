@@ -7,3 +7,4 @@
 | hack-visual | models/gemini-3.5-flash | Visuals mit Nano Banana ueber tools/bild.py: Entwuerfe mit models/gemini-3.1-flash-image, Finale mit models/gemini-3-pro-image (hoechstens 250 pro Tag); Bilder nach assets/ im eigenen Worktree | agent/hack-visual |
 | hack-ideen | models/gemini-3.8-flash | Exploration: Ideen, Wow-Features, Alternativen und Wettbewerb; baut zu jeder offenen Entscheidung von hack-chef die Optionen als kurze Entwuerfe auf Branches opt/nr-A und opt/nr-B vor | agent/hack-ideen |
 | hack-marketing | models/gemini-2.5-flash | Pitch und Video: 2-Minuten-Skript, README-Erzaehlung, Slogans, Bildtexte; Meta-Story (Produkt in 2 Stunden von Agenten gebaut) mit Zahlen aus docs/META | agent/hack-marketing |
+| hack-review | models/gemini-2.5-pro | Qualitaet: startet die App lokal, testet Endpunkte und Ablauf, prueft Diffs der Bauer gegen die Abnahme vor jedem Merge, meldet Fehler an hack-chef; sparsam (Modell nur 1000 Aufrufe pro Tag) | agent/hack-review |
