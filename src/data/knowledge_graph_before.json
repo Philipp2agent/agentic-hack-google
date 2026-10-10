@@ -1,110 +1,173 @@
 {
+  "phase": "before",
   "stage": "BEFORE",
-  "generated_at": "2026-10-10T14:17:21Z",
   "nodes": [
     {
       "id": "agent-hack-chef",
       "label": "hack-chef",
+      "kind": "agenda",
       "type": "agent",
       "status": "ACTIVE",
       "details": "Swarm agent: hack-chef",
-      "metadata": {}
+      "metadata": {},
+      "data": {}
     },
     {
       "id": "evt-001",
-      "label": "Swarm assignment & role coordination question",
+      "label": "Version 1 MVP Deployed: Web Audio & Meta Ray-Ban T",
+      "kind": "agenda",
       "type": "event",
-      "status": "UNRESOLVED",
-      "details": "Open items in STAND.md: - hack-bau2 und hack-bau3 anlegen oder Pakete voice/dashboard an hack-bau1 bzw. hack-chef uebergeben?",
+      "status": "OPEN",
+      "details": "gradbot Web Call running over Bluetooth to Meta Ray-Bans. WhatsApp calling postponed to Version 2 roadmap.",
       "metadata": {
-        "severity": "WARNING",
-        "source": "STAND.md / swarm coordination"
-      }
+        "severity": "INFO",
+        "source": "Infrastructure Chat / 15:35"
+      },
+      "data": {}
+    },
+    {
+      "id": "agent-hack-bau1",
+      "label": "hack-bau1",
+      "kind": "agenda",
+      "type": "agent",
+      "status": "ACTIVE",
+      "details": "Swarm agent: hack-bau1",
+      "metadata": {},
+      "data": {}
     },
     {
       "id": "evt-002",
-      "label": "feat: Schritt 0 Datenmodelle, Schnittstellendokume",
+      "label": "Autonomous Night Shift Pipeline & Production Repo ",
+      "kind": "agenda",
       "type": "event",
-      "status": "OPEN",
-      "details": "Commit 8ead13b by hack-chef: feat: Schritt 0 Datenmodelle, Schnittstellendokumentation & Lagebrett aktualisiert",
+      "status": "UNRESOLVED",
+      "details": "Swarm proposing autonomous night shift where agents run overnight with direct commits to main and public repo switch.",
       "metadata": {
-        "severity": "INFO",
-        "source": "git commit 8ead13b"
-      }
+        "severity": "WARNING",
+        "source": "Git Swarm Pipeline / 16:20"
+      },
+      "data": {}
     },
     {
-      "id": "agent-hack-swarm",
-      "label": "hack-swarm",
+      "id": "agent-hack-bau2",
+      "label": "hack-bau2",
+      "kind": "agenda",
       "type": "agent",
       "status": "ACTIVE",
-      "details": "Swarm agent: hack-swarm",
-      "metadata": {}
+      "details": "Swarm agent: hack-bau2",
+      "metadata": {},
+      "data": {}
     },
     {
       "id": "evt-003",
-      "label": "auftraege: parallelstart",
+      "label": "Voice Cloning & WhatsApp Business Calling Engine",
+      "kind": "agenda",
       "type": "event",
       "status": "OPEN",
-      "details": "Commit 2085b70 by hack-agents (buzzagent): auftraege: parallelstart",
+      "details": "Architecture ready for cloning Philipp's voice and connecting real WhatsApp Business telephony for v2.",
       "metadata": {
         "severity": "INFO",
-        "source": "git commit 2085b70"
-      }
+        "source": "Gradium Voice Lab / 15:55"
+      },
+      "data": {}
+    },
+    {
+      "id": "agent-claude-cloud",
+      "label": "claude-cloud",
+      "kind": "agenda",
+      "type": "agent",
+      "status": "ACTIVE",
+      "details": "Swarm agent: claude-cloud",
+      "metadata": {},
+      "data": {}
     },
     {
       "id": "evt-004",
-      "label": "feat(dawndispatch): update IDEE.md, AGENTEN.md, ST",
+      "label": "claude-03: E2E Backend MVP & Video Generation Pipe",
+      "kind": "agenda",
       "type": "event",
       "status": "OPEN",
-      "details": "Commit 3cdd23d by hack-chef: feat(dawndispatch): update IDEE.md, AGENTEN.md, STAND.md and claude-02 for web voice",
+      "details": "FastAPI backend unifying /call, /ws/chat and /dashboard with Google Veo/Omni pitch video scripts.",
       "metadata": {
         "severity": "INFO",
-        "source": "git commit 3cdd23d"
-      }
+        "source": "STAND.md / 16:40"
+      },
+      "data": {}
+    },
+    {
+      "id": "agent-hack-visual",
+      "label": "hack-visual",
+      "kind": "agenda",
+      "type": "agent",
+      "status": "ACTIVE",
+      "details": "Swarm agent: hack-visual",
+      "metadata": {},
+      "data": {}
     },
     {
       "id": "evt-005",
-      "label": "feat(idee): update IDEE.md with Ray-Ban demo scrip",
+      "label": "Visual Branding Suite & Bee Swarm Commander Identi",
+      "kind": "agenda",
       "type": "event",
       "status": "OPEN",
-      "details": "Commit df4339d by hack-chef: feat(idee): update IDEE.md with Ray-Ban demo script, claude-02 and STAND.md",
+      "details": "Branding suite delivered via Nano Banana: Hero banner, node icons, and call avatar.",
       "metadata": {
         "severity": "INFO",
-        "source": "git commit df4339d"
-      }
+        "source": "assets/brand / 14:20"
+      },
+      "data": {}
+    },
+    {
+      "id": "evt-006",
+      "label": "Google DeepMind Interactions Quota Headroom at 85%",
+      "kind": "agenda",
+      "type": "event",
+      "status": "UNRESOLVED",
+      "details": "Swarm interactions budget monitor warning. Daytime buffer allocated for final live presentations.",
+      "metadata": {
+        "severity": "WARNING",
+        "source": "Google GenAI Interactions API / 14:50"
+      },
+      "data": {}
     },
     {
       "id": "agenda-01",
-      "label": "Swarm Agent Delegation for Subsystems",
+      "label": "Version 2: Real Telephony & WhatsApp Calling",
+      "kind": "agenda",
       "type": "agenda",
       "status": "PENDING_TRIAGE",
-      "details": "Should we spin up hack-bau2 and hack-bau3, or assign voice and dashboard to existing agents?",
+      "details": "Upgrade Version 2 to real WhatsApp Business Calling and cloned lead voice? Yes or no?",
       "metadata": {
-        "recommended_action": "APPROVE - assign voice to hack-bau1 and dashboard to hack-chef to reduce swarm overhead",
+        "recommended_action": "APPROVE - transitions from simulated web audio to native mobile telephony",
         "is_irreversible": false
-      }
+      },
+      "data": {}
     },
     {
       "id": "agenda-02",
-      "label": "Parallel Task Execution Pipeline Kickoff",
+      "label": "Version 2: Autonomous Night Shift & Public Release",
+      "kind": "agenda",
       "type": "agenda",
       "status": "PENDING_TRIAGE",
-      "details": "Unblock parallel worker execution following the overnight parallelstart trigger?",
+      "details": "Enable autonomous night shift where agents commit directly to main and make repo public at 19:00?",
       "metadata": {
-        "recommended_action": "APPROVE - activate parallel agent task queues immediately",
-        "is_irreversible": false
-      }
+        "recommended_action": "APPROVE with Human Checkpoint - irreversible autonomous write access and public release requires desk sign-off",
+        "is_irreversible": true
+      },
+      "data": {}
     },
     {
       "id": "agenda-03",
-      "label": "Ray-Ban Demo and Schema Baseline",
+      "label": "Version 2: Autonomous Build Queue Dispatch",
+      "kind": "agenda",
       "type": "agenda",
       "status": "PENDING_TRIAGE",
-      "details": "Accept updated data models, Ray-Ban commute script, and web voice specs as current milestone?",
+      "details": "Convert call decisions into direct autonomous build tasks for the agent swarm? Yes or no?",
       "metadata": {
-        "recommended_action": "APPROVE - lock Schritt 0 interface specs and advance to live testing",
+        "recommended_action": "APPROVE - \"The agent owns the code and the human\" autonomous queue",
         "is_irreversible": false
-      }
+      },
+      "data": {}
     }
   ],
   "edges": [
@@ -112,49 +175,65 @@
       "source": "agent-hack-chef",
       "target": "evt-001",
       "relation": "PRODUCED",
+      "label": "",
       "status": "PENDING"
     },
     {
-      "source": "agent-hack-chef",
+      "source": "agent-hack-bau1",
       "target": "evt-002",
       "relation": "PRODUCED",
+      "label": "",
       "status": "PENDING"
     },
     {
-      "source": "agent-hack-swarm",
+      "source": "agent-hack-bau2",
       "target": "evt-003",
       "relation": "PRODUCED",
+      "label": "",
       "status": "PENDING"
     },
     {
-      "source": "agent-hack-chef",
+      "source": "agent-claude-cloud",
       "target": "evt-004",
       "relation": "PRODUCED",
+      "label": "",
+      "status": "PENDING"
+    },
+    {
+      "source": "agent-hack-visual",
+      "target": "evt-005",
+      "relation": "PRODUCED",
+      "label": "",
       "status": "PENDING"
     },
     {
       "source": "agent-hack-chef",
-      "target": "evt-005",
+      "target": "evt-006",
       "relation": "PRODUCED",
+      "label": "",
       "status": "PENDING"
     },
     {
       "source": "evt-001",
       "target": "agenda-01",
       "relation": "TRIGGERS",
+      "label": "",
       "status": "PENDING"
     },
     {
       "source": "evt-002",
       "target": "agenda-02",
       "relation": "TRIGGERS",
+      "label": "",
       "status": "PENDING"
     },
     {
       "source": "evt-003",
       "target": "agenda-03",
       "relation": "TRIGGERS",
+      "label": "",
       "status": "PENDING"
     }
-  ]
+  ],
+  "generated_at": "2026-10-10T14:49:33Z"
 }

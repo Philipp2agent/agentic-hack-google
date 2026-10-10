@@ -2,38 +2,46 @@
   {
     "action_id": "act-101",
     "item_id": "agenda-01",
-    "action_type": "DEPLOY_VOICE_SERVICE",
+    "action_type": "VERSION_2_REAL_TELEPHONY",
     "status": "COMPLETED",
     "artifacts": {
-      "port": 8090,
-      "commit": "3cdd23d",
-      "logs": "Service started successfully on ws://0.0.0.0:8090/ws/chat",
+      "execution_timestamp": "2026-10-10T14:49:43Z",
+      "voice_notes": "API test approval",
       "dispatch_status": "Auto-dispatched upon morning commute approval"
-    }
+    },
+    "description": "",
+    "checkpoint_reason": null,
+    "created_at": "2026-10-10T14:49:43Z",
+    "updated_at": "2026-10-10T14:49:43Z"
   },
   {
     "action_id": "act-102",
     "item_id": "agenda-02",
-    "action_type": "PURGE_STATE_AND_MIGRATE",
+    "action_type": "VERSION_2_AUTONOMOUS_NIGHT",
     "status": "BLOCKED_ON_CHECKPOINT",
     "artifacts": {
-      "reason": "Irreversible database state purge & schema migration requires Web Dashboard 1-click confirmation",
+      "reason": "Irreversible action requires Web Dashboard 1-click confirmation",
       "pending_url": "/dashboard/checkpoint/agenda-02",
-      "scope": "PostgreSQL schema v2 migration & Redis session cache flush",
-      "risk_level": "CRITICAL"
-    }
+      "voice_notes": "Philipp via Ray-Ban: 'Yes, but hold night shift push on checkpoint until I verify the diff.'"
+    },
+    "description": "",
+    "checkpoint_reason": null,
+    "created_at": "2026-10-10T14:49:43Z",
+    "updated_at": "2026-10-10T14:49:43Z"
   },
   {
     "action_id": "act-103",
     "item_id": "agenda-03",
-    "action_type": "PUBLISH_HERO_ASSET",
-    "status": "BLOCKED_ON_CHECKPOINT",
+    "action_type": "VERSION_2_AUTONOMOUS_BUILD",
+    "status": "COMPLETED",
     "artifacts": {
-      "reason": "Public release of brand hero banner asset requires human lead 1-click confirmation",
-      "pending_url": "/dashboard/checkpoint/agenda-03",
-      "asset_preview": "/assets/titelbild-v3.jpg",
-      "target": "Production Hero Banner (assets/brand)",
-      "risk_level": "HIGH"
-    }
+      "execution_timestamp": "2026-10-10T14:49:43Z",
+      "voice_notes": "Philipp via Ray-Ban: 'Yes, dispatch autonomous v2 queue.'",
+      "dispatch_status": "Auto-dispatched upon morning commute approval"
+    },
+    "description": "",
+    "checkpoint_reason": null,
+    "created_at": "2026-10-10T14:49:43Z",
+    "updated_at": "2026-10-10T14:49:43Z"
   }
 ]

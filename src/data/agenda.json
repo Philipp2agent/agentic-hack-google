@@ -1,23 +1,40 @@
 [
   {
     "item_id": "agenda-01",
-    "topic": "Swarm Agent Delegation for Subsystems",
-    "question_for_lead": "Should we spin up hack-bau2 and hack-bau3, or assign voice and dashboard to existing agents?",
-    "recommended_action": "APPROVE - assign voice to hack-bau1 and dashboard to hack-chef to reduce swarm overhead",
-    "is_irreversible": false
+    "topic": "Version 2: Real Telephony & WhatsApp Calling",
+    "question_for_lead": "Upgrade Version 2 to real WhatsApp Business Calling and cloned lead voice? Yes or no?",
+    "recommended_action": "APPROVE - transitions from simulated web audio to native mobile telephony",
+    "is_irreversible": false,
+    "action_type": "DISPATCH_AGENT",
+    "event_ids": [
+      "evt-001",
+      "evt-003"
+    ],
+    "priority": 1
   },
   {
     "item_id": "agenda-02",
-    "topic": "Parallel Task Execution Pipeline Kickoff",
-    "question_for_lead": "Unblock parallel worker execution following the overnight parallelstart trigger?",
-    "recommended_action": "APPROVE - activate parallel agent task queues immediately",
-    "is_irreversible": true
+    "topic": "Version 2: Autonomous Night Shift & Public Release",
+    "question_for_lead": "Enable autonomous night shift where agents commit directly to main and make repo public at 19:00?",
+    "recommended_action": "APPROVE with Human Checkpoint - irreversible autonomous write access and public release requires desk sign-off",
+    "is_irreversible": true,
+    "action_type": "DEPLOY",
+    "event_ids": [
+      "evt-002"
+    ],
+    "priority": 2
   },
   {
     "item_id": "agenda-03",
-    "topic": "Ray-Ban Demo and Schema Baseline",
-    "question_for_lead": "Accept updated data models, Ray-Ban commute script, and web voice specs as current milestone?",
-    "recommended_action": "APPROVE - lock Schritt 0 interface specs and advance to live testing",
-    "is_irreversible": false
+    "topic": "Version 2: Autonomous Build Queue Dispatch",
+    "question_for_lead": "Convert call decisions into direct autonomous build tasks for the agent swarm? Yes or no?",
+    "recommended_action": "APPROVE - \"The agent owns the code and the human\" autonomous queue",
+    "is_irreversible": false,
+    "action_type": "UPDATE_BUDGET",
+    "event_ids": [
+      "evt-004",
+      "evt-006"
+    ],
+    "priority": 3
   }
 ]
