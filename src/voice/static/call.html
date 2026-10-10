@@ -55,7 +55,7 @@
           <div class="pulse-ring ring-3"></div>
           <div class="avatar-disc">
             <div class="avatar-glasses-icon">
-              <svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="currentColor" stroke-width="1.8">
+              <svg viewBox="0 0 24 24" width="54" height="54" fill="none" stroke="currentColor" stroke-width="1.8">
                 <circle cx="6" cy="12" r="4"/>
                 <circle cx="18" cy="12" r="4"/>
                 <path d="M10 12h4M2 12h0M22 12h0"/>
@@ -68,7 +68,7 @@
         <div class="incoming-prompt">
           <p>Philipp walking to office</p>
           <span class="prompt-sub">Double-tap glasses temple or press Answer</span>
-          <div class="audio-hint" id="audio-hint">Tap anywhere to enable ring audio</div>
+          <div class="audio-hint" id="audio-hint">🔊 Ringing • Tap anywhere or press Answer</div>
         </div>
 
         <div class="incoming-actions">
@@ -90,6 +90,8 @@
             <span>Answer</span>
           </button>
         </div>
+
+        <div class="desktop-hint">Shortcut: <kbd>Space</kbd> or <kbd>Enter</kbd> to Answer</div>
       </section>
 
       <!-- 2. ACTIVE CALL SCREEN -->
@@ -104,21 +106,24 @@
         </div>
 
         <!-- Waveform Audio Visualizer (Dynamic Web Audio / Animation) -->
-        <div class="waveform-container listening" id="waveform">
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
+        <div class="waveform-block">
+          <div class="waveform-container listening" id="waveform">
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+          </div>
+          <div class="waveform-sub" id="waveform-sub">Ray-Ban Hands-Free Audio • Standup Active</div>
         </div>
 
         <!-- Schnellfeuer-Karten-Container (Interactive Quick-Fire Card) -->
@@ -181,21 +186,21 @@
         </div>
 
         <!-- Quick Fire Yes/Hold/No Quick-Tap Controls -->
-        <div class="quickfire-tap-bar" id="quickfire-controls">
+        <div class="quickfire-tap-bar hidden" id="quickfire-controls">
           <button class="qf-btn qf-yes" data-answer="Yes" aria-label="Approve decision">
             <span class="qf-icon">✓</span>
             <span class="qf-label">YES</span>
-            <small>Approve</small>
+            <small>Approve <kbd>1</kbd></small>
           </button>
           <button class="qf-btn qf-hold" data-answer="Hold" aria-label="Hold for human checkpoint">
             <span class="qf-icon">⏸</span>
             <span class="qf-label">HOLD</span>
-            <small>Checkpoint</small>
+            <small>Checkpoint <kbd>2</kbd></small>
           </button>
           <button class="qf-btn qf-no" data-answer="No" aria-label="Reject decision">
             <span class="qf-icon">✕</span>
             <span class="qf-label">NO</span>
-            <small>Reject</small>
+            <small>Reject <kbd>3</kbd></small>
           </button>
         </div>
 
@@ -238,8 +243,8 @@
         </div>
 
         <h2 class="ended-title">Call Completed</h2>
-        <div class="ended-duration" id="ended-duration-label">Duration: 00:58</div>
-        <p class="ended-desc">
+        <div class="ended-duration" id="ended-duration-label">Duration: 00:54</div>
+        <p class="ended-desc" id="ended-desc">
           Decisions recorded hands-free via Meta Ray-Ban audio during morning walk. Knowledge Graph updated in background.
         </p>
 
@@ -251,6 +256,10 @@
           <ul class="summary-list" id="summary-decision-list">
             <li>Loading decisions...</li>
           </ul>
+        </div>
+
+        <div class="summary-meta" id="summary-meta">
+          Autonomous Swarm Pipeline Synchronized
         </div>
 
         <div class="ended-actions">
