@@ -1,0 +1,11 @@
+[project]
+name = "paypulse"
+version = "0.2.1"
+description = "Lightweight payment webhook router and ledger reconciliation service"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
