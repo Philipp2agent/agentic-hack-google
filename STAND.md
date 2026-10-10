@@ -5,7 +5,6 @@
 - 2. Modell-Konfiguration fuer hack-visual, hack-marketing & hack-review in Buzz (melden Provider-Fehler): (A: In Buzz Desktop Modell neu zuweisen & Neustart | B: hack-chef baut Pakete mit hack-bau1/main) -> Empfehlung: 2A
 
 ## CLAUDE-LINKS ZUM KLICKEN
-- [claude-05: Plug-and-Play fuer jedes Repo (setup.sh, from_repo.py, start.sh, Deadline 18:20)](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-05.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
 - [claude-03: Lauffaehiges MVP E2E Backend, Integration & Video-Tools (PR #3 bereit, Ton-Check)](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-03.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
 
 | ID | Auftrag | Wer | Branch | Status | Naechster Schritt |
@@ -23,13 +22,13 @@
 | claude-04 | Live-Visualisierung /src/live Mission Control | Claude-Cloud | main | fertig, gemerged | PR #4 gemerged auf main |
 | S-IDEEN | 15 Produktnamen (Agent promptet Menschen, merkbar) | hack-ideen | main | fertig, gemerged | docs/NAMEN.md live, Top 3 zur Wahl |
 | claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools | Claude-Cloud | claude/auftraege-claude-03-jh0o10 | PR #3 bereit | Merge nach Ton-Bestaetigung |
-| claude-05 | Plug-and-Play fuer jedes Repo (setup.sh, start.sh) | Claude-Cloud | claude/claude-05 | vergeben | Claude-Link klicken |
+| claude-05 | Plug-and-Play fuer jedes Repo (setup.sh, start.sh) | Claude-Cloud | main | fertig, gemerged | setup.sh, start.sh, dawn/from_repo.py & 84 Tests gruen |
 | S-MKTG | Video-2-Skript (2 Min) & README-Erzaehlung "Try in 3 min" | hack-bau1 | main | fertig, gemerged | docs/VIDEO_SCRIPT_V2.md & README live |
 | S-VISUAL | Neutrale Titelkarte & Abspann ("8 Gemini agents + Claude") | hack-bau3 | main | fertig, gemerged | assets/brand/video2_* & docs/VISUALS_V2.md live |
 | S-LIVE-UI | Live-Ansicht verfeinern (Fokus zentriert, Rest gedimmt) | hack-bau2 | main | fertig, gemerged | HUD-Fokus & Dimmung fuer Brillenkamera live |
 | S-NACHHER | Nachher-Ansicht Live-Seite ("Das hat das Gespraech gebracht") | hack-bau3 | main | fertig, gemerged | 3 Vorher->Nachher Karten live in /live |
 | S-EXAMPLE | Realistic Example Repo unter examples/ fuer Plug-and-Play | hack-bau1 | main | fertig, gemerged | PayPulse mit 30 Commits & Tests live |
-| S-REVIEW | Frischer Klon E2E Test fuer claude-05 (setup.sh/start.sh) | hack-review | agent/hack-review | wartet | wartet auf claude-05 PR |
+| S-REVIEW | Frischer Klon E2E Test fuer claude-05 (setup.sh/start.sh) | hack-review / hack-chef | main | laeuft | Verifikation setup.sh/start.sh & E2E Klon |
 
 ## ZEITPLAN
 ```mermaid
@@ -48,11 +47,11 @@ gantt
   section Parallele Spuren Sprint 18:20
   claude-04 Live Mission Control :done, p_cl4, 17:00, 17:55
   S-IDEEN 15 Produktnamen        :done, p_ide, 17:55, 17:58
-  claude-05 Plug-and-Play Repo   :crit, active, p_cl5, 17:55, 18:20
+  claude-05 Plug-and-Play Repo   :done, p_cl5, 17:55, 18:15
   S-MKTG Video-2-Skript & Story  :done, p_mkt, 17:55, 18:08
   S-VISUAL Titelkarte & Abspann  :done, p_vis, 17:55, 18:12
   S-LIVE-UI Brillen-Fokus Screen :done, p_b2, 17:55, 18:07
   S-NACHHER Nachher-Ansicht      :done, p_b3, 17:55, 18:03
   S-EXAMPLE Example Target Repo  :done, p_b1, 17:55, 18:00
-  S-REVIEW Klon & Setup Test     :p_rev, 18:15, 18:25
+  S-REVIEW Klon & Setup Test     :crit, active, p_rev, 18:15, 18:25
 ```
