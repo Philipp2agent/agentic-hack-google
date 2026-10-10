@@ -17,6 +17,7 @@
 | P-DASHBOARD-UI | Vorher-Nachher Graph (/dashboard) v1/v2 Kontrast & Checkpoint-Pulse | hack-bau3 | main | fertig, gemerged | E2E Integration in claude-03 |
 | gemini-01 | Demo-Szenario v1->v2 (context/hackathon-day.md) in src/data | hack-bau1 | main | fertig, gemerged | E2E Integration in claude-03 |
 | P-LIVE-SIM | Live-Demo-Events-Simulator & Vertragstests (docs/LIVE-EVENTS.md) | hack-bau2 | main | fertig, gemerged | Simulator fuer /live & tests |
+| P-DEMO-DATA | Demo-Agenda-Daten gemaess docs/LIVE-EVENTS.md (v1, v2, Checkpoint, 42 Teams) | hack-bau1 | main | fertig, gemerged | Datenbasis fuer claude-03 & claude-04 bereit |
 | claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools (Deadline 17:10) | Claude-Cloud | claude/... | laeuft in Cloud | Warten auf PR bis 17:10 |
 | claude-04 | Live-Visualisierung /src/live Mission Control (Deadline 17:30) | Claude-Cloud | claude/... | vergeben | Klick durch Philipp, PR bis 17:30 |
 | P-VISUAL | assets/brand: Graph Icons, Call Avatar, Banner (Nano Banana) | hack-visual | agent/hack-visual | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
@@ -42,6 +43,7 @@ gantt
   P-DASHBOARD-UI Graph Split-View   :done, p_dui, 16:35, 16:58
   gemini-01 Szenario v1->v2         :done, p_gem1, 16:35, 16:50
   P-LIVE-SIM Live Events Simulator  :done, p_sim, 16:50, 16:57
+  P-DEMO-DATA Live Agenda Daten     :done, p_data, 16:50, 17:02
   claude-03 E2E MVP & Video-Tools   :crit, active, p_cl3, 16:40, 17:10
   claude-04 Live Visualisierung     :active, p_cl4, 16:50, 17:30
   Probelauf Ray-Ban Brille          :crit, p_probe, 17:10, 17:30
