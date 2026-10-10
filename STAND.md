@@ -20,9 +20,9 @@
 | P-DEMO-DATA | Demo-Agenda-Daten gemaess docs/LIVE-EVENTS.md (v1, v2, Checkpoint, 42 Teams) | hack-bau1 | main | fertig, gemerged | Datenbasis fuer claude-03 & claude-04 bereit |
 | claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools (Deadline 17:10) | Claude-Cloud | claude/auftraege-claude-03-jh0o10 | PR #3 bereit | Merge nach Philipps Freigabe |
 | claude-04 | Live-Visualisierung /src/live Mission Control (Deadline 17:30) | Claude-Cloud | claude/... | vergeben | Klick durch Philipp, PR bis 17:30 |
-| P-VISUAL | assets/brand: Graph Icons, Call Avatar, Banner (Nano Banana) | hack-visual | agent/hack-visual | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
+| P-VISUAL | Brand-Assets (Banner, Call-Avatar, Graph-Icons) | hack-bau1 | agent/hack-bau1 | vergeben | assets/brand/* & docs/VISUALS.md |
 | P-MARKETING | 2-Minuten-Video-Skript & README-Erzaehlung | hack-bau1 | main | fertig, gemerged | README, VIDEO_SCRIPT & docs/META bereit |
-| P-REVIEW | Testplan & Validierung fuer E2E-Test 17:15 | hack-bau1 | agent/hack-bau1 | vergeben | docs/TESTPLAN.md & scripts/validate_demo.py |
+| P-REVIEW | Testplan & Validierung fuer E2E-Test 17:15 | hack-bau1 | main | fertig, gemerged | 55/55 Checks & docs/TESTPLAN.md bereit |
 
 ## ZEITPLAN
 ```mermaid
