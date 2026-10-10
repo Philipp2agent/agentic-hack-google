@@ -11,6 +11,7 @@
 | T-01 | docs/STRUKTUR.md Ordnerstruktur | hack-bau1 | agent/hack-bau1 | fertig, gemerged | - |
 | T-02 | Titelbild-Entwurf assets/titelbild.jpg | hack-visual | agent/hack-visual | fertig, gemerged | - |
 | T-03 | Titelbild v2 & Token-/Kostenbericht | hack-visual | agent/hack-visual | fertig, gemerged | - |
+| T-04 | Titelbild v3 (Solitäre Silhouette, Bienen-Schwarm-Agents, Basstöne) | hack-visual | agent/hack-visual | vergeben | Bild generieren & pushen |
 | claude-01 | tools/ton.py (Gemini TTS) | Claude-Cloud | claude/... | fertig, gemerged | - |
 
 ## ZEITPLAN
