@@ -11,7 +11,7 @@
     "topic": "Parallel Task Execution Pipeline Kickoff",
     "question_for_lead": "Unblock parallel worker execution following the overnight parallelstart trigger?",
     "recommended_action": "APPROVE - activate parallel agent task queues immediately",
-    "is_irreversible": false
+    "is_irreversible": true
   },
   {
     "item_id": "agenda-03",

@@ -74,6 +74,7 @@ class TestCoreModels(unittest.TestCase):
             item_id="agenda-01",
             decision_type="APPROVE",
             voice_notes="Approved via Ray-Ban headset",
+            human_verified=True,
         )
         self.assertEqual(dec.decision_type, "APPROVE")
         self.assertTrue(dec.human_verified)

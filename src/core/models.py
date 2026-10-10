@@ -27,7 +27,7 @@ TurnRole = Literal["agent", "user", "tool"]
 GraphPhase = Literal["before", "after", "BEFORE", "AFTER"]
 GraphStageType = GraphPhase
 NodeKind = Literal["agent", "event", "agenda", "decision", "action", "checkpoint", "resource"]
-NodeStatus = Literal["open", "blocked", "resolved", "info", "UNRESOLVED", "COMPLETED", "BLOCKED", "PENDING"]
+NodeStatus = str
 
 ACTION_TYPES = (
     "MERGE_BRANCH",
@@ -58,7 +58,7 @@ ARTIFACT_KEYS = (
 
 def now_iso() -> str:
     """UTC timestamp, ISO 8601, second precision."""
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def new_id(prefix: str) -> str:
