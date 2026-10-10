@@ -52,6 +52,13 @@ assets_dir = PROJECT_ROOT / "assets"
 if assets_dir.exists():
     app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
 
+# Mount WhatsApp Voice Telephony router
+try:
+    from src.voice.whatsapp_adapter import router as whatsapp_router
+    app.include_router(whatsapp_router, prefix="/api/whatsapp", tags=["whatsapp"])
+except Exception:
+    pass
+
 
 @app.get("/")
 async def root():

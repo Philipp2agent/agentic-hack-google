@@ -7,6 +7,10 @@ from src.voice.gradium_client import (
     extract_decisions_from_turns,
     save_call_transcript,
 )
+from src.voice.whatsapp_adapter import (
+    WhatsAppConfig,
+    generate_twiml_stream,
+)
 
 __all__ = [
     "app",
@@ -14,4 +18,6 @@ __all__ = [
     "build_system_instructions",
     "extract_decisions_from_turns",
     "save_call_transcript",
+    "WhatsAppConfig",
+    "generate_twiml_stream",
 ]
