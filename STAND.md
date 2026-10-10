@@ -24,12 +24,12 @@ gantt
   axisFormat %H:%M
   section Phasen
   Phase 1 Rahmen & Setup     :done, p1, 14:00, 15:00
-  Phase 2 Idee & Scope       :active, p2, 15:00, 15:50
-  Phase 3 Bau & Integration  :crit, p3, 15:50, 18:00
+  Phase 2 Idee & Scope       :active, p2, 15:00, 15:55
+  Phase 3 Bau & Integration  :crit, p3, 15:55, 18:00
   Phase 4 Feature-Freeze & Video :p4, 18:00, 18:40
   Phase 5 Politur & Abgabe   :p5, 18:40, 19:00
   section Auftraege
-  IDEE.md Konzept            :done, t_idee, 15:30, 15:40
-  claude-02 Architektur      :active, t_cl2, 15:40, 16:05
-  gemini-01..03 Baupakete    :t_gem, 16:05, 18:00
+  IDEE.md Konzept            :done, t_idee, 15:30, 15:45
+  claude-02 Architektur      :active, t_cl2, 15:45, 16:15
+  gemini-01..03 Baupakete    :t_gem, 16:15, 18:00
 ```

@@ -6,14 +6,14 @@ Modell: Fable (sonst Opus)
 Entwirf die vollstaendige technische Architektur fuer das Hackathon-Produkt **DawnDispatch (Morgen-Anruf-Agent)** und zerlege die Umsetzung in praezise, unabhaengige Arbeitspakete als `auftraege/gemini-NN.md` fuer die Gemini-Bauer-Agenten.
 
 Grundlage sind:
-- `IDEE.md`: Morning Commute Phone Call via Twilio + Gradium + Gemini 3.8 Flash, gefolgt vom Web-Dashboard ("Show me, don't tell me").
+- `IDEE.md`: Morning Commute Phone Call via Twilio + Meta Ray-Ban + Gradium + Gemini 3.8 Flash, gefolgt vom Web-Dashboard ("Show me, don't tell me").
 - `HACKATHON.md`: Partner-Technologien Google Gemini (Interactions API / OpenAI-compat) und Gradium (gradbot, STT/TTS). Alles in Englisch.
 - `docs/SETUP.md`: Python-Laufzeit am VPS (`/home/buzzagent/hack/.venv`), Secrets in `secrets.env` (nie committen!), Twilio + cloudflared Tunnel.
 
 ## Vorgaben & Architektur-Umfang
 Erstelle `docs/ARCHITEKTUR.md` mit folgenden Abschnitten:
 1. **Systemuebersicht & Komponenten-Diagramm (ASCII oder Mermaid):**
-   - Telephony / Voice Front Door (`gradbot` + Gradium STT/TTS + Twilio Webhook)
+   - Telephony / Voice Front Door (`gradbot` + Gradium STT/TTS + Twilio Webhook, Audio ueber Handy / Meta Ray-Ban)
    - Core Agent (`gemini-3.8-flash` ueber OpenAI-compat/Google-API mit Tool-Calling)
    - State & Action Engine (Overnight Seed-Daten, Call-State, Executed Actions)
    - Web Dashboard (FastAPI + HTML/Tailwind)
