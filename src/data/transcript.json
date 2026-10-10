@@ -1,0 +1,28 @@
+{
+  "call_id": "test-call-api-999",
+  "caller": "DawnDispatch Voice Agent",
+  "callee": "Philipp (Meta Ray-Ban Audio)",
+  "started_at": "2026-10-10T14:28:39Z",
+  "ended_at": "2026-10-10T14:28:39Z",
+  "duration_seconds": 52,
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "Good morning"
+    },
+    {
+      "speaker": "user",
+      "text": "Yes, approve PR"
+    }
+  ],
+  "decisions_captured": [
+    {
+      "item_id": "agenda-01",
+      "decision_type": "APPROVE",
+      "voice_notes": "API test approval",
+      "timestamp": "2026-10-10T14:28:39Z",
+      "human_verified": true
+    }
+  ],
+  "status": "SYNCED_TO_DASHBOARD"
+}

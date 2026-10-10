@@ -2,22 +2,23 @@
   {
     "action_id": "act-101",
     "item_id": "agenda-01",
-    "action_type": "DEPLOY_VOICE_SERVICE",
+    "action_type": "SWARM_AGENT_DELEGATION_FOR",
     "status": "COMPLETED",
     "artifacts": {
-      "port": 8090,
-      "commit": "3cdd23d",
-      "logs": "Service started successfully on ws://0.0.0.0:8090/ws/chat"
+      "execution_timestamp": "2026-10-10T14:28:39Z",
+      "voice_notes": "API test approval",
+      "dispatch_status": "Auto-dispatched upon morning commute approval"
     }
   },
   {
     "action_id": "act-102",
     "item_id": "agenda-02",
-    "action_type": "PURGE_STATE_AND_MIGRATE",
+    "action_type": "PARALLEL_TASK_EXECUTION_PIPELINE",
     "status": "BLOCKED_ON_CHECKPOINT",
     "artifacts": {
-      "reason": "Irreversible action requires Web Dashboard 1-click confirmation",
-      "pending_url": "/dashboard/checkpoint/agenda-02"
+      "reason": "Lead placed item on hold during morning triage call",
+      "pending_url": "/dashboard/checkpoint/agenda-02",
+      "voice_notes": "Lead requested manual dashboard checkpoint confirmation before wiping database."
     }
   }
 ]
