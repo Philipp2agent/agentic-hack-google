@@ -7,7 +7,8 @@
     "artifacts": {
       "port": 8090,
       "commit": "3cdd23d",
-      "logs": "Service started successfully on ws://0.0.0.0:8090/ws/chat"
+      "logs": "Service started successfully on ws://0.0.0.0:8090/ws/chat",
+      "dispatch_status": "Auto-dispatched upon morning commute approval"
     }
   },
   {
@@ -16,8 +17,23 @@
     "action_type": "PURGE_STATE_AND_MIGRATE",
     "status": "BLOCKED_ON_CHECKPOINT",
     "artifacts": {
-      "reason": "Irreversible action requires Web Dashboard 1-click confirmation",
-      "pending_url": "/dashboard/checkpoint/agenda-02"
+      "reason": "Irreversible database state purge & schema migration requires Web Dashboard 1-click confirmation",
+      "pending_url": "/dashboard/checkpoint/agenda-02",
+      "scope": "PostgreSQL schema v2 migration & Redis session cache flush",
+      "risk_level": "CRITICAL"
+    }
+  },
+  {
+    "action_id": "act-103",
+    "item_id": "agenda-03",
+    "action_type": "PUBLISH_HERO_ASSET",
+    "status": "BLOCKED_ON_CHECKPOINT",
+    "artifacts": {
+      "reason": "Public release of brand hero banner asset requires human lead 1-click confirmation",
+      "pending_url": "/dashboard/checkpoint/agenda-03",
+      "asset_preview": "/assets/titelbild-v3.jpg",
+      "target": "Production Hero Banner (assets/brand)",
+      "risk_level": "HIGH"
     }
   }
 ]

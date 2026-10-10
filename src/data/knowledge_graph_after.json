@@ -1,6 +1,6 @@
 {
   "stage": "AFTER",
-  "generated_at": "2026-10-10T14:17:21Z",
+  "generated_at": "2026-10-10T14:27:22Z",
   "nodes": [
     {
       "id": "agent-hack-chef",
@@ -133,11 +133,12 @@
       "label": "DEPLOY_VOICE_SERVICE",
       "type": "action",
       "status": "COMPLETED",
-      "details": "COMPLETED",
+      "details": "Auto-dispatched upon morning commute approval",
       "metadata": {
         "port": 8090,
         "commit": "3cdd23d",
-        "logs": "Service started successfully on ws://0.0.0.0:8090/ws/chat"
+        "logs": "Service started successfully on ws://0.0.0.0:8090/ws/chat",
+        "dispatch_status": "Auto-dispatched upon morning commute approval"
       }
     },
     {
@@ -145,10 +146,26 @@
       "label": "PURGE_STATE_AND_MIGRATE",
       "type": "action",
       "status": "BLOCKED_ON_CHECKPOINT",
-      "details": "Irreversible action requires Web Dashboard 1-click confirmation",
+      "details": "Irreversible database state purge & schema migration requires Web Dashboard 1-click confirmation",
       "metadata": {
-        "reason": "Irreversible action requires Web Dashboard 1-click confirmation",
-        "pending_url": "/dashboard/checkpoint/agenda-02"
+        "reason": "Irreversible database state purge & schema migration requires Web Dashboard 1-click confirmation",
+        "pending_url": "/dashboard/checkpoint/agenda-02",
+        "scope": "PostgreSQL schema v2 migration & Redis session cache flush",
+        "risk_level": "CRITICAL"
+      }
+    },
+    {
+      "id": "act-103",
+      "label": "PUBLISH_HERO_ASSET",
+      "type": "action",
+      "status": "BLOCKED_ON_CHECKPOINT",
+      "details": "Public release of brand hero banner asset requires human lead 1-click confirmation",
+      "metadata": {
+        "reason": "Public release of brand hero banner asset requires human lead 1-click confirmation",
+        "pending_url": "/dashboard/checkpoint/agenda-03",
+        "asset_preview": "/assets/titelbild-v3.jpg",
+        "target": "Production Hero Banner (assets/brand)",
+        "risk_level": "HIGH"
       }
     }
   ],
@@ -222,6 +239,12 @@
     {
       "source": "dec-agenda-02",
       "target": "act-102",
+      "relation": "DISPATCHES",
+      "status": "BLOCKED"
+    },
+    {
+      "source": "agenda-03",
+      "target": "act-103",
       "relation": "DISPATCHES",
       "status": "BLOCKED"
     }
