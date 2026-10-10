@@ -386,8 +386,11 @@
 
   function renderFocus() {
     const f = S.focus, el = $('focus');
-    graphArea.classList.toggle('dim', !!(f && f.dim));
-    sidebar.classList.toggle('dim', !!(f && f.dim));
+    const isDim = !!(f && f.dim);
+    graphArea.classList.toggle('dim', isDim);
+    sidebar.classList.toggle('dim', isDim);
+    const tb = $('topbar');
+    if (tb) tb.classList.toggle('dim', isDim);
     if (!f) { el.classList.add('hidden'); el.dataset.key = ''; return; }
     el.className = 'focus ' + (f.mode || '') + (f.cls ? ' ' + f.cls : '') + (f.up ? ' up' : '');
     $('focus-eyebrow').textContent = f.eyebrow || '';
@@ -513,7 +516,7 @@
         const keep = lastSeq;
         resetView(); lastSeq = keep;
         setStatus('live'); S.callStartMs = atMs;
-        setFocus({ key: 'opening', mode: 'opening', eyebrow: 'DAWN IS CALLING', title: d.opening || 'Call started', dim: false, autoHide: 9000 }, animate);
+        setFocus({ key: 'opening', mode: 'opening', eyebrow: 'DAWN IS CALLING', title: d.opening || 'Call started', dim: true, autoHide: 9000 }, animate);
         break;
       }
       case 'time_budget':
@@ -543,7 +546,7 @@
       case 'user_said':
         if (d.text) {
           S.said.push(String(d.text)); S.said = S.said.slice(-3); renderSaid();
-          if (S.focus && (S.focus.mode === 'question' || S.focus.mode === 'checkpoint')) { S.focus.answer = String(d.text); renderFocus(); }
+          if (S.focus && (S.focus.mode === 'question' || S.focus.mode === 'checkpoint' || S.focus.mode === 'opening')) { S.focus.answer = String(d.text); renderFocus(); }
         }
         break;
       case 'decision': {
@@ -562,7 +565,7 @@
           if (S.current === id) S.current = null;
         }
         setFocus({ key: 'd:' + (id || S.decisions.length), mode: 'decision', cls: st === 'rejected' ? 'neg' : st === 'hold' ? 'hold' : '',
-          eyebrow: 'DECISION', title, answer: S.focus && S.focus.answer, verdict: verdictFor(d.decision), summary: d.summary || '', dim: false, autoHide: 5500 }, animate);
+          eyebrow: 'DECISION', title, answer: S.focus && S.focus.answer, verdict: verdictFor(d.decision), summary: d.summary || '', dim: true, autoHide: 6000 }, animate);
         renderAgenda(); reheat(0.5);
         break;
       }
@@ -592,8 +595,8 @@
         const a = agendaEntry(id, { state: approved ? 'done' : 'rejected', tag: approved ? 'APPROVED' : 'DECLINED' });
         if (S.current === id) S.current = null;
         if (!S.checkpoint || S.checkpoint.item_id === id) S.checkpoint = null;
-        setFocus({ key: 'cpr:' + id, mode: 'resolved', cls: approved ? '' : 'neg', eyebrow: 'IRREVERSIBLE', title: cp.action || a.title,
-          verdict: approved ? 'APPROVED ON THE LAPTOP' : 'DECLINED', dim: false, autoHide: 5500 }, animate);
+        setFocus({ key: 'cpr:' + id, mode: 'resolved', cls: approved ? '' : 'neg', eyebrow: 'IRREVERSIBLE ACTION', title: cp.action || a.title,
+          verdict: approved ? 'APPROVED ON THE LAPTOP' : 'DECLINED', dim: true, autoHide: 5500 }, animate);
         renderAgenda(); reheat(0.4);
         break;
       }
@@ -604,7 +607,7 @@
         addNode({ id, kind: 'v2', state: 'v2', label: d.title || id, badge: 'V2', near: linked[0] || HUB_ID }, animate);
         (linked.length ? linked : [HUB_ID]).forEach((src) => addLink(src, id, 'v2', animate));
         setCaption('Version 2: ' + trunc(d.title || id, 70), 7000);
-        if (S.focus && S.focus.mode === 'decision') { S.focus.up = true; renderFocus(); }
+        if (S.focus && (S.focus.mode === 'decision' || S.focus.mode === 'resolved')) { S.focus.up = true; S.focus.dim = false; renderFocus(); }
         reheat(0.7);
         break;
       }
@@ -631,7 +634,7 @@
         setStatus('ended');
         nodes.forEach((n) => { if (n.pulse === 'pulse-soft') { n.pulse = ''; updateNode(n); } });
         S.current = null;
-        setFocus({ key: 'ended', mode: 'ended', eyebrow: 'CALL ENDED', title: mmss(S.durationS), summary: `${S.decisions.length} decision${S.decisions.length === 1 ? '' : 's'} · building your brief`, dim: false }, animate);
+        setFocus({ key: 'ended', mode: 'ended', eyebrow: 'CALL ENDED', title: mmss(S.durationS), summary: `${S.decisions.length} decision${S.decisions.length === 1 ? '' : 's'} · building your brief`, dim: true }, animate);
         setCaption('');
         renderAgenda(); updateClock();
         break;
