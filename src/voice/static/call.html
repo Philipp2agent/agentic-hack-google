@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>DawnDispatch — Commute Voice Call</title>
   <link rel="stylesheet" href="/static/call.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="mobile-body">
   <div class="phone-frame">
@@ -18,7 +18,7 @@
       </div>
       <div class="status-dynamic-island">
         <div class="island-pill">
-          <span class="island-dot"></span>
+          <span class="island-dot" id="island-dot"></span>
           <span class="island-text" id="island-status">Ray-Ban Connected</span>
         </div>
       </div>
@@ -35,7 +35,7 @@
     <!-- MAIN CALL SCREEN -->
     <main class="call-content">
       
-      <!-- INCOMING CALL SCREEN -->
+      <!-- 1. INCOMING CALL SCREEN -->
       <section id="screen-incoming" class="screen-view active">
         <div class="caller-meta">
           <div class="incoming-label">INCOMING CALL</div>
@@ -55,7 +55,7 @@
           <div class="pulse-ring ring-3"></div>
           <div class="avatar-disc">
             <div class="avatar-glasses-icon">
-              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.8">
+              <svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="currentColor" stroke-width="1.8">
                 <circle cx="6" cy="12" r="4"/>
                 <circle cx="18" cy="12" r="4"/>
                 <path d="M10 12h4M2 12h0M22 12h0"/>
@@ -68,26 +68,31 @@
         <div class="incoming-prompt">
           <p>Philipp walking to office</p>
           <span class="prompt-sub">Double-tap glasses temple or press Answer</span>
+          <div class="audio-hint" id="audio-hint">Tap anywhere to enable ring audio</div>
         </div>
 
         <div class="incoming-actions">
           <button id="btn-decline" class="call-btn btn-decline" aria-label="Decline call">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-              <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.99.99 0 0 1 0-1.41C3.28 8.78 7.42 7 12 7s8.72 1.78 11.71 4.67c.39.39.39 1.02 0 1.41l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.1-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
-            </svg>
+            <div class="btn-icon-wrapper">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.99.99 0 0 1 0-1.41C3.28 8.78 7.42 7 12 7s8.72 1.78 11.71 4.67c.39.39.39 1.02 0 1.41l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.1-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
+              </svg>
+            </div>
             <span>Decline</span>
           </button>
 
           <button id="btn-accept" class="call-btn btn-accept" aria-label="Answer call">
-            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
-              <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-.99-1z"/>
-            </svg>
+            <div class="btn-icon-wrapper pulse-answer">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1A11.36 11.36 0 0 1 8.5 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-.99-1z"/>
+              </svg>
+            </div>
             <span>Answer</span>
           </button>
         </div>
       </section>
 
-      <!-- ACTIVE CALL SCREEN -->
+      <!-- 2. ACTIVE CALL SCREEN -->
       <section id="screen-active" class="screen-view">
         <div class="active-header">
           <div class="active-caller">DawnDispatch Agent</div>
@@ -98,8 +103,14 @@
           </div>
         </div>
 
-        <!-- Waveform Audio Visualizer -->
-        <div class="waveform-container" id="waveform">
+        <!-- Waveform Audio Visualizer (Dynamic Web Audio / Animation) -->
+        <div class="waveform-container listening" id="waveform">
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
           <span class="wave-bar"></span>
           <span class="wave-bar"></span>
           <span class="wave-bar"></span>
@@ -110,29 +121,80 @@
           <span class="wave-bar"></span>
         </div>
 
-        <!-- Live Quick-Fire Dialog Card -->
-        <div class="dialog-card">
-          <div class="dialog-badge" id="dialog-phase-badge">OPENING GREETING</div>
-          <div class="agent-speech-bubble" id="agent-speech">
-            "Good morning Philipp. Swarm overnight triage ready. How much time do you have?"
-          </div>
-          <div class="user-speech-bubble" id="user-speech">
-            Listening for your voice...
+        <!-- Schnellfeuer-Karten-Container (Interactive Quick-Fire Card) -->
+        <div class="quickfire-card-wrapper">
+          <div class="quickfire-card" id="quickfire-card">
+            <!-- Stepper Indicators -->
+            <div class="qf-card-header">
+              <div class="qf-stepper" id="qf-stepper">
+                <span class="step-dot active" data-step="0"></span>
+                <span class="step-dot" data-step="1"></span>
+                <span class="step-dot" data-step="2"></span>
+              </div>
+              <div class="qf-badges">
+                <span class="dialog-badge" id="dialog-phase-badge">OPENING GREETING</span>
+                <span class="checkpoint-badge hidden" id="checkpoint-badge">⚠️ IRREVERSIBLE CHECKPOINT</span>
+              </div>
+            </div>
+
+            <!-- Card Topic / Context -->
+            <div class="qf-topic-label" id="qf-topic">Overnight Swarm Standup</div>
+
+            <!-- Agent Speech Bubble (Main Prompt) -->
+            <div class="agent-speech-bubble" id="agent-speech">
+              "Good morning Philipp. Swarm overnight triage ready. How much time do you have?"
+            </div>
+
+            <!-- Swarm Recommendation Box -->
+            <div class="qf-recommendation-box" id="qf-recommendation-box">
+              <div class="rec-header">
+                <span class="rec-icon">🤖</span>
+                <span class="rec-title">SWARM RECOMMENDATION</span>
+              </div>
+              <div class="rec-text" id="qf-recommendation">Speed triage: answer available commute time to begin</div>
+            </div>
+
+            <!-- User Speech Bubble / Transcript Live Feed -->
+            <div class="user-speech-bubble" id="user-speech">
+              Listening for your voice (Ray-Ban mic active)...
+            </div>
+
+            <!-- Stamp Overlay for Instant Decision Feedback -->
+            <div class="card-stamp hidden" id="card-stamp">APPROVED</div>
           </div>
         </div>
 
-        <!-- Quick Fire Yes/No Quick-Tap Controls -->
+        <!-- Quick-Time Budget Chips (Active during Greeting Phase) -->
+        <div class="quick-budget-chips" id="quick-budget-chips">
+          <button class="budget-chip" data-time="60 seconds">
+            <span class="chip-icon">⏱️</span>
+            <span>60 Seconds</span>
+          </button>
+          <button class="budget-chip" data-time="30 seconds">
+            <span class="chip-icon">⚡</span>
+            <span>30 Seconds</span>
+          </button>
+          <button class="budget-chip" data-time="2 minutes">
+            <span class="chip-icon">🚶</span>
+            <span>2 Minutes</span>
+          </button>
+        </div>
+
+        <!-- Quick Fire Yes/Hold/No Quick-Tap Controls -->
         <div class="quickfire-tap-bar" id="quickfire-controls">
-          <button class="qf-btn qf-yes" data-answer="Yes">
-            <span>✓ YES</span>
+          <button class="qf-btn qf-yes" data-answer="Yes" aria-label="Approve decision">
+            <span class="qf-icon">✓</span>
+            <span class="qf-label">YES</span>
             <small>Approve</small>
           </button>
-          <button class="qf-btn qf-hold" data-answer="Hold">
-            <span>⏸ HOLD</span>
+          <button class="qf-btn qf-hold" data-answer="Hold" aria-label="Hold for human checkpoint">
+            <span class="qf-icon">⏸</span>
+            <span class="qf-label">HOLD</span>
             <small>Checkpoint</small>
           </button>
-          <button class="qf-btn qf-no" data-answer="No">
-            <span>✕ NO</span>
+          <button class="qf-btn qf-no" data-answer="No" aria-label="Reject decision">
+            <span class="qf-icon">✕</span>
+            <span class="qf-label">NO</span>
             <small>Reject</small>
           </button>
         </div>
@@ -148,9 +210,12 @@
           </button>
 
           <button id="btn-end-call" class="call-btn btn-hangup" aria-label="End call">
-            <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
-              <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.99.99 0 0 1 0-1.41C3.28 8.78 7.42 7 12 7s8.72 1.78 11.71 4.67c.39.39.39 1.02 0 1.41l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.1-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
-            </svg>
+            <div class="btn-icon-wrapper hangup-wrapper">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.99.99 0 0 1 0-1.41C3.28 8.78 7.42 7 12 7s8.72 1.78 11.71 4.67c.39.39.39 1.02 0 1.41l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.1-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
+              </svg>
+            </div>
+            <span>End Call</span>
           </button>
 
           <button id="btn-speaker" class="control-circle-btn active" aria-label="Speaker / Ray-Ban toggle">
@@ -163,10 +228,10 @@
         </div>
       </section>
 
-      <!-- ENDED CALL SCREEN -->
+      <!-- 3. ENDED CALL SCREEN -->
       <section id="screen-ended" class="screen-view">
         <div class="ended-icon-wrapper">
-          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#22c55e" stroke-width="2">
+          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#22c55e" stroke-width="2.2">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
             <polyline points="22 4 12 14.01 9 11.01"/>
           </svg>
@@ -175,13 +240,13 @@
         <h2 class="ended-title">Call Completed</h2>
         <div class="ended-duration" id="ended-duration-label">Duration: 00:58</div>
         <p class="ended-desc">
-          Decisions recorded hands-free via Meta Ray-Ban audio during morning walk.
+          Decisions recorded hands-free via Meta Ray-Ban audio during morning walk. Knowledge Graph updated in background.
         </p>
 
         <div class="summary-card">
           <div class="summary-header">
             <span>SYNC STATUS</span>
-            <span class="badge-synced">✓ SYNCED</span>
+            <span class="badge-synced">✓ SYNCED TO GRAPH</span>
           </div>
           <ul class="summary-list" id="summary-decision-list">
             <li>Loading decisions...</li>
@@ -191,7 +256,7 @@
         <div class="ended-actions">
           <a href="/dashboard" class="btn-dashboard-jump">
             <span>Open Laptop Dashboard</span>
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
           </a>
