@@ -1,0 +1,82 @@
+"""Smoke test (claude-03): the combined app imports and serves /dashboard and /call without any API call."""
+from __future__ import annotations
+
+import unittest
+
+from fastapi.testclient import TestClient
+
+from src.app import MOUNTED, app
+
+
+class SmokeTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.client = TestClient(app)
+
+    def test_health_lists_mounted_packages(self):
+        res = self.client.get("/api/health")
+        self.assertEqual(res.status_code, 200)
+        body = res.json()
+        self.assertEqual(body["status"], "ok")
+        self.assertTrue(body["mounted"].get("voice"))
+        self.assertTrue(body["mounted"].get("dashboard"))
+        self.assertEqual(MOUNTED, body["mounted"])
+
+    def test_root_redirects_to_dashboard(self):
+        res = self.client.get("/", follow_redirects=False)
+        self.assertIn(res.status_code, (302, 307))
+        self.assertEqual(res.headers["location"], "/dashboard")
+
+    def test_dashboard_200(self):
+        res = self.client.get("/dashboard")
+        self.assertEqual(res.status_code, 200)
+        self.assertIn("text/html", res.headers["content-type"])
+        self.assertIn("DawnDispatch", res.text)
+
+    def test_call_200_start_page(self):
+        res = self.client.get("/call")
+        self.assertEqual(res.status_code, 200)
+        self.assertIn("text/html", res.headers["content-type"])
+        self.assertIn("Start call", res.text)
+        self.assertIn("/ws/chat", res.text)
+        self.assertIn("/static/js/synced-audio-player.js", res.text)
+        self.assertNotIn("ringtone", res.text.lower())
+
+    def test_call_sim_200(self):
+        res = self.client.get("/call/sim")
+        self.assertEqual(res.status_code, 200)
+        self.assertIn("/static/voice/call.js", res.text)
+
+    def test_dashboard_api_routes_are_included(self):
+        for path in ("/api/graph/before", "/api/graph/after", "/api/actions", "/api/transcript", "/api/agenda"):
+            res = self.client.get(path)
+            self.assertEqual(res.status_code, 200, path)
+
+    def test_call_agenda_and_state(self):
+        res = self.client.get("/api/call/agenda")
+        self.assertEqual(res.status_code, 200)
+        items = res.json()["items"]
+        self.assertEqual(len(items), 4)
+        self.assertTrue(any(it["is_irreversible"] for it in items))
+        res = self.client.get("/api/call/state")
+        self.assertEqual(res.status_code, 200)
+        self.assertIn("call", res.json())
+
+    def test_ws_chat_route_exists(self):
+        # FastAPI >= 0.143 keeps included routers nested, so look at the voice router itself
+        from src.voice.server import router as voice_router
+
+        self.assertIn("/ws/chat", {getattr(r, "path", None) for r in voice_router.routes})
+        self.assertTrue(MOUNTED.get("voice"))
+        # and the HTTP side of the same router is reachable through the app
+        self.assertEqual(self.client.get("/api/audio-config").status_code, 200)
+
+    def test_static_mounts(self):
+        self.assertEqual(self.client.get("/static/style.css").status_code, 200)
+        self.assertEqual(self.client.get("/static/voice/call.css").status_code, 200)
+        if MOUNTED.get("gradbot_js"):
+            self.assertEqual(self.client.get("/static/js/synced-audio-player.js").status_code, 200)
+
+
+if __name__ == "__main__":
+    unittest.main()
