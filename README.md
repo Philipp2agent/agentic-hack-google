@@ -28,7 +28,7 @@ Then open:
 
 | URL | What |
 |---|---|
-| `http://127.0.0.1:8090/call` | phone page: big **Start call** button, the agent speaks first (mic needs HTTPS on a phone, see tunnel) |
+| `http://127.0.0.1:8090/call` | phone page (redirects to `/voice/`): big round call button, the agent speaks first (mic needs HTTPS on a phone, see tunnel) |
 | `http://127.0.0.1:8090/dashboard` | laptop: knowledge graph before/after, transcript, human checkpoints |
 | `http://127.0.0.1:8090/live` | laptop: live mission-control screen (when `src/live` is merged) |
 | `http://127.0.0.1:8090/call/sim` | static call simulation without backend audio (hack-bau2) |
@@ -45,7 +45,7 @@ python -m pytest -q
 
 ## How the call works
 
-`src/voice/server.py` runs a gradbot session on `/ws/chat` (pattern: gradbot `demos/simple_chat`). Gemini (`LLM_MODEL`
+`src/voice/server.py` is gradbot `demos/simple_chat/main.py` (init_logging, config, make_config, handle_session, routes.setup) plus instructions and tools; the page `src/voice/static/index.html` is simple_chat's with the agenda panel added. The app is mounted at `/voice` like the gradbot demos launcher; `/ws/chat` and `/api/call/*` are also served at the root. Gemini (`LLM_MODEL`
 over `LLM_BASE_URL`) leads the dialog from `src/voice/prompt.py`; Gradium does STT and TTS. Tools the agent calls:
 
 | Tool | Effect |

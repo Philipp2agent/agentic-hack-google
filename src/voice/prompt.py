@@ -148,7 +148,7 @@ TOOL_SPECS: list[dict[str, Any]] = [
         "parameters": {
             "type": "object",
             "properties": {
-                "seconds": {"type": "integer", "minimum": 10, "maximum": 900, "description": "time budget in seconds"},
+                "seconds": {"type": "integer", "description": "time budget in seconds (10 to 900)"},
             },
             "required": ["seconds"],
         },
@@ -194,7 +194,7 @@ TOOL_SPECS: list[dict[str, Any]] = [
         "parameters": {
             "type": "object",
             "properties": {
-                "speed": {"type": "number", "minimum": 0.6, "maximum": 1.8},
+                "speed": {"type": "number", "description": "speaking speed factor, 0.6 to 1.8 (1.0 = normal)"},
                 "reason": {"type": "string", "description": "what the lead said or signalled"},
             },
             "required": ["speed", "reason"],

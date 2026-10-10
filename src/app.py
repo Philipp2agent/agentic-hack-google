@@ -47,14 +47,42 @@ def _existing_paths() -> set[str]:
     return paths
 
 
-# --- voice (claude-03): /call, /call/sim, /ws/chat, /api/audio-config, /api/call/* -------------
+# --- voice (claude-03): simple_chat-style app mounted at /voice like gradbot's demos/app.py ------------
 try:
-    from src.voice.server import router as voice_router
+    from src.voice.server import api_router as voice_api_router
+    from src.voice.server import app as voice_app
+    from src.voice.server import cfg as voice_cfg
+    from src.voice.server import ws_chat as voice_ws_chat
 
-    app.include_router(voice_router)
+    @app.get("/call", include_in_schema=False)
+    async def call_redirect():
+        """The phone opens /call; the page itself lives at /voice/ (relative paths exactly as in simple_chat)."""
+        return fastapi.responses.RedirectResponse("/voice/")
+
+    @app.websocket("/ws/chat")
+    async def ws_chat_root(websocket: fastapi.WebSocket):
+        await voice_ws_chat(websocket)
+
+    @app.get("/api/audio-config")
+    async def audio_config_root():
+        return {"pcm": bool(voice_cfg.use_pcm)}
+
+    app.include_router(voice_api_router)  # /api/call/* at the root too (dashboard, live placeholder)
+
+    _SIM_PAGE = REPO_ROOT / "src" / "voice" / "static" / "call.html"
+
+    @app.get("/call/sim", include_in_schema=False)
+    async def call_simulation_page():
+        """hack-bau2's static incoming-call simulation (no backend audio), asset paths rewritten for this app."""
+        if not _SIM_PAGE.exists():
+            return fastapi.responses.JSONResponse({"error": "call.html not found"}, status_code=404)
+        html = _SIM_PAGE.read_text(encoding="utf-8").replace('"/static/call.', '"/static/voice/call.')
+        return fastapi.responses.HTMLResponse(html)
+
     MOUNTED["voice"] = True
 except Exception as exc:  # pragma: no cover
-    log.warning("voice router not mounted: %s", exc)
+    log.warning("voice app not mounted: %s", exc)
+    voice_app = None
     MOUNTED["voice"] = False
 
 # --- dashboard (hack-bau3): its FastAPI app's API routes, skipping duplicates and its static mounts ---
@@ -121,6 +149,20 @@ for prefix, folder in (
 ):
     if folder.is_dir():
         app.mount(prefix, fastapi.staticfiles.StaticFiles(directory=folder), name=prefix.strip("/").replace("/", "_"))
+
+# hack-bau3's templates/index.html has relative fallbacks (graph.js, style.css) that resolve to the site root
+@app.get("/graph.js", include_in_schema=False)
+async def _dashboard_graph_js_alias():
+    return fastapi.responses.RedirectResponse("/static/graph.js")
+
+
+@app.get("/style.css", include_in_schema=False)
+async def _dashboard_style_alias():
+    return fastapi.responses.RedirectResponse("/static/style.css")
+
+
+if voice_app is not None:
+    app.mount("/voice", voice_app, name="voice")  # /voice/ page, /voice/ws/chat, /voice/static/js, /voice/api/voices
 
 _audio = REPO_ROOT / "src" / "data" / "audio"
 _audio.mkdir(parents=True, exist_ok=True)

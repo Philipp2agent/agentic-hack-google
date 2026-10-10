@@ -118,7 +118,7 @@ class VoiceServerTest(unittest.TestCase):
         self.assertEqual(h.results[-1]["next_item_id"], "agenda-01")
         self.assertEqual(state.load().call.time_budget_s, 60)
 
-        self.session.on_user_text({"type": "user_text", "text": "nothing to flag", "turn_idx": 1, "stop_s": 5.0})
+        run(self.session.record_turn("user", 1, "nothing to flag", 5.0))
         h = self.call("log_decision", item_id="agenda-01", decision="APPROVE", notes="nothing to flag")
         self.assertEqual(h.results[-1]["next_item_id"], "agenda-02")
 

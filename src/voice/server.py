@@ -1,15 +1,15 @@
-"""DawnDispatch voice server (claude-03): /call page and the gradbot session on /ws/chat.
+"""DawnDispatch voice app (claude-03), built 1:1 on gradbot demos/simple_chat/main.py.
 
-Pattern: gradbot demos/simple_chat (FastAPI + gradbot.websocket.handle_session + Gradium STT/TTS,
-Gemini through the OpenAI-compatible endpoint from LLM_BASE_URL / LLM_MODEL).
+Taken unchanged from simple_chat: gradbot.init_logging(), cfg = gradbot.config.from_env(), make_config() shape,
+handle_session(websocket, config=cfg, on_start=make_config), gradbot.routes.setup(app, config=cfg, static_dir, with_voices=True)
+and the client JS in static/index.html (audio path + message format). Added on top: the instructions (demo agenda from
+docs/LIVE-EVENTS.md, agent speaks first), the tools, LIVE-EVENTS publishing and the post-call processing.
 
-Keys only from the environment: GRADIUM_API_KEY, LLM_API_KEY, LLM_BASE_URL (no trailing slash),
-LLM_MODEL; optional DAWN_VOICE_ID, DAWN_SPEED, DAWN_LANGUAGE, DAWN_TEAM_COUNT, DAWN_DATA_DIR.
+Mounted by src/app.py at /voice like the official demos launcher (demos/app.py); /call redirects there and the
+root also exposes /ws/chat, /api/audio-config and /api/call/*.
 
-Tools the agent can call (see prompt.TOOL_SPECS): set_time_budget, log_decision,
-mark_irreversible_checkpoint, set_speaking_speed, end_call. Every agenda step and tool publishes an
-event per docs/LIVE-EVENTS.md through ``src.live.bus.publish`` (try-import, otherwise no-op) and
-mirrors it to the phone page over the same WebSocket.
+Keys only from the environment: GRADIUM_API_KEY, LLM_API_KEY, LLM_BASE_URL (no trailing slash), LLM_MODEL;
+optional DAWN_VOICE_ID, DAWN_SPEED, DAWN_LANGUAGE, DAWN_TEAM_COUNT, DAWN_DATA_DIR, DAWN_HIDE_ERRORS=1.
 """
 from __future__ import annotations
 
@@ -23,6 +23,7 @@ from typing import Any
 
 import fastapi
 import fastapi.responses
+import gradbot
 
 from src.core import state
 from src.core.action_engine import on_decision
@@ -30,15 +31,39 @@ from src.core.models import AgendaItem, DecisionRecord, TranscriptTurn, now_iso
 from src.voice import postcall, prompt
 
 log = logging.getLogger("dawndispatch.voice")
+if not logging.getLogger().handlers:  # uvicorn leaves the root logger unconfigured
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
+# --- exactly as in demos/simple_chat/main.py ------------------------------------------------------------
+if os.environ.get("LLM_BASE_URL", "").endswith("/"):  # a trailing slash gave a 404 on the VPS this afternoon
+    os.environ["LLM_BASE_URL"] = os.environ["LLM_BASE_URL"].rstrip("/")
+
+gradbot.init_logging()
+app = fastapi.FastAPI(title="DawnDispatch Voice")
+cfg = gradbot.config.from_env()
+if os.environ.get("DAWN_HIDE_ERRORS") != "1":
+    cfg.debug = True  # the phone page shows the real error text instead of "An error occurred"
+
+DEFAULT_VOICE_ID = "cLONiZ4hQ8VpQ4Sz"  # Skyler
 STATIC_DIR = pathlib.Path(__file__).resolve().parent / "static"
-LIVE_PAGE = STATIC_DIR / "call_live.html"
-SIM_PAGE = STATIC_DIR / "call.html"  # hack-bau2's static simulation, kept reachable at /call/sim
-
-DEFAULT_VOICE_ID = "cLONiZ4hQ8VpQ4Sz"  # Gradium flagship "Skyler" (English, US)
 CLOSE_GRACE_S = float(os.environ.get("DAWN_CLOSE_GRACE_S", "15"))
 
-# --- live events bus (claude-04), optional ---------------------------------------------------
+
+def make_config(msg: dict, padding_bonus: float | None = None) -> gradbot.SessionConfig:
+    """simple_chat's make_config + instructions/tools; DAWN_VOICE_ID (if set) wins over the page's voice picker."""
+    voice_id = os.environ.get("DAWN_VOICE_ID") or msg.get("voice_id") or DEFAULT_VOICE_ID
+    language = msg.get("language") or os.environ.get("DAWN_LANGUAGE") or "en"
+    extra: dict[str, Any] = {} if padding_bonus is None else {"padding_bonus": padding_bonus}
+    return gradbot.SessionConfig(
+        voice_id=voice_id,
+        language=gradbot.LANGUAGES.get(language) if language else None,
+        instructions=prompt.build_instructions(),
+        tools=prompt.gradbot_tools(),
+        **({"assistant_speaks_first": True} | cfg.session_kwargs | extra),
+    )
+
+
+# --- live events bus (claude-04), optional ---------------------------------------------------------------
 try:  # pragma: no cover - depends on the sibling package
     from src.live.bus import publish as _bus_publish  # type: ignore
 except Exception:  # module missing until claude-04 is merged
@@ -62,26 +87,16 @@ async def publish(event_type: str, data: dict[str, Any] | None = None) -> dict[s
     return event
 
 
-# --- gradbot config ----------------------------------------------------------------------------
-def gradbot_config():
-    """gradbot Config from the environment (LLM_BASE_URL normalised: no trailing slash -> no 404)."""
-    base = os.environ.get("LLM_BASE_URL")
-    if base and base.endswith("/"):
-        os.environ["LLM_BASE_URL"] = base.rstrip("/")
-    import gradbot
-
-    return gradbot.config.from_env()
-
-
+# --- helpers ---------------------------------------------------------------------------------------------
 def voice_id() -> str:
     return os.environ.get("DAWN_VOICE_ID") or DEFAULT_VOICE_ID
 
 
 def default_speed() -> float:
     try:
-        return float(os.environ.get("DAWN_SPEED", "1.1"))
+        return float(os.environ.get("DAWN_SPEED", "1.0"))
     except ValueError:
-        return 1.1
+        return 1.0
 
 
 def speed_to_padding(speed: float) -> float:
@@ -128,37 +143,17 @@ def v2_idea_payload(option: str, notes: str, item_id: str) -> dict[str, Any]:
     return {"id": f"v2-opt-{option.lower()}", "title": title, "linked_to": [item_id, prompt.V1_ITEM_ID]}
 
 
-# --- transcript buffering ----------------------------------------------------------------------
-class _TurnBuffer:
-    """Collects the incremental user_text / agent_text chunks gradbot sends."""
-
-    def __init__(self, role: str):
-        self.role = role
-        self.turn_idx: int | None = None
-        self.parts: list[str] = []
-        self.t_s: float | None = None
-
-    def add(self, text: str, turn_idx: int | None, t_s: float | None) -> None:
-        if turn_idx is not None and self.turn_idx is not None and turn_idx != self.turn_idx and self.parts:
-            # caller flushes on turn change; keep the newest turn
-            self.parts = []
-        self.turn_idx = turn_idx if turn_idx is not None else self.turn_idx
-        self.parts.append(text.strip())
-        self.t_s = t_s if t_s is not None else self.t_s
-
-    def pop(self) -> tuple[str, int | None, float | None]:
-        text = " ".join(p for p in self.parts if p).strip()
-        turn_idx, t_s = self.turn_idx, self.t_s
-        self.parts, self.turn_idx, self.t_s = [], None, None
-        return text, turn_idx, t_s
+# --- per-call state: agenda progress, speed, tools, events ---------------------------------------------
+CURRENT: dict[str, "CallSession | None"] = {"session": None}
 
 
 class CallSession:
-    """Per-WebSocket state: agenda progress, speed, time budget, transcript, events."""
+    """Tool handlers and LIVE-EVENTS for one call. Does not touch the audio path."""
 
-    def __init__(self, websocket: fastapi.WebSocket, language: str = "en"):
+    def __init__(self, websocket: Any, start_msg: dict | None = None):
         self.websocket = websocket
-        self.language = language
+        self.start_msg = dict(start_msg or {})
+        self.language = (self.start_msg.get("language") or os.environ.get("DAWN_LANGUAGE") or "en").lower()
         self.agenda: list[AgendaItem] = postcall.ensure_demo_agenda()
         self.speed = default_speed()
         self.time_budget_s: int | None = None
@@ -169,9 +164,9 @@ class CallSession:
         self.post_call: dict[str, Any] | None = None
         self.input_handle: Any = None
         self.events: list[dict[str, Any]] = []
-        self._user = _TurnBuffer("user")
-        self._agent = _TurnBuffer("agent")
+        self.turns: dict[tuple[str, int | None], str] = {}
         self._close_task: asyncio.Task | None = None
+        self.ready = asyncio.Event()  # set once start() reset the state; tools and turns wait for it
 
     # -- helpers ------------------------------------------------------------------------------
     def item(self, item_id: str) -> AgendaItem | None:
@@ -195,53 +190,30 @@ class CallSession:
         await self.send_client(event)
         return event
 
-    def make_config(self):
-        import gradbot
-
-        cfg = gradbot_config()
-        lang = gradbot.LANGUAGES.get(self.language, gradbot.Lang.En)
-        kwargs = {
-            "assistant_speaks_first": True,
-            "silence_timeout_s": float(os.environ.get("DAWN_SILENCE_TIMEOUT_S", "0")),
-            "padding_bonus": speed_to_padding(self.speed),
-            "rewrite_rules": lang.rewrite_rules,
-            "flush_duration_s": 0.5,
-        } | cfg.session_kwargs
-        kwargs["padding_bonus"] = speed_to_padding(self.speed)  # the tool decides, not the yaml
-        return gradbot.SessionConfig(
-            voice_id=voice_id(),
-            instructions=prompt.build_instructions(),
-            language=lang,
-            tools=prompt.gradbot_tools(),
-            **kwargs,
-        )
-
-    # -- transcript ---------------------------------------------------------------------------
-    def on_user_text(self, msg: dict[str, Any]) -> None:
-        self._user.add(msg.get("text", ""), msg.get("turn_idx"), msg.get("stop_s"))
-
-    def on_agent_text(self, msg: dict[str, Any]) -> None:
-        turn_idx = msg.get("turn_idx")
-        if self._agent.parts and turn_idx is not None and self._agent.turn_idx not in (None, turn_idx):
-            self.flush_agent()
-        self._agent.add(msg.get("text", ""), turn_idx, msg.get("stop_s"))
-
-    def flush_agent(self) -> str:
-        text, turn_idx, t_s = self._agent.pop()
-        if text:
-            state.append_turn(TranscriptTurn(role="agent", text=text, t_s=t_s, turn_idx=turn_idx))
-        return text
-
-    async def flush_user(self) -> str:
-        text, turn_idx, t_s = self._user.pop()
-        if text:
-            state.append_turn(TranscriptTurn(role="user", text=text, t_s=t_s, turn_idx=turn_idx))
+    # -- transcript (posted by the page from SyncedAudioPlayer.onText, see static/index.html) -------
+    async def record_turn(self, role: str, turn_idx: int | None, text: str, t_s: float | None = None) -> bool:
+        await self.wait_ready()
+        key = (role, turn_idx)
+        is_new = key not in self.turns
+        self.turns[key] = text
+        await asyncio.to_thread(self._persist_turn, role, turn_idx, text, t_s)
+        if role == "user" and is_new:
             await self.emit("user_said", {"text": text[:160]})
-        return text
+        return is_new
+
+    @staticmethod
+    def _persist_turn(role: str, turn_idx: int | None, text: str, t_s: float | None) -> None:
+        def _do(st):
+            for t in st.call.transcript:
+                if t.role == role and t.turn_idx == turn_idx:
+                    t.text = text
+                    t.t_s = t_s if t_s is not None else t.t_s
+                    return
+            st.call.transcript.append(TranscriptTurn(role=role, text=text, t_s=t_s, turn_idx=turn_idx))  # type: ignore[arg-type]
+        state.update(_do)
 
     # -- agenda progression -------------------------------------------------------------------
     async def advance_to(self, index: int) -> AgendaItem | None:
-        """Announce agenda item `index` (1-based) once; returns the item or None when done."""
         if index < 1 or index > len(self.agenda):
             return None
         if index <= self.current_index:
@@ -253,23 +225,34 @@ class CallSession:
 
     # -- session lifecycle --------------------------------------------------------------------
     async def start(self) -> None:
-        state.reset()  # fresh decisions/actions/call/meta for every call; events + agenda stay
-        state.start_call(language=self.language, voice_id=voice_id())
+        """Bookkeeping at call start; runs as a background task so it never delays gradbot.run."""
         try:
-            if not postcall.paths()["graph_before"].exists():
-                postcall.refresh_graph_before()
+            await asyncio.to_thread(self._start_state)
         except Exception:
-            log.exception("could not build knowledge_graph_before.json")
+            log.exception("call start bookkeeping failed (the voice session continues)")
+        self.ready.set()
         await self.send_client(prompt.agenda_payload(self.agenda))
         await self.emit("call_started", {"opening": prompt.OPENING})
+        log.info("call started: voice=%s agenda=%d items", self.start_msg.get("voice_id") or voice_id(), len(self.agenda))
+
+    async def wait_ready(self) -> None:
+        """Never let a tool or a transcript line race the state reset at call start."""
+        try:
+            await asyncio.wait_for(self.ready.wait(), timeout=10)
+        except asyncio.TimeoutError:
+            log.warning("call start bookkeeping still pending; continuing")
+
+    def _start_state(self) -> None:
+        state.reset()  # fresh decisions/actions/call/meta for every call; events + agenda stay
+        state.start_call(language=self.language, voice_id=voice_id())
+        if not postcall.paths()["graph_before"].exists():
+            postcall.refresh_graph_before()
 
     async def finish(self, summary: str | None = None, reason: str = "end_call") -> dict[str, Any]:
         """call_ended -> post-call processing -> brief_ready. Idempotent."""
         if self.ended:
             return self.post_call or {}
         self.ended = True
-        await self.flush_user()
-        self.flush_agent()
         duration = self.duration_s()
         await self.emit("call_ended", {"duration_s": duration, "reason": reason})
         try:
@@ -281,7 +264,7 @@ class CallSession:
         return self.post_call
 
     def schedule_close(self) -> None:
-        """Fallback: close the socket a few seconds after end_call if the client does not stop."""
+        """Fallback: close the socket a few seconds after end_call if the page does not send stop."""
         if self._close_task is not None:
             return
 
@@ -299,8 +282,7 @@ class CallSession:
         self.input_handle = input_handle
         name, args = handle.name, handle.args or {}
         log.info("tool %s %s", name, args)
-        await self.flush_user()
-        self.flush_agent()
+        await self.wait_ready()
         try:
             if name == "set_time_budget":
                 await self._tool_set_time_budget(handle, args)
@@ -319,10 +301,9 @@ class CallSession:
             await handle.send_error(f"{name} failed: {exc}")
 
     async def _tool_set_time_budget(self, handle, args) -> None:
-        seconds = int(args.get("seconds") or 60)
-        seconds = max(10, min(900, seconds))
+        seconds = max(10, min(900, int(args.get("seconds") or 60)))
         self.time_budget_s = seconds
-        state.set_time_budget(seconds)
+        await asyncio.to_thread(state.set_time_budget, seconds)
         await self.emit("time_budget", {"seconds": seconds})
         first = await self.advance_to(1)
         await handle.send_json({
@@ -345,7 +326,7 @@ class CallSession:
             return
         notes = str(args.get("notes") or "").strip()
         rec = DecisionRecord(item_id=item_id, decision_type=decision, voice_notes=notes, source="voice_tool")  # type: ignore[arg-type]
-        state.add_decision(rec)
+        await asyncio.to_thread(state.add_decision, rec)
         # core seam (src/core/action_engine.on_decision): reversible -> executed now, irreversible -> BLOCKED_ON_CHECKPOINT
         await asyncio.to_thread(on_decision, rec)
         await self.emit("decision", {"item_id": item_id, "decision": decision, "summary": notes[:160]})
@@ -354,7 +335,7 @@ class CallSession:
             option = str(args.get("option") or "OTHER").strip().upper()
             if option not in prompt.V2_OPTIONS and option != "OTHER":
                 option = "OTHER"
-            state.set_meta("v2_option", option)
+            await asyncio.to_thread(state.set_meta, "v2_option", option)
             await self.emit("v2_idea", v2_idea_payload(option, notes, item_id))
         if it.is_irreversible and decision == "APPROVE":
             await self._checkpoint(item_id, "Irreversible: makes the repository public and submits. Needs your click on the laptop.")
@@ -394,8 +375,8 @@ class CallSession:
         speed = clamp_speed(float(args.get("speed") or 1.0))
         reason = str(args.get("reason") or "").strip()
         self.speed = speed
-        if self.input_handle is not None:
-            await self.input_handle.send_config(self.make_config())
+        if self.input_handle is not None:  # same config as at start, only the cadence changes
+            await self.input_handle.send_config(make_config(self.start_msg, padding_bonus=speed_to_padding(speed)))
         await self.emit("speed_changed", {"speed": speed, "reason": reason[:160]})
         await handle.send_json({"ok": True, "speed": speed})
 
@@ -406,97 +387,21 @@ class CallSession:
         await handle.send_json({"ok": True, "say": prompt.CLOSING_LINE, "briefing": result.get("briefing", [])})
 
 
-class _TranscriptProxy:
-    """Wraps the FastAPI WebSocket so gradbot's user_text / agent_text frames are captured.
-
-    ``get_session`` is a callable because the session is created inside gradbot's on_start.
-    Everything else (accept, receive, send_bytes, close) is delegated untouched.
-    """
-
-    def __init__(self, websocket: fastapi.WebSocket, get_session: Any):
-        self._ws = websocket
-        self._get_session = get_session
-
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self._ws, name)
-
-    async def send_json(self, payload: Any, *args: Any, **kwargs: Any) -> None:
-        session = self._get_session()
-        if session is not None and isinstance(payload, dict):
-            t = payload.get("type")
-            if t == "user_text":
-                session.on_user_text(payload)
-            elif t == "agent_text":
-                session.on_agent_text(payload)
-        await self._ws.send_json(payload, *args, **kwargs)
-
-
-# --- routes --------------------------------------------------------------------------------------
-router = fastapi.APIRouter()
-
-
-@router.get("/call", include_in_schema=False)
-async def call_page():
-    if LIVE_PAGE.exists():
-        return fastapi.responses.FileResponse(LIVE_PAGE, media_type="text/html")
-    return fastapi.responses.JSONResponse({"error": "call_live.html not found"}, status_code=404)
-
-
-@router.get("/call/sim", include_in_schema=False)
-async def call_simulation_page():
-    """hack-bau2's static incoming-call simulation (no backend audio), paths rewritten for src.app."""
-    if not SIM_PAGE.exists():
-        return fastapi.responses.JSONResponse({"error": "call.html not found"}, status_code=404)
-    html = SIM_PAGE.read_text(encoding="utf-8").replace('"/static/call.', '"/static/voice/call.')
-    return fastapi.responses.HTMLResponse(html)
-
-
-@router.get("/api/audio-config")
-async def audio_config():
-    try:
-        return {"pcm": bool(gradbot_config().use_pcm)}
-    except Exception:
-        return {"pcm": False}
-
-
-@router.get("/api/call/agenda")
-async def call_agenda():
-    return prompt.agenda_payload(postcall.ensure_demo_agenda())
-
-
-@router.get("/api/call/state")
-async def call_state():
-    st = state.load()
-    return {
-        "call": st.call.model_dump(),
-        "decisions": [d.model_dump() for d in st.decisions],
-        "actions": [a.model_dump() for a in st.actions],
-        "meta": st.meta,
-        "voice_ready": bool(os.environ.get("GRADIUM_API_KEY") and os.environ.get("LLM_API_KEY")),
-    }
-
-
-@router.post("/api/call/postcall")
-async def call_postcall():
-    """Manual trigger (demo safety net): rebuild actions, graph after, transcript from the recorded state."""
-    return await asyncio.to_thread(postcall.process_post_call, None, None)
-
-
-@router.websocket("/ws/chat")
+# --- WebSocket: as in simple_chat, plus on_tool_call ---------------------------------------------------
+@app.websocket("/ws/chat")
 async def ws_chat(websocket: fastapi.WebSocket):
-    import gradbot
-
     session: CallSession | None = None
-    proxy = _TranscriptProxy(websocket, lambda: session)
+    bookkeeping: list[asyncio.Task] = []
+    log.info("ws/chat: client connected (model=%s base_url=%s keys: gradium=%s llm=%s)",
+             cfg.llm.model, cfg.llm.base_url, bool(cfg.gradium.api_key), bool(cfg.llm.api_key))
 
-    async def on_start(msg: dict) -> Any:
+    def on_start(msg: dict) -> gradbot.SessionConfig:
         nonlocal session
-        language = (msg.get("language") or os.environ.get("DAWN_LANGUAGE") or "en").lower()
-        if language not in gradbot.LANGUAGES:
-            language = "en"
-        session = CallSession(proxy, language=language)  # type: ignore[arg-type]
-        await session.start()
-        return session.make_config()
+        session = CallSession(websocket, msg)
+        CURRENT["session"] = session
+        log.info("ws/chat: start received %s -> gradbot.run", {k: msg.get(k) for k in ("type", "voice_name", "voice_id", "language")})
+        bookkeeping.append(asyncio.create_task(session.start()))
+        return make_config(msg)
 
     async def on_tool_call(handle, input_handle, ws):
         if session is not None:
@@ -504,14 +409,79 @@ async def ws_chat(websocket: fastapi.WebSocket):
 
     try:
         await gradbot.websocket.handle_session(
-            proxy,  # type: ignore[arg-type]
-            config=gradbot_config(),
+            websocket,
+            config=cfg,
             on_start=on_start,
             on_tool_call=on_tool_call,
         )
     finally:
+        log.info("ws/chat: session closed")
+        if bookkeeping:
+            try:
+                await asyncio.wait_for(asyncio.gather(*bookkeeping, return_exceptions=True), timeout=10)
+            except Exception:
+                log.exception("call start bookkeeping did not finish")
         if session is not None:
             try:
                 await session.finish(None, reason="hangup")
             except Exception:
                 log.exception("post-call after hangup failed")
+
+
+# --- DawnDispatch API (served under /voice and at the root) ---------------------------------------------
+api_router = fastapi.APIRouter()
+AVATAR = pathlib.Path(__file__).resolve().parents[2] / "assets" / "brand" / "call_avatar.png"
+
+
+@api_router.get("/api/call/agenda")
+async def call_agenda():
+    payload = prompt.agenda_payload(postcall.ensure_demo_agenda())
+    payload["avatar_url"] = "/assets/brand/call_avatar.png" if AVATAR.exists() else None
+    payload["voice_id_env"] = bool(os.environ.get("DAWN_VOICE_ID"))
+    return payload
+
+
+@api_router.get("/api/call/state")
+async def call_state():
+    st = state.load()
+    return {
+        "call": st.call.model_dump(),
+        "decisions": [d.model_dump() for d in st.decisions],
+        "actions": [a.model_dump() for a in st.actions],
+        "meta": st.meta,
+        "voice_ready": bool(cfg.gradium.api_key and cfg.llm.api_key),
+    }
+
+
+@api_router.post("/api/call/turn")
+async def call_turn(payload: dict[str, Any]):
+    """The page posts finished transcript lines (SyncedAudioPlayer.onText) so the dashboard and user_said get them."""
+    role = "user" if payload.get("is_user") or payload.get("role") == "user" else "agent"
+    text = str(payload.get("text") or "").strip()
+    turn_idx = payload.get("turn_idx")
+    if not text:
+        return {"ok": False}
+    session = CURRENT["session"]
+    if session is not None and not session.ended:
+        is_new = await session.record_turn(role, turn_idx, text, payload.get("t_s"))
+    else:
+        await asyncio.to_thread(CallSession._persist_turn, role, turn_idx, text, payload.get("t_s"))
+        is_new = True
+    return {"ok": True, "new": is_new}
+
+
+@api_router.post("/api/call/postcall")
+async def call_postcall():
+    """Manual trigger (demo safety net): rebuild actions, graph after, transcript from the recorded state."""
+    return await asyncio.to_thread(postcall.process_post_call, None, None)
+
+
+app.include_router(api_router)
+
+# --- exactly as in demos/simple_chat/main.py: /, /static, /static/js, /api/audio-config, /api/voices ----
+gradbot.routes.setup(
+    app,
+    config=cfg,
+    static_dir=STATIC_DIR,
+    with_voices=True,
+)

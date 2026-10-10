@@ -41,14 +41,23 @@ class SmokeTest(unittest.TestCase):
         self.assertIn("DawnDispatch", res.text)
 
     def test_call_200_start_page(self):
-        res = self.client.get("/call")
+        """/call redirects to the simple_chat-style page at /voice/ (relative asset + ws paths, like the demos launcher)."""
+        res = self.client.get("/call", follow_redirects=False)
+        self.assertIn(res.status_code, (302, 307))
+        self.assertEqual(res.headers["location"], "/voice/")
+        res = self.client.get("/call")  # follows the redirect
         self.assertEqual(res.status_code, 200)
         self.assertIn("text/html", res.headers["content-type"])
-        self.assertIn("Start call", res.text)
-        self.assertIn("/ws/chat", res.text)
-        self.assertIn("/static/js/synced-audio-player.js", res.text)
+        self.assertIn("DawnDispatch", res.text)
+        self.assertIn('src="static/js/synced-audio-player.js"', res.text)
+        self.assertIn('fetch("api/audio-config")', res.text)
+        self.assertIn("player.handleMessage(event.data)", res.text)
+        self.assertNotIn("binaryType", res.text)  # SyncedAudioPlayer plays audio only for Blob frames
         self.assertNotIn("ringtone", res.text.lower())
         self.assertIn("navigator.wakeLock.request('screen')", res.text)
+        for path in ("/voice/", "/voice/static/js/synced-audio-player.js", "/voice/static/js/audio-processor.js",
+                     "/voice/static/js/opus-encoder.js", "/voice/api/audio-config", "/voice/api/call/agenda"):
+            self.assertEqual(self.client.get(path).status_code, 200, path)
 
     def test_call_sim_200_and_its_backend_routes(self):
         res = self.client.get("/call/sim")
@@ -103,12 +112,12 @@ class SmokeTest(unittest.TestCase):
         self.assertEqual(self.client.get("/assets/titelbild-v3.jpg").status_code, 200)
 
     def test_ws_chat_route_exists(self):
-        # FastAPI >= 0.143 keeps included routers nested, so look at the voice router itself
-        from src.voice.server import router as voice_router
+        from src.app import _existing_paths
+        from src.voice.server import app as voice_app
 
-        self.assertIn("/ws/chat", {getattr(r, "path", None) for r in voice_router.routes})
+        self.assertIn("/ws/chat", {getattr(r, "path", None) for r in voice_app.routes})  # /voice/ws/chat
+        self.assertIn("/ws/chat", _existing_paths())  # root alias used by the auftrag
         self.assertTrue(MOUNTED.get("voice"))
-        # and the HTTP side of the same router is reachable through the app
         self.assertEqual(self.client.get("/api/audio-config").status_code, 200)
 
     def test_static_mounts(self):

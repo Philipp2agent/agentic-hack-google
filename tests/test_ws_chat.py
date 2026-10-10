@@ -77,10 +77,12 @@ class _Output:
         self._msgs = list(msgs)
 
     async def receive(self):
-        if self._msgs:
-            return self._msgs.pop(0)
         import asyncio
 
+        while self._msgs and isinstance(self._msgs[0], (int, float)):
+            await asyncio.sleep(self._msgs.pop(0))  # pause in the fake conversation
+        if self._msgs:
+            return self._msgs.pop(0)
         await asyncio.sleep(2.0)  # give the background tool task time, then end like a finished session
         return None
 
@@ -95,6 +97,7 @@ class WsChatWiringTest(unittest.TestCase):
         self._old_env = os.environ.get("DAWN_DATA_DIR")
         os.environ["DAWN_DATA_DIR"] = str(self.tmp)
         self.tool_handle = _ToolHandle()
+        self.end_handle = _ToolHandle()
         self.inp = _Input()
         msgs = [
             _Msg("tts_text", text="Good morning Philipp.", turn_idx=0, stop_s=1.0),
@@ -102,6 +105,8 @@ class WsChatWiringTest(unittest.TestCase):
             _Msg("stt_text", text="about a minute", turn_idx=1, stop_s=4.0),
             _Msg("tool_call", tool_call=_ToolCall("set_time_budget", {"seconds": 60}), tool_call_handle=self.tool_handle),
             _Msg("audio", data=b"\x00\x01", start_s=4.5, stop_s=5.0, turn_idx=2),
+            2.5,  # seconds of "conversation" before the lead wraps up (the test posts transcript lines meanwhile)
+            _Msg("tool_call", tool_call=_ToolCall("end_call", {"summary": "nothing decided, test run"}), tool_call_handle=self.end_handle),
         ]
         self._real_run = gws.gradbot.run
 
@@ -139,19 +144,29 @@ class WsChatWiringTest(unittest.TestCase):
             # agenda, call_started, agent_text x2, user_text, user_said, audio_timing + bytes, then the
             # tool task (runs in the background) sends time_budget + agenda_item
             with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-                for _ in range(14):
+                seen = set()
+                for _ in range(16):
                     try:
                         msg = pool.submit(ws.receive).result(timeout=8)
                     except Exception:
                         break
                     received.append(msg)
-                    if "text" in msg and json.loads(msg["text"]).get("type") == "agenda_item":
+                    if "text" in msg:
+                        seen.add(json.loads(msg["text"]).get("type"))
+                    if {"agenda_item", "call_started", "user_said", "brief_ready"} <= seen:
                         break
+                    if {"agenda_item", "call_started"} <= seen and "turn_posted" not in seen:
+                        # the page posts finished transcript lines (SyncedAudioPlayer.onText) while the call runs
+                        r1 = client.post("/api/call/turn", json={"is_user": False, "turn_idx": 0, "text": "Good morning Philipp. How much time do you have?"})
+                        r2 = client.post("/api/call/turn", json={"is_user": True, "turn_idx": 1, "text": "about a minute"})
+                        self.assertTrue(r1.json()["ok"] and r2.json()["ok"])
+                        seen.add("turn_posted")
             ws.send_json({"type": "stop"})
 
         texts = [json.loads(m["text"]) for m in received if "text" in m]
         types = [t.get("type") for t in texts]
-        self.assertEqual(types[0], "agenda")
+        # bookkeeping (agenda, call_started) runs in a background task, so only membership is guaranteed
+        self.assertIn("agenda", types)
         self.assertIn("call_started", types)
         self.assertIn("agent_text", types)
         self.assertIn("user_text", types)
@@ -159,16 +174,24 @@ class WsChatWiringTest(unittest.TestCase):
         self.assertIn("agenda_item", types)
         self.assertTrue(any("bytes" in m for m in received), "audio bytes forwarded")
         self.assertEqual(self.tool_handle.results[0]["seconds"], 60)
+        self.assertEqual(self.end_handle.results[0]["say"], "Your dashboard is ready.")
         self.assertEqual(self.run_kwargs["session_config"].assistant_speaks_first, True)
         self.assertTrue(self.inp.closed)
 
-        # hangup -> post-call ran: transcript has both speakers, state ended
+        # hangup -> post-call runs in the server task after the socket closed: wait for it (bounded)
+        import time
+
+        for _ in range(50):
+            if state.load().call.status == "ended":
+                break
+            time.sleep(0.1)
         st = state.load()
         self.assertEqual(st.call.status, "ended")
         self.assertEqual(st.call.time_budget_s, 60)
         roles = [t.role for t in st.call.transcript]
         self.assertIn("agent", roles)
         self.assertIn("user", roles)
+        self.assertIn("user_said", [e["type"] for e in self.events])
         self.assertIn("call_ended", [e["type"] for e in self.events])
         self.assertTrue((self.tmp / "knowledge_graph_after.json").exists())
         self.assertTrue((self.tmp / "transcript.json").exists())
