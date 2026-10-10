@@ -1,23 +1,23 @@
 [
   {
     "item_id": "agenda-01",
-    "topic": "Voice WebSocket Deployment & Audio Routing",
-    "question_for_lead": "Deploy gradbot voice streaming backend to port 8090 for smartphone Ray-Ban connection?",
-    "recommended_action": "APPROVE - tests pass, latency is under 350ms",
+    "topic": "Swarm Agent Delegation for Subsystems",
+    "question_for_lead": "Should we spin up hack-bau2 and hack-bau3, or assign voice and dashboard to existing agents?",
+    "recommended_action": "APPROVE - assign voice to hack-bau1 and dashboard to hack-chef to reduce swarm overhead",
     "is_irreversible": false
   },
   {
     "item_id": "agenda-02",
-    "topic": "Database & State Reset on VPS",
-    "question_for_lead": "Purge overnight ephemeral logs and apply schema migration before live commute demo?",
-    "recommended_action": "APPROVE - requires explicit lead sign-off due to irreversible wipe",
-    "is_irreversible": true
+    "topic": "Parallel Task Execution Pipeline Kickoff",
+    "question_for_lead": "Unblock parallel worker execution following the overnight parallelstart trigger?",
+    "recommended_action": "APPROVE - activate parallel agent task queues immediately",
+    "is_irreversible": false
   },
   {
     "item_id": "agenda-03",
-    "topic": "Nano Banana Visual Brand Release",
-    "question_for_lead": "Publish DawnDispatch hero banner and logo to public repo README?",
-    "recommended_action": "APPROVE - visual identity approved",
+    "topic": "Ray-Ban Demo and Schema Baseline",
+    "question_for_lead": "Accept updated data models, Ray-Ban commute script, and web voice specs as current milestone?",
+    "recommended_action": "APPROVE - lock Schritt 0 interface specs and advance to live testing",
     "is_irreversible": false
   }
 ]

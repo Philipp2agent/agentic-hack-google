@@ -10,7 +10,7 @@
 |---|---|---|---|---|---|
 | Schritt-0 | Datenmodelle & docs/SCHNITTSTELLE.md | hack-chef | main | fertig, gemerged | - |
 | IDEE | Schaerfung: Phone Call UI, Quick Fire, Before/After Graph | hack-chef | main | fertig, gemerged | - |
-| P-CORE | src/core: Knowledge Graph Engine (before/after) & Agenda | hack-bau1 | agent/hack-bau1 | vergeben, laeuft | Bau & PR |
+| P-CORE | src/core: Aggregator, Agenda-Synthese & Graph Engine | hack-bau1 | agent/hack-bau1 | fertig gebaut & getestet | PR & Merge nach main |
 | P-VOICE | src/voice: Mobile Call Screen (/call) & Gradium Web Audio | hack-bau2 | agent/hack-bau2 | wartet auf Anlegen | Philipp legt hack-bau2 an |
 | P-DASHBOARD | src/dashboard: Vorher-Nachher Graph (/dashboard) & Checkpoints | hack-bau3 | agent/hack-bau3 | wartet auf Anlegen | Philipp legt hack-bau3 an |
 | P-VISUAL | assets/brand: Graph Icons, Call Avatar, Banner (Nano Banana) | hack-visual | agent/hack-visual | vergeben, laeuft | Bildgenerierung |

@@ -1,29 +1,47 @@
 [
   {
     "id": "evt-001",
-    "source": "git commit 3cdd23d",
-    "agent_id": "hack-bau1",
-    "title": "Core Swarm Aggregator skeleton pushed",
-    "details": "Aggregator parsed git log and created seed event structure. Unit tests passing with 100% coverage.",
-    "severity": "INFO",
-    "proposed_action": "Proceed with agenda synthesis pipeline"
+    "source": "STAND.md / swarm coordination",
+    "agent_id": "hack-chef",
+    "title": "Swarm assignment & role coordination question",
+    "details": "Open items in STAND.md: - hack-bau2 und hack-bau3 anlegen oder Pakete voice/dashboard an hack-bau1 bzw. hack-chef uebergeben?",
+    "severity": "WARNING",
+    "proposed_action": "Resolve role delegation (voice & dashboard) during morning commute call"
   },
   {
     "id": "evt-002",
-    "source": "PR #4 merge conflict check",
-    "agent_id": "hack-bau2",
-    "title": "Voice pipeline migration to WebSocket streaming",
-    "details": "Changes touch network interfaces and gradbot audio buffer. Irreversible deployment step pending confirmation.",
-    "severity": "WARNING",
-    "proposed_action": "Request human decision: Approve production audio port bind (8090)"
+    "source": "git commit 8ead13b",
+    "agent_id": "hack-chef",
+    "title": "feat: Schritt 0 Datenmodelle, Schnittstellendokumentation & Lagebrett aktualisiert",
+    "details": "Commit 8ead13b by hack-chef: feat: Schritt 0 Datenmodelle, Schnittstellendokumentation & Lagebrett aktualisiert",
+    "severity": "INFO",
+    "proposed_action": "Proceed with integration into active pipeline"
   },
   {
     "id": "evt-003",
-    "source": "agent log / STAND.md update",
-    "agent_id": "hack-visual",
-    "title": "Visual assets generation completed",
-    "details": "Hero banners and app icons generated via Nano Banana. Storage footprint 1.2MB.",
+    "source": "git commit 2085b70",
+    "agent_id": "hack-swarm",
+    "title": "auftraege: parallelstart",
+    "details": "Commit 2085b70 by hack-agents (buzzagent): auftraege: parallelstart",
     "severity": "INFO",
-    "proposed_action": "Bundle into dashboard static assets"
+    "proposed_action": "Review diff and proceed to next milestone"
+  },
+  {
+    "id": "evt-004",
+    "source": "git commit 3cdd23d",
+    "agent_id": "hack-chef",
+    "title": "feat(dawndispatch): update IDEE.md, AGENTEN.md, STAND.md and claude-02 for web voice",
+    "details": "Commit 3cdd23d by hack-chef: feat(dawndispatch): update IDEE.md, AGENTEN.md, STAND.md and claude-02 for web voice",
+    "severity": "INFO",
+    "proposed_action": "Proceed with integration into active pipeline"
+  },
+  {
+    "id": "evt-005",
+    "source": "git commit df4339d",
+    "agent_id": "hack-chef",
+    "title": "feat(idee): update IDEE.md with Ray-Ban demo script, claude-02 and STAND.md",
+    "details": "Commit df4339d by hack-chef: feat(idee): update IDEE.md with Ray-Ban demo script, claude-02 and STAND.md",
+    "severity": "INFO",
+    "proposed_action": "Proceed with integration into active pipeline"
   }
 ]
