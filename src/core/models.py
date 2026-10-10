@@ -1,98 +1,190 @@
-"""Data models for DawnDispatch core swarm, voice, and dashboard.
+"""DawnDispatch data contract (claude-02; supersedes nothing, formalises docs/SCHNITTSTELLE.md).
 
-Defined according to docs/SCHNITTSTELLE.md and IDEE.md.
+Field names, enum values and the JSON files under src/data/ are the interface between
+src/core (hack-bau1), src/voice (hack-bau2) and src/dashboard (hack-bau3).
+Rule: extend with optional fields, never rename or remove anything.
+Only hack-bau1 edits this file; everyone else imports it.
 """
+from __future__ import annotations
 
-from datetime import datetime, timezone
 import json
 from pathlib import Path
+import uuid
+from datetime import datetime, timezone
 from typing import Any, Literal
+
 from pydantic import BaseModel, Field
 
-
-SeverityType = Literal["INFO", "WARNING", "ERROR"]
+# --- vocabularies ------------------------------------------------------------
+Severity = Literal["INFO", "WARNING", "ERROR"]
+SeverityType = Severity
 DecisionType = Literal["APPROVE", "REJECT", "HOLD", "AMEND"]
-ActionStatusType = Literal["PENDING", "EXECUTING", "COMPLETED", "BLOCKED_ON_CHECKPOINT"]
-GraphStageType = Literal["BEFORE", "AFTER"]
+DecisionSource = Literal["voice_tool", "post_call", "dashboard"]
+ActionStatus = Literal["PENDING", "EXECUTING", "COMPLETED", "BLOCKED_ON_CHECKPOINT", "FAILED"]
+ActionStatusType = ActionStatus
+CallStatus = Literal["idle", "ringing", "live", "ended"]
+TurnRole = Literal["agent", "user", "tool"]
+GraphPhase = Literal["before", "after", "BEFORE", "AFTER"]
+GraphStageType = GraphPhase
+NodeKind = Literal["agent", "event", "agenda", "decision", "action", "checkpoint", "resource"]
+NodeStatus = Literal["open", "blocked", "resolved", "info", "UNRESOLVED", "COMPLETED", "BLOCKED", "PENDING"]
+
+ACTION_TYPES = (
+    "MERGE_BRANCH",
+    "DISPATCH_AGENT",
+    "RUN_TESTS",
+    "UPDATE_BUDGET",
+    "NOTE",
+    "DELETE_FILES",
+    "TAG_RELEASE",
+    "PUBLISH_ASSET",
+    "DEPLOY",
+)
+IRREVERSIBLE_ACTION_TYPES = frozenset({"DELETE_FILES", "TAG_RELEASE", "PUBLISH_ASSET", "DEPLOY"})
+
+ARTIFACT_KEYS = (
+    "diff",
+    "log",
+    "logs",
+    "commit",
+    "url",
+    "file",
+    "note",
+    "reason",
+    "pending_url",
+    "port",
+)
 
 
+def now_iso() -> str:
+    """UTC timestamp, ISO 8601, second precision."""
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def new_id(prefix: str) -> str:
+    return f"{prefix}-{uuid.uuid4().hex[:8]}"
+
+
+# --- core records (src/data/overnight_events.json, agenda.json, decisions.json, actions.json) ---
 class OvernightEvent(BaseModel):
-    """Event from overnight swarm agent activity (git commits, PRs, agent logs)."""
+    """One thing that happened in the repo / agent swarm overnight."""
 
-    id: str = Field(description="Unique event ID, e.g. 'evt-001'")
-    source: str = Field(description="Origin source, e.g. 'git commit 3cdd23d' or 'PR #4'")
-    agent_id: str = Field(description="Executing agent ID, e.g. 'hack-bau1'")
-    title: str = Field(description="Concise event title")
-    details: str = Field(description="Detailed description of status or outcome")
-    severity: SeverityType = Field(default="INFO", description="Event severity: INFO, WARNING, ERROR")
-    proposed_action: str = Field(description="Proposed follow-up action")
+    id: str  # evt-001
+    source: str  # free text: "git commit 3cdd23d", "PR #4", "agent log / STAND.md update"
+    agent_id: str  # hack-bau1, hack-visual, hack-chef, claude-cloud, philipp
+    title: str
+    details: str = ""
+    severity: Severity = "INFO"
+    proposed_action: str = ""
+    timestamp: str | None = None
+    ref: str | None = None  # commit sha, PR url, file path
 
 
 class AgendaItem(BaseModel):
-    """Discussion item synthesized for the morning voice call (max 3 items)."""
+    """One question the morning call asks the lead (max 3 per call)."""
 
-    item_id: str = Field(description="Unique agenda item ID, e.g. 'agenda-01'")
-    topic: str = Field(description="Topic title")
-    question_for_lead: str = Field(description="Crisp question for the lead during call")
-    recommended_action: str = Field(description="Recommended action by system")
-    is_irreversible: bool = Field(default=False, description="Whether action has irreversible impact")
+    item_id: str  # agenda-01
+    topic: str
+    question_for_lead: str
+    recommended_action: str
+    is_irreversible: bool = False  # authoritative for the human checkpoint
+    action_type: str = "NOTE"  # see ACTION_TYPES
+    event_ids: list[str] = Field(default_factory=list)
+    priority: int = 1  # 1 = asked first
 
 
 class DecisionRecord(BaseModel):
-    """Decision captured during voice call via log_decision tool."""
+    """A decision the lead made (by voice, post-call extraction or dashboard)."""
 
-    item_id: str = Field(description="Referenced agenda item ID")
-    decision_type: DecisionType = Field(description="Decision outcome: APPROVE, REJECT, HOLD, AMEND")
-    voice_notes: str = Field(default="", description="Summary/notes from lead voice interaction")
-    timestamp: str = Field(
-        default_factory=lambda: datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        description="ISO-8601 UTC timestamp",
-    )
-    human_verified: bool = Field(default=True, description="Whether verified by human lead")
+    item_id: str
+    decision_type: DecisionType
+    voice_notes: str = ""
+    timestamp: str = Field(default_factory=now_iso)
+    human_verified: bool = False  # True once confirmed by a dashboard click
+    decision_id: str = Field(default_factory=lambda: new_id("dec"))
+    source: DecisionSource = "voice_tool"
 
 
 class ActionExecution(BaseModel):
-    """Execution state of follow-up actions derived from decisions."""
+    """Downstream work derived from a decision. Irreversible ones wait on a checkpoint."""
 
-    action_id: str = Field(description="Unique action ID, e.g. 'act-101'")
-    item_id: str = Field(description="Referenced agenda item ID")
-    action_type: str = Field(description="Action identifier / type code")
-    status: ActionStatusType = Field(default="PENDING", description="Execution status")
-    artifacts: dict[str, Any] = Field(default_factory=dict, description="Artifacts, logs, links, ports")
+    action_id: str = Field(default_factory=lambda: new_id("act"))  # act-101
+    item_id: str
+    action_type: str  # see ACTION_TYPES
+    status: ActionStatus = "PENDING"
+    artifacts: dict[str, Any] = Field(default_factory=dict)  # see ARTIFACT_KEYS
+    description: str = ""
+    checkpoint_reason: str | None = None  # why a human click is required
+    created_at: str = Field(default_factory=now_iso)
+    updated_at: str = Field(default_factory=now_iso)
 
 
+# --- call (src/data/call.json) -------------------------------------------------
+class TranscriptTurn(BaseModel):
+    role: TurnRole
+    text: str
+    t_s: float | None = None  # seconds since call start (gradbot stop_s)
+    turn_idx: int | None = None
+
+
+class CallRecord(BaseModel):
+    status: CallStatus = "idle"
+    started_at: str | None = None
+    ended_at: str | None = None
+    language: str = "en"
+    voice_id: str | None = None
+    time_budget_s: int | None = None  # answer to "How much time do you have?"
+    transcript: list[TranscriptTurn] = Field(default_factory=list)
+    audio_url: str | None = None  # e.g. /data/audio/last_call.wav (optional)
+    briefing: list[str] = Field(default_factory=list)  # 3-bullet standup summary
+
+
+# --- knowledge graph (derived view, GET /api/graph?phase=before|after) ---------------
 class GraphNode(BaseModel):
-    """Node in the DawnDispatch Knowledge Graph."""
-
-    id: str = Field(description="Unique node ID")
-    label: str = Field(description="Display label")
-    type: str = Field(description="Node type: agent, event, agenda, decision, action, resource")
-    status: str = Field(default="UNRESOLVED", description="Node status, e.g. UNRESOLVED, BLOCKED, RESOLVED, COMPLETED")
-    details: str = Field(default="", description="Detailed node description")
-    metadata: dict[str, Any] = Field(default_factory=dict, description="Custom node metadata")
+    id: str  # same id as the underlying record (agent name, evt-001, agenda-01, dec-.., act-..)
+    label: str
+    kind: NodeKind = "agenda"
+    type: str = ""  # backwards compatibility
+    status: NodeStatus = "info"  # open=yellow/red, blocked=amber, resolved=green, info=grey
+    details: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    data: dict[str, Any] = Field(default_factory=dict)  # severity, decision_type, action status, ...
 
 
 class GraphEdge(BaseModel):
-    """Directed edge in the DawnDispatch Knowledge Graph."""
-
-    source: str = Field(description="Source node ID")
-    target: str = Field(description="Target node ID")
-    relation: str = Field(description="Edge relation: e.g. PRODUCED, TRIGGERS, DECIDED_BY, DISPATCHES")
-    status: str = Field(default="PENDING", description="Edge status: PENDING, RESOLVED, BLOCKED")
+    source: str
+    target: str
+    relation: str = ""
+    label: str = ""
+    status: str = "PENDING"
 
 
 class KnowledgeGraph(BaseModel):
-    """Before/After Knowledge Graph for commute triage and dashboard visualization."""
-
-    stage: GraphStageType = Field(default="BEFORE", description="Graph stage: BEFORE or AFTER call")
-    generated_at: str = Field(
-        default_factory=lambda: datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        description="ISO-8601 UTC timestamp",
-    )
+    phase: GraphPhase = "before"
+    stage: GraphPhase = "BEFORE"
     nodes: list[GraphNode] = Field(default_factory=list)
     edges: list[GraphEdge] = Field(default_factory=list)
+    generated_at: str = Field(default_factory=now_iso)
 
 
+# --- whole state (in-memory aggregate of the files under src/data/) ----------------
+class DawnState(BaseModel):
+    generated_at: str = Field(default_factory=now_iso)
+    events: list[OvernightEvent] = Field(default_factory=list)
+    agenda: list[AgendaItem] = Field(default_factory=list)
+    decisions: list[DecisionRecord] = Field(default_factory=list)
+    actions: list[ActionExecution] = Field(default_factory=list)
+    call: CallRecord = Field(default_factory=CallRecord)
+    meta: dict[str, Any] = Field(default_factory=dict)  # interaction ids, budgets, checkpoint reasons
+
+    def item(self, item_id: str) -> AgendaItem | None:
+        return next((a for a in self.agenda if a.item_id == item_id), None)
+
+    def action(self, action_id: str) -> ActionExecution | None:
+        return next((a for a in self.actions if a.action_id == action_id), None)
+
+
+# --- File I/O helpers ---
 def load_events(path: Path | str) -> list[OvernightEvent]:
     p = Path(path)
     if not p.exists():
