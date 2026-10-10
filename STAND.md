@@ -12,13 +12,13 @@
 | IDEE | Schaerfung: Phone Call UI, Quick Fire, Before/After Graph | hack-chef | main | fertig, gemerged | - |
 | claude-02 | docs/ARCHITEKTUR.md, state.py & Baupakete | Claude-Cloud | main | fertig, gemerged | - |
 | P-CORE | src/core: Aggregator, Agenda-Synthese & Graph Engine | hack-bau1 | main | fertig, gemerged | - |
-| P-VOICE-UI | Mobile Call Screen (/call) statische UI | hack-bau2 | main | fertig, gemerged | E2E Integration in claude-03 |
+| P-VOICE-UI | Mobile Call Screen (/call) autarker Demo-Flow | hack-bau2 | main | fertig, gemerged | E2E Integration in claude-03 |
 | P-DASHBOARD-UI | Vorher-Nachher Graph (/dashboard) statische UI | hack-bau3 | main | fertig, gemerged | E2E Integration in claude-03 |
 | gemini-01 | Demo-Szenario v1->v2 (context/hackathon-day.md) in src/data | hack-bau1 | main | fertig, gemerged | E2E Integration in claude-03 |
-| claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools (Deadline 17:10) | Claude-Cloud | claude/... | vergeben | Klick durch Philipp, PR bis 17:10 |
+| claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools (Deadline 17:10) | Claude-Cloud | claude/... | laeuft in Cloud | Warten auf PR bis 17:10 |
 | P-VISUAL | assets/brand: Graph Icons, Call Avatar, Banner (Nano Banana) | hack-visual | agent/hack-visual | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
 | P-MARKETING | 2-Minuten-Video-Skript & README-Erzaehlung | hack-marketing | agent/hack-marketing | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
-| P-REVIEW | Testplan & Vorbereitung fuer E2E-Test 17:10 | hack-review | agent/hack-review | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
+| P-REVIEW | Testplan & Vorbereitung fuer E2E-Test 17:10 | hack-review | agent/hack-review | wartet auf claude-03 | Startet bei Eintreffen claude-03 |
 
 ## ZEITPLAN
 ```mermaid
@@ -35,7 +35,7 @@ gantt
   Phase 6 Politur & Abgabe       :p6, 18:40, 19:00
   section Parallele Spuren
   P-CORE Knowledge Graph Inferenz   :done, p_core, 16:15, 16:20
-  P-VOICE-UI Mobile Call Screen     :done, p_vui, 16:35, 16:45
+  P-VOICE-UI Mobile Call Screen     :done, p_vui, 16:35, 16:56
   P-DASHBOARD-UI Graph Split-View   :done, p_dui, 16:35, 16:43
   gemini-01 Szenario v1->v2         :done, p_gem1, 16:35, 16:50
   claude-03 E2E MVP & Video-Tools   :crit, active, p_cl3, 16:40, 17:10
