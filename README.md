@@ -1,16 +1,42 @@
 # DawnDispatch
 
-> **Autonomous Commute Voice Dispatcher & Knowledge Graph Dashboard**  
-> *"The agent owns the code and the human."*
+> **Autonomous Commute Voice Dispatcher & Live Knowledge Graph**  
+> *The agent prompts the human — not the other way around.*
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
 [![Google DeepMind Gemini](https://img.shields.io/badge/Gemini-3.8_Flash-4285F4.svg)](https://deepmind.google/technologies/gemini/)
 [![Gradium Voice](https://img.shields.io/badge/Gradium-Realtime_Voice-FF5722.svg)](https://gradium.ai)
-[![Tests](https://img.shields.io/badge/Tests-41%2F41_Passing-success.svg)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-60%2F60_Passing-success.svg)](tests/)
 [![Hackathon](https://img.shields.io/badge/Hackathon-{Tech:_Europe}_Zürich_2026-blueviolet.svg)](HACKATHON.md)
 
 ![DawnDispatch Hero Banner](assets/titelbild-v2.jpg)
+
+---
+
+## ⚡ Try it on your own repo in 3 minutes
+
+Turn any GitHub repository or local codebase into an interactive voice standup agent. In 3 minutes, you receive an incoming voice call on your phone and an active live synchronization on your laptop screen.
+
+```bash
+# 1. Clone this repository
+git clone https://github.com/Philipp2agent/agentic-hack-google.git
+cd agentic-hack-google
+
+# 2. Setup virtual environment, keys, and target repository
+./setup.sh
+
+# 3. Start call server, live visualization, and dispatch bridge
+./start.sh
+```
+
+### Prerequisites
+- **Python 3.11+**
+- **Google Gemini API Key (`GEMINI_API_KEY`):** Synthesizes repository context (`gemini-3.8-flash`) into concise spoken briefings and real-time live events.
+- **Gradium Voice API Key (`GRADIUM_API_KEY`):** Provides sub-second ultra-low latency voice streaming over WebSocket.
+- **Target Repository:** Any local directory path or remote Git repository (or test directly with our built-in demo: `examples/sample-project`).
+
+> 🔒 **Privacy & Data Security Notice:** Only your repository's high-level status material (README, recent commit log, and status files such as `STAND.md`, `TODO.md`, `CHANGELOG.md`) is sent to the Google Gemini API to prepare your morning phone briefing. Source code files remain strictly local.
 
 ---
 
