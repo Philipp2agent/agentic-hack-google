@@ -1,47 +1,68 @@
 [
   {
     "id": "evt-001",
-    "source": "STAND.md / swarm coordination",
+    "source": "Infrastructure Chat / 15:35",
     "agent_id": "hack-chef",
-    "title": "Swarm assignment & role coordination question",
-    "details": "Open items in STAND.md: - hack-bau2 und hack-bau3 anlegen oder Pakete voice/dashboard an hack-bau1 bzw. hack-chef uebergeben?",
-    "severity": "WARNING",
-    "proposed_action": "Resolve role delegation (voice & dashboard) during morning commute call"
+    "title": "Version 1 MVP Deployed: Web Audio & Meta Ray-Ban Test Passed",
+    "details": "gradbot Web Call running over Bluetooth to Meta Ray-Bans. WhatsApp calling postponed to Version 2 roadmap.",
+    "severity": "INFO",
+    "proposed_action": "Triage open Version 2 architecture decisions with lead during morning commute",
+    "timestamp": null,
+    "ref": "context/hackathon-day.md:15:35"
   },
   {
     "id": "evt-002",
-    "source": "git commit 8ead13b",
-    "agent_id": "hack-chef",
-    "title": "feat: Schritt 0 Datenmodelle, Schnittstellendokumentation & Lagebrett aktualisiert",
-    "details": "Commit 8ead13b by hack-chef: feat: Schritt 0 Datenmodelle, Schnittstellendokumentation & Lagebrett aktualisiert",
-    "severity": "INFO",
-    "proposed_action": "Proceed with integration into active pipeline"
+    "source": "Git Swarm Pipeline / 16:20",
+    "agent_id": "hack-bau1",
+    "title": "Autonomous Night Shift Pipeline & Production Repo Release",
+    "details": "Swarm proposing autonomous night shift where agents run overnight with direct commits to main and public repo switch.",
+    "severity": "WARNING",
+    "proposed_action": "Flag as irreversible human checkpoint: unmoderated night shift and public release require desk sign-off",
+    "timestamp": null,
+    "ref": "context/hackathon-day.md:21"
   },
   {
     "id": "evt-003",
-    "source": "git commit 2085b70",
-    "agent_id": "hack-swarm",
-    "title": "auftraege: parallelstart",
-    "details": "Commit 2085b70 by hack-agents (buzzagent): auftraege: parallelstart",
+    "source": "Gradium Voice Lab / 15:55",
+    "agent_id": "hack-bau2",
+    "title": "Voice Cloning & WhatsApp Business Calling Engine",
+    "details": "Architecture ready for cloning Philipp's voice and connecting real WhatsApp Business telephony for v2.",
     "severity": "INFO",
-    "proposed_action": "Review diff and proceed to next milestone"
+    "proposed_action": "Ask lead whether to activate voice cloning and direct telephony",
+    "timestamp": null,
+    "ref": "context/hackathon-day.md:24"
   },
   {
     "id": "evt-004",
-    "source": "git commit 3cdd23d",
-    "agent_id": "hack-chef",
-    "title": "feat(dawndispatch): update IDEE.md, AGENTEN.md, STAND.md and claude-02 for web voice",
-    "details": "Commit 3cdd23d by hack-chef: feat(dawndispatch): update IDEE.md, AGENTEN.md, STAND.md and claude-02 for web voice",
+    "source": "STAND.md / 16:40",
+    "agent_id": "claude-cloud",
+    "title": "claude-03: E2E Backend MVP & Video Generation Pipeline",
+    "details": "FastAPI backend unifying /call, /ws/chat and /dashboard with Google Veo/Omni pitch video scripts.",
     "severity": "INFO",
-    "proposed_action": "Proceed with integration into active pipeline"
+    "proposed_action": "Review integration and lock v1 baseline",
+    "timestamp": null,
+    "ref": "auftraege/claude-03.md"
   },
   {
     "id": "evt-005",
-    "source": "git commit df4339d",
-    "agent_id": "hack-chef",
-    "title": "feat(idee): update IDEE.md with Ray-Ban demo script, claude-02 and STAND.md",
-    "details": "Commit df4339d by hack-chef: feat(idee): update IDEE.md with Ray-Ban demo script, claude-02 and STAND.md",
+    "source": "assets/brand / 14:20",
+    "agent_id": "hack-visual",
+    "title": "Visual Branding Suite & Bee Swarm Commander Identity",
+    "details": "Branding suite delivered via Nano Banana: Hero banner, node icons, and call avatar.",
     "severity": "INFO",
-    "proposed_action": "Proceed with integration into active pipeline"
+    "proposed_action": "Integrate branding into public dashboard",
+    "timestamp": null,
+    "ref": "assets/titelbild-v3.jpg"
+  },
+  {
+    "id": "evt-006",
+    "source": "Google GenAI Interactions API / 14:50",
+    "agent_id": "hack-chef",
+    "title": "Google DeepMind Interactions Quota Headroom at 85%",
+    "details": "Swarm interactions budget monitor warning. Daytime buffer allocated for final live presentations.",
+    "severity": "WARNING",
+    "proposed_action": "Allocate token headroom for v2 autonomous build queues",
+    "timestamp": null,
+    "ref": "gemini-3.8-flash:quota"
   }
 ]

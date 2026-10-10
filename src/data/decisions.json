@@ -2,15 +2,28 @@
   {
     "item_id": "agenda-01",
     "decision_type": "APPROVE",
-    "voice_notes": "Lead approved via Ray-Ban glasses audio call during morning walk.",
-    "timestamp": "2026-10-10T16:10:00Z",
-    "human_verified": true
+    "voice_notes": "API test approval",
+    "timestamp": "2026-10-10T14:49:43Z",
+    "human_verified": true,
+    "decision_id": "dec-70c0f8ae",
+    "source": "voice_tool"
   },
   {
     "item_id": "agenda-02",
-    "decision_type": "HOLD",
-    "voice_notes": "Lead requested manual dashboard checkpoint confirmation before wiping database.",
-    "timestamp": "2026-10-10T16:10:45Z",
-    "human_verified": true
+    "decision_type": "APPROVE",
+    "voice_notes": "Philipp via Ray-Ban: 'Yes, but hold night shift push on checkpoint until I verify the diff.'",
+    "timestamp": "2026-10-10T14:48:45Z",
+    "human_verified": false,
+    "decision_id": "dec-agenda-02",
+    "source": "voice_tool"
+  },
+  {
+    "item_id": "agenda-03",
+    "decision_type": "APPROVE",
+    "voice_notes": "Philipp via Ray-Ban: 'Yes, dispatch autonomous v2 queue.'",
+    "timestamp": "2026-10-10T14:49:00Z",
+    "human_verified": true,
+    "decision_id": "dec-agenda-03",
+    "source": "voice_tool"
   }
 ]
