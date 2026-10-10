@@ -1,9 +1,9 @@
-"""DawnDispatch voice app (claude-03), built 1:1 on gradbot demos/simple_chat/main.py.
+"""DawnDispatch voice app (claude-03), built on dawn/main.py (the proven gradbot simple_chat base).
 
-Taken unchanged from simple_chat: gradbot.init_logging(), cfg = gradbot.config.from_env(), make_config() shape,
-handle_session(websocket, config=cfg, on_start=make_config), gradbot.routes.setup(app, config=cfg, static_dir, with_voices=True)
-and the client JS in static/index.html (audio path + message format). Added on top: the instructions (demo agenda from
-docs/LIVE-EVENTS.md, agent speaks first), the tools, LIVE-EVENTS publishing and the post-call processing.
+Taken unchanged from dawn/main.py: gradbot.init_logging(), cfg = gradbot.config.from_env(), make_config(),
+handle_session(websocket, config=cfg, on_start=...), gradbot.routes.setup(..., static_dir=dawn/static, with_voices=True)
+and the client dawn/static/index.html. Added: the tools (log_decision, mark_irreversible_checkpoint, end_call;
+set_time_budget and set_speaking_speed behind DAWN_EXTRA_TOOLS=1), the LIVE-EVENTS publishing and the post-call.
 
 Mounted by src/app.py at /voice like the official demos launcher (demos/app.py); /call redirects there and the
 root also exposes /ws/chat, /api/audio-config and /api/call/*.
@@ -44,15 +44,18 @@ cfg = gradbot.config.from_env()
 if os.environ.get("DAWN_HIDE_ERRORS") != "1":
     cfg.debug = True  # the phone page shows the real error text instead of "An error occurred"
 
-DEFAULT_VOICE_ID = "cLONiZ4hQ8VpQ4Sz"  # Skyler
-STATIC_DIR = pathlib.Path(__file__).resolve().parent / "static"
+DEFAULT_VOICE_ID = "cLONiZ4hQ8VpQ4Sz"  # Skyler, im Test bewaehrt (dawn/main.py)
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
+STATIC_DIR = REPO_ROOT / "dawn" / "static"  # the proven client, unchanged
+if not STATIC_DIR.is_dir():  # pragma: no cover - dawn/ missing in a checkout
+    STATIC_DIR = pathlib.Path(__file__).resolve().parent / "static"
 CLOSE_GRACE_S = float(os.environ.get("DAWN_CLOSE_GRACE_S", "15"))
 
 
 def make_config(msg: dict, padding_bonus: float | None = None) -> gradbot.SessionConfig:
-    """simple_chat's make_config + instructions/tools; DAWN_VOICE_ID (if set) wins over the page's voice picker."""
-    voice_id = os.environ.get("DAWN_VOICE_ID") or msg.get("voice_id") or DEFAULT_VOICE_ID
-    language = msg.get("language") or os.environ.get("DAWN_LANGUAGE") or "en"
+    """dawn/main.py make_config, plus tools (and padding_bonus only when set_speaking_speed is used)."""
+    voice_id = msg.get("voice_id") or os.environ.get("DAWN_VOICE_ID") or DEFAULT_VOICE_ID
+    language = msg.get("language") or "en"
     extra: dict[str, Any] = {} if padding_bonus is None else {"padding_bonus": padding_bonus}
     return gradbot.SessionConfig(
         voice_id=voice_id,
@@ -137,7 +140,7 @@ def v2_idea_payload(option: str, notes: str, item_id: str) -> dict[str, Any]:
     for raw in _read_json("v2_options.json", []) or []:
         if isinstance(raw, dict) and str(raw.get("key", "")).upper() == option:
             linked = raw.get("linked_to") or item_id
-            return {"id": raw.get("id") or f"v2-opt-{option.lower()}", "title": raw.get("title") or prompt.V2_OPTIONS.get(option, notes),
+            return {"id": raw.get("id") or f"v2-opt-{option.lower()}", "title": prompt.V2_OPTIONS.get(option) or raw.get("title") or notes,
                     "linked_to": linked if isinstance(linked, list) else [linked, prompt.V1_ITEM_ID]}
     title = prompt.V2_OPTIONS.get(option) or (notes or "a custom Version 2")
     return {"id": f"v2-opt-{option.lower()}", "title": title, "linked_to": [item_id, prompt.V1_ITEM_ID]}
@@ -232,7 +235,8 @@ class CallSession:
             log.exception("call start bookkeeping failed (the voice session continues)")
         self.ready.set()
         await self.send_client(prompt.agenda_payload(self.agenda))
-        await self.emit("call_started", {"opening": prompt.OPENING})
+        await self.emit("call_started", {"opening": prompt.dawn_prompt().split('"')[1] if '"' in prompt.dawn_prompt() else prompt.OPENING})
+        await self.advance_to(self.item_index(prompt.V2_ITEM_ID))  # decision one
         log.info("call started: voice=%s agenda=%d items", self.start_msg.get("voice_id") or voice_id(), len(self.agenda))
 
     async def wait_ready(self) -> None:

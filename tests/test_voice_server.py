@@ -95,18 +95,20 @@ class VoiceServerTest(unittest.TestCase):
 
     def test_prompt_contains_contract_lines_and_tools(self):
         text = prompt.build_instructions()
-        self.assertIn(prompt.OPENING, text)
-        self.assertIn("Shall I make the repo public and submit?", text)
-        self.assertIn("every other team at the hackathon", text)
-        self.assertIn("Your dashboard is ready.", text)
+        self.assertIn("public", text)
+        self.assertIn("other teams", text)
+        self.assertIn(prompt.CLOSING_LINE, text)
         self.assertEqual(set(prompt.TOOL_NAMES), {"set_time_budget", "log_decision", "mark_irreversible_checkpoint", "set_speaking_speed", "end_call"})
+        self.assertEqual({s["name"] for s in prompt.active_tool_specs()}, {"log_decision", "mark_irreversible_checkpoint", "end_call"})
+        self.assertIn("Hey Philipp, it's Dawn", text)  # dawn/prompt.txt is the base
+        self.assertIn("log_decision", text)
         for spec in prompt.TOOL_SPECS:
             json.dumps(spec["parameters"])  # valid JSON schema payload
 
     def test_start_emits_call_started_and_agenda(self):
         run(self.session.start())
-        self.assertEqual(self.types(), ["call_started"])
-        self.assertEqual(self.bus_events[0]["data"]["opening"], prompt.OPENING)
+        self.assertEqual(self.types(), ["call_started", "agenda_item"])
+        self.assertIn("Dawn", self.bus_events[0]["data"]["opening"])
         self.assertEqual(self.ws.sent[0]["type"], "agenda")
         self.assertEqual(len(self.ws.sent[0]["items"]), 4)
         self.assertEqual(state.load().call.status, "live")
@@ -151,7 +153,7 @@ class VoiceServerTest(unittest.TestCase):
         for t in ("call_started", "time_budget", "agenda_item", "user_said", "decision", "v2_idea",
                   "speed_changed", "checkpoint", "participants_scaled", "call_ended", "brief_ready"):
             self.assertIn(t, types, t)
-        self.assertEqual(types.count("agenda_item"), 4)
+        self.assertEqual(types.count("agenda_item"), 3)  # decisions one to three (agenda-02..04)
         scaled = next(e for e in self.bus_events if e["type"] == "participants_scaled")
         self.assertEqual(scaled["data"]["count"], 7)
         for e in self.bus_events:

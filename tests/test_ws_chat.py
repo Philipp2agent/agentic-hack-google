@@ -21,7 +21,7 @@ except Exception:  # pragma: no cover
 from fastapi.testclient import TestClient
 
 from src.core import state
-from src.voice import server
+from src.voice import prompt, server
 
 SEED_DIR = state.DEFAULT_DATA_DIR
 
@@ -103,7 +103,7 @@ class WsChatWiringTest(unittest.TestCase):
             _Msg("tts_text", text="Good morning Philipp.", turn_idx=0, stop_s=1.0),
             _Msg("tts_text", text="How much time do you have?", turn_idx=0, stop_s=2.0),
             _Msg("stt_text", text="about a minute", turn_idx=1, stop_s=4.0),
-            _Msg("tool_call", tool_call=_ToolCall("set_time_budget", {"seconds": 60}), tool_call_handle=self.tool_handle),
+            _Msg("tool_call", tool_call=_ToolCall("log_decision", {"item_id": "agenda-02", "decision": "APPROVE", "notes": "WhatsApp first", "option": "A"}), tool_call_handle=self.tool_handle),
             _Msg("audio", data=b"\x00\x01", start_s=4.5, stop_s=5.0, turn_idx=2),
             2.5,  # seconds of "conversation" before the lead wraps up (the test posts transcript lines meanwhile)
             _Msg("tool_call", tool_call=_ToolCall("end_call", {"summary": "nothing decided, test run"}), tool_call_handle=self.end_handle),
@@ -153,14 +153,8 @@ class WsChatWiringTest(unittest.TestCase):
                     received.append(msg)
                     if "text" in msg:
                         seen.add(json.loads(msg["text"]).get("type"))
-                    if {"agenda_item", "call_started", "user_said", "brief_ready"} <= seen:
+                    if {"agenda_item", "call_started", "decision", "v2_idea", "brief_ready"} <= seen:
                         break
-                    if {"agenda_item", "call_started"} <= seen and "turn_posted" not in seen:
-                        # the page posts finished transcript lines (SyncedAudioPlayer.onText) while the call runs
-                        r1 = client.post("/api/call/turn", json={"is_user": False, "turn_idx": 0, "text": "Good morning Philipp. How much time do you have?"})
-                        r2 = client.post("/api/call/turn", json={"is_user": True, "turn_idx": 1, "text": "about a minute"})
-                        self.assertTrue(r1.json()["ok"] and r2.json()["ok"])
-                        seen.add("turn_posted")
             ws.send_json({"type": "stop"})
 
         texts = [json.loads(m["text"]) for m in received if "text" in m]
@@ -170,11 +164,13 @@ class WsChatWiringTest(unittest.TestCase):
         self.assertIn("call_started", types)
         self.assertIn("agent_text", types)
         self.assertIn("user_text", types)
-        self.assertIn("time_budget", types)
+        self.assertIn("decision", types)
+        self.assertIn("v2_idea", types)
         self.assertIn("agenda_item", types)
         self.assertTrue(any("bytes" in m for m in received), "audio bytes forwarded")
-        self.assertEqual(self.tool_handle.results[0]["seconds"], 60)
-        self.assertEqual(self.end_handle.results[0]["say"], "Your dashboard is ready.")
+        self.assertEqual(self.tool_handle.results[0]["recorded"], "APPROVE")
+        self.assertEqual(self.tool_handle.results[0]["next_item_id"], "agenda-03")
+        self.assertEqual(self.end_handle.results[0]["say"], prompt.CLOSING_LINE)
         self.assertEqual(self.run_kwargs["session_config"].assistant_speaks_first, True)
         self.assertTrue(self.inp.closed)
 
@@ -187,11 +183,8 @@ class WsChatWiringTest(unittest.TestCase):
             time.sleep(0.1)
         st = state.load()
         self.assertEqual(st.call.status, "ended")
-        self.assertEqual(st.call.time_budget_s, 60)
-        roles = [t.role for t in st.call.transcript]
-        self.assertIn("agent", roles)
-        self.assertIn("user", roles)
-        self.assertIn("user_said", [e["type"] for e in self.events])
+        self.assertEqual(st.meta.get("v2_option"), "A")
+        self.assertEqual(len(st.decisions), 1)
         self.assertIn("call_ended", [e["type"] for e in self.events])
         self.assertTrue((self.tmp / "knowledge_graph_after.json").exists())
         self.assertTrue((self.tmp / "transcript.json").exists())

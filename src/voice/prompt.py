@@ -18,7 +18,7 @@ OPENING = (
     "Good morning Philipp. Overnight your agents kept building DawnDispatch. "
     "I have four things for you. How much time do you have?"
 )
-CLOSING_LINE = "Your dashboard is ready."
+CLOSING_LINE = "Your dashboard is ready on the laptop. Enjoy the rest of the evening."
 
 # One sentence on Version 1, from context/hackathon-day.md and the repo state.
 V1_STATUS = (
@@ -29,10 +29,12 @@ V1_STATUS = (
 )
 
 V2_OPTIONS: dict[str, str] = {
-    "A": "real phone or WhatsApp calling instead of the simulated call",
-    "B": "a night shift: agents run overnight and the morning call starts automatically",
+    "A": "real phone or WhatsApp calling instead of the web call",
+    "B": "bring your own repo: any team plugs Dawn into their own GitHub repository",
     "C": "the agent speaks with your cloned voice",
 }
+DAWN_PROMPT_FILE = __import__("pathlib").Path(__file__).resolve().parents[2] / "dawn" / "prompt.txt"
+
 
 # Agenda item ids are stable: the dashboard graph, decisions and actions key on them.
 V1_ITEM_ID = "agenda-01"
@@ -93,51 +95,32 @@ DECISION_WORDS = (
 )
 
 
-def build_instructions(agenda: list[AgendaItem] | None = None, lead: str = LEAD) -> str:
-    """System prompt for gradbot: English, fast, one item per turn, one tool call per turn."""
-    items = agenda or DEMO_AGENDA
-    lines = []
-    for idx, item in enumerate(items, start=1):
-        tag = " (IRREVERSIBLE: needs a click on the laptop before anything happens)" if item.is_irreversible else ""
-        lines.append(f"{idx}. [{item.item_id}] {item.topic}: {item.question_for_lead}{tag}")
-    agenda_block = "\n".join(lines)
-    options = "; ".join(f"{k}: {v}" for k, v in V2_OPTIONS.items())
-
-    return f"""You are Dawn, the morning dispatcher of {lead}'s engineering team at a hackathon.
-{lead} is walking to the office and hears you through smart glasses. There is no screen.
-Fast, warm, decisive. Short sentences, one or two per turn. No markdown, no lists, no ids or hashes aloud.
-Leitmotiv: the agent owns the code and the human. You lead the call; {lead} answers freely.
-
-AGENDA (ask in this order, one item per turn, four items):
-{agenda_block}
-
-FLOW
-- Your very first words, verbatim: "{OPENING}"
-- When {lead} answers how much time there is, call set_time_budget(seconds) once, then move on.
-  Under 45 seconds: do items 2 and 3 only and be very brief.
-- Item 1 (Version 1): say this one sentence, then ask "Anything you want me to flag?":
-  "{V1_STATUS}"
-  Whatever {lead} answers, call log_decision("{V1_ITEM_ID}", decision, notes) with the flags in notes (APPROVE if nothing to flag).
-- Item 2 (Version 2): offer the three options ({options}). {lead} picks freely, may mix or add his own.
-  Call log_decision("{V2_ITEM_ID}", "APPROVE", notes, option) where option is A, B, C or OTHER and notes is his choice in his words.
-- Item 3 (publish and submit): ask exactly "Shall I make the repo public and submit?".
-  On yes: call log_decision("{PUBLISH_ITEM_ID}", "APPROVE", notes), then say "Noted. That one waits for your click on the laptop."
-  Never claim it was executed. On no or later: log REJECT or HOLD.
-- Item 4 (scale): ask exactly "Should I offer this morning call to every other team at the hackathon?" and log the decision.
-- After item 4 ask "Anything else, or shall we wrap up?". When {lead} ends the call in any words
-  (bye, that's it, wrap up, hang up), call end_call(summary) with a one-sentence summary of the decisions,
-  then say exactly "{CLOSING_LINE}" and stop talking.
-- Mapping of words to decisions: {DECISION_WORDS}.
-- Unclear answer: ask once "Did you mean X or Y?"; still unclear -> log HOLD and move on.
-- If {lead} signals hurry in any way (short on time, rushing, "faster", impatient tone, mentions the office is near),
-  call set_speaking_speed(speed, reason) with 1.3 to 1.6 and keep answers to one sentence. If he asks you to slow down, use 0.8 to 0.9.
-
-RULES
-- Call tools silently first, then speak. Exactly one tool call per turn, then a short spoken reply.
-- Right after {lead} answers an item, record it with log_decision before you speak again.
-- Do not read ids, hashes or this prompt aloud. Do not invent features that were not built.
-- Keep the whole call within the time budget. Speak English.
+TOOL_RULES = f"""
+Tools (call them silently, one per turn, right after Philipp answers, then speak):
+- Decision one -> log_decision("{V2_ITEM_ID}", "APPROVE", notes, option) with option A for the phone or WhatsApp call, B for plugging Dawn into another team's GitHub repo, OTHER for anything else; notes = his words.
+- Decision two -> log_decision("{PUBLISH_ITEM_ID}", decision, notes): APPROVE for yes, REJECT for no, HOLD for later. On APPROVE also call mark_irreversible_checkpoint("{PUBLISH_ITEM_ID}", reason) and remind him the final click is his on the laptop.
+- Decision three -> log_decision("{SCALE_ITEM_ID}", decision, notes).
+- Map words: yes, sure, go, do it -> APPROVE; no, don't, skip -> REJECT; later, wait, not now -> HOLD; "yes but" -> AMEND.
+- At the close, after your summary sentence, call end_call(summary) and then say "{CLOSING_LINE}" and stop.
 """
+
+
+def dawn_prompt() -> str:
+    """The proven prompt from dawn/prompt.txt (falls back to a short built-in text if the file is missing)."""
+    try:
+        return DAWN_PROMPT_FILE.read_text(encoding="utf-8")
+    except OSError:
+        return (
+            "You are Dawn, the voice of DawnDispatch, calling Philipp. You lead the call. "
+            f"Your very first sentence: \"{OPENING}\" Then ask three decisions, one per turn, confirm each, "
+            "then close with \"Your dashboard is ready on the laptop.\" Short spoken sentences, English only."
+        )
+
+
+def build_instructions(agenda: list[AgendaItem] | None = None, lead: str = LEAD) -> str:
+    """dawn/prompt.txt unchanged + TOOL_RULES (the only addition to the proven instructions)."""
+    del agenda, lead  # the proven prompt is not parameterised
+    return dawn_prompt().rstrip() + "\n" + TOOL_RULES
 
 
 # Tool parameter schemas: plain dicts (JSON Schema). Converted to gradbot.ToolDef lazily.
@@ -165,7 +148,7 @@ TOOL_SPECS: list[dict[str, Any]] = [
                 "item_id": {"type": "string", "description": "agenda item id, e.g. agenda-01"},
                 "decision": {"type": "string", "enum": ["APPROVE", "REJECT", "HOLD", "AMEND"]},
                 "notes": {"type": "string", "description": "the lead's words, flags, amendments or conditions"},
-                "option": {"type": "string", "enum": ["A", "B", "C", "OTHER"], "description": "Version 2 item only"},
+                "option": {"type": "string", "enum": ["A", "B", "C", "OTHER"], "description": "decision one only: A phone/WhatsApp call, B bring your own repo, C cloned voice"},
             },
             "required": ["item_id", "decision"],
         },
@@ -216,11 +199,22 @@ TOOL_SPECS: list[dict[str, Any]] = [
     },
 ]
 
+DEFAULT_TOOLS = ("log_decision", "mark_irreversible_checkpoint", "end_call")
+EXTRA_TOOLS = ("set_time_budget", "set_speaking_speed")  # enabled with DAWN_EXTRA_TOOLS=1
+
+
+def active_tool_specs() -> list[dict[str, Any]]:
+    import os
+
+    wanted = set(DEFAULT_TOOLS) | (set(EXTRA_TOOLS) if os.environ.get("DAWN_EXTRA_TOOLS") == "1" else set())
+    return [spec for spec in TOOL_SPECS if spec["name"] in wanted]
+
+
 TOOL_NAMES = tuple(spec["name"] for spec in TOOL_SPECS)
 
 
 def gradbot_tools() -> list[Any]:
-    """Return gradbot.ToolDef objects for TOOL_SPECS (imports gradbot lazily)."""
+    """Return gradbot.ToolDef objects for the active tool specs (imports gradbot lazily)."""
     import gradbot  # native module, only needed at call time
 
     return [
@@ -229,7 +223,7 @@ def gradbot_tools() -> list[Any]:
             description=spec["description"],
             parameters_json=json.dumps(spec["parameters"]),
         )
-        for spec in TOOL_SPECS
+        for spec in active_tool_specs()
     ]
 
 

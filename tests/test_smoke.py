@@ -1,6 +1,7 @@
 """Smoke test (claude-03): the combined app imports and serves /dashboard and /call without any API call."""
 from __future__ import annotations
 
+import pathlib
 import unittest
 
 from fastapi.testclient import TestClient
@@ -48,13 +49,15 @@ class SmokeTest(unittest.TestCase):
         res = self.client.get("/call")  # follows the redirect
         self.assertEqual(res.status_code, 200)
         self.assertIn("text/html", res.headers["content-type"])
-        self.assertIn("DawnDispatch", res.text)
+        self.assertIn("Dawn", res.text)
         self.assertIn('src="static/js/synced-audio-player.js"', res.text)
         self.assertIn('fetch("api/audio-config")', res.text)
         self.assertIn("player.handleMessage(event.data)", res.text)
         self.assertNotIn("binaryType", res.text)  # SyncedAudioPlayer plays audio only for Blob frames
         self.assertNotIn("ringtone", res.text.lower())
-        self.assertIn("navigator.wakeLock.request('screen')", res.text)
+        # the page is dawn/static/index.html itself (proven on the phone), served unchanged
+        dawn_page = (pathlib.Path(__file__).resolve().parents[1] / "dawn" / "static" / "index.html").read_text(encoding="utf-8")
+        self.assertEqual(res.text, dawn_page)
         for path in ("/voice/", "/voice/static/js/synced-audio-player.js", "/voice/static/js/audio-processor.js",
                      "/voice/static/js/opus-encoder.js", "/voice/api/audio-config", "/voice/api/call/agenda"):
             self.assertEqual(self.client.get(path).status_code, 200, path)
