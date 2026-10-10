@@ -5,6 +5,7 @@
 
 (function () {
   'use strict';
+  window.DawnDispatchLoaded = true;
 
   // State
   let graphBeforeData = null;
@@ -66,18 +67,18 @@
   }
 
   function setupEventListeners() {
-    btnViewSplit.addEventListener('click', () => setViewMode('split'));
-    btnViewBefore.addEventListener('click', () => setViewMode('before'));
-    btnViewAfter.addEventListener('click', () => setViewMode('after'));
+    if (btnViewSplit) btnViewSplit.addEventListener('click', () => setViewMode('split'));
+    if (btnViewBefore) btnViewBefore.addEventListener('click', () => setViewMode('before'));
+    if (btnViewAfter) btnViewAfter.addEventListener('click', () => setViewMode('after'));
 
-    btnZoomIn.addEventListener('click', () => adjustZoom(0.15));
-    btnZoomOut.addEventListener('click', () => adjustZoom(-0.15));
-    btnZoomReset.addEventListener('click', () => resetZoom());
-    btnRefresh.addEventListener('click', () => loadAllData());
+    if (btnZoomIn) btnZoomIn.addEventListener('click', () => adjustZoom(0.15));
+    if (btnZoomOut) btnZoomOut.addEventListener('click', () => adjustZoom(-0.15));
+    if (btnZoomReset) btnZoomReset.addEventListener('click', () => resetZoom());
+    if (btnRefresh) btnRefresh.addEventListener('click', () => loadAllData());
 
-    btnCloseInspector.addEventListener('click', () => closeInspector());
+    if (btnCloseInspector) btnCloseInspector.addEventListener('click', () => closeInspector());
 
-    btnAudioPlay.addEventListener('click', toggleAudioPlayback);
+    if (btnAudioPlay) btnAudioPlay.addEventListener('click', toggleAudioPlayback);
 
     window.addEventListener('resize', () => {
       if (graphBeforeData) renderGraph(svgBefore, graphBeforeData, 'BEFORE');
@@ -87,6 +88,7 @@
 
   function setupClock() {
     const clockEl = document.getElementById('clock-display');
+    if (!clockEl) return;
     const updateTime = () => {
       const now = new Date();
       clockEl.textContent = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' CEST';
@@ -103,24 +105,67 @@
     }
   }
 
-  // Load API Data
+  // Load API Data (supporting /api/state as well as dedicated endpoints)
   async function loadAllData() {
     try {
-      const [beforeRes, afterRes, transRes, actsRes] = await Promise.all([
-        fetch('/api/graph/before'),
-        fetch('/api/graph/after'),
-        fetch('/api/transcript'),
-        fetch('/api/actions'),
-      ]);
+      let stateData = null;
+      try {
+        const stateRes = await fetch('/api/state');
+        if (stateRes.ok) {
+          stateData = await stateRes.json();
+        }
+      } catch (e) {
+        // Optional /api/state
+      }
 
-      if (beforeRes.ok) graphBeforeData = await beforeRes.json();
-      if (afterRes.ok) graphAfterData = await afterRes.json();
-      if (transRes.ok) transcriptData = await transRes.json();
-      if (actsRes.ok) actionsData = await actsRes.json();
+      if (stateData) {
+        if (stateData.actions && stateData.actions.length > 0) {
+          actionsData = stateData.actions;
+        }
+        if (stateData.call && stateData.call.transcript && stateData.call.transcript.length > 0) {
+          transcriptData = { turns: stateData.call.transcript };
+        }
+      }
+
+      // Fetch Before Graph
+      try {
+        const beforeRes = await fetch('/api/graph?phase=before').then(r => r.ok ? r : fetch('/api/graph/before'));
+        if (beforeRes && beforeRes.ok) graphBeforeData = await beforeRes.json();
+      } catch (e) {}
+
+      // Fetch After Graph
+      try {
+        const afterRes = await fetch('/api/graph?phase=after').then(r => r.ok ? r : fetch('/api/graph/after'));
+        if (afterRes && afterRes.ok) graphAfterData = await afterRes.json();
+      } catch (e) {}
+
+      // Fallback transcript
+      if (!transcriptData) {
+        try {
+          const transRes = await fetch('/api/transcript');
+          if (transRes.ok) transcriptData = await transRes.json();
+        } catch (e) {}
+      }
+
+      // Fallback actions
+      if (!actionsData || actionsData.length === 0) {
+        try {
+          const actsRes = await fetch('/api/actions');
+          if (actsRes.ok) actionsData = await actsRes.json();
+        } catch (e) {}
+      }
+
+      // If graph is still missing, synthesize from stateData
+      if (!graphBeforeData && stateData && stateData.events) {
+        graphBeforeData = synthesizeGraphBefore(stateData.events, stateData.agenda || []);
+      }
+      if (!graphAfterData && graphBeforeData && stateData) {
+        graphAfterData = synthesizeGraphAfter(graphBeforeData, stateData.decisions || [], actionsData);
+      }
 
       updateMetrics();
-      renderGraph(svgBefore, graphBeforeData, 'BEFORE');
-      renderGraph(svgAfter, graphAfterData, 'AFTER');
+      if (svgBefore && graphBeforeData) renderGraph(svgBefore, graphBeforeData, 'BEFORE');
+      if (svgAfter && graphAfterData) renderGraph(svgAfter, graphAfterData, 'AFTER');
       renderTranscript();
       renderCheckpoints();
     } catch (err) {
@@ -129,32 +174,79 @@
     }
   }
 
+  function synthesizeGraphBefore(events, agenda) {
+    const nodes = [];
+    const edges = [];
+    const seenAgents = new Set();
+
+    events.forEach(evt => {
+      const agentId = evt.agent_id || 'hack-agent';
+      if (!seenAgents.has(agentId)) {
+        seenAgents.add(agentId);
+        nodes.push({ id: `agent-${agentId}`, label: agentId, type: 'agent', status: 'ACTIVE', details: `Agent ${agentId}` });
+      }
+      nodes.push({ id: evt.id || `evt-${Math.random()}`, label: evt.title || 'Event', type: 'event', status: 'UNRESOLVED', details: evt.details || '' });
+      edges.push({ source: `agent-${agentId}`, target: evt.id, relation: 'PRODUCED', status: 'PENDING' });
+    });
+
+    agenda.forEach((ag, idx) => {
+      nodes.push({ id: ag.item_id || `agenda-${idx}`, label: ag.topic || 'Agenda Item', type: 'agenda', status: 'PENDING_TRIAGE', details: ag.question_for_lead || '' });
+      if (events[idx]) {
+        edges.push({ source: events[idx].id, target: ag.item_id, relation: 'TRIGGERS', status: 'PENDING' });
+      }
+    });
+
+    return { stage: 'BEFORE', nodes, edges };
+  }
+
+  function synthesizeGraphAfter(before, decisions, actions) {
+    const nodes = JSON.parse(JSON.stringify(before.nodes));
+    const edges = JSON.parse(JSON.stringify(before.edges));
+
+    nodes.forEach(n => {
+      if (n.type === 'event') n.status = 'RESOLVED';
+    });
+
+    decisions.forEach(d => {
+      const decId = `dec-${d.item_id}`;
+      nodes.push({ id: decId, label: `Decision: ${d.decision_type}`, type: 'decision', status: 'RECORDED', details: d.voice_notes || '' });
+      edges.push({ source: d.item_id, target: decId, relation: 'DECIDED_BY', status: 'RESOLVED' });
+    });
+
+    actions.forEach(a => {
+      nodes.push({ id: a.action_id, label: a.action_type, type: 'action', status: a.status, details: a.artifacts?.reason || '' });
+      edges.push({ source: `dec-${a.item_id}`, target: a.action_id, relation: 'DISPATCHES', status: a.status === 'COMPLETED' ? 'RESOLVED' : 'BLOCKED' });
+    });
+
+    return { stage: 'AFTER', nodes, edges };
+  }
+
   function setViewMode(mode) {
     viewMode = mode;
-    btnViewSplit.classList.toggle('active', mode === 'split');
-    btnViewBefore.classList.toggle('active', mode === 'before');
-    btnViewAfter.classList.toggle('active', mode === 'after');
+    if (btnViewSplit) btnViewSplit.classList.toggle('active', mode === 'split');
+    if (btnViewBefore) btnViewBefore.classList.toggle('active', mode === 'before');
+    if (btnViewAfter) btnViewAfter.classList.toggle('active', mode === 'after');
 
-    graphsWorkspace.className = 'graphs-workspace layout-' + mode;
+    if (graphsWorkspace) graphsWorkspace.className = 'graphs-workspace layout-' + mode;
 
     setTimeout(() => {
-      if (graphBeforeData) renderGraph(svgBefore, graphBeforeData, 'BEFORE');
-      if (graphAfterData) renderGraph(svgAfter, graphAfterData, 'AFTER');
+      if (graphBeforeData && svgBefore) renderGraph(svgBefore, graphBeforeData, 'BEFORE');
+      if (graphAfterData && svgAfter) renderGraph(svgAfter, graphAfterData, 'AFTER');
     }, 150);
   }
 
   function adjustZoom(delta) {
     zoomLevel = Math.max(0.4, Math.min(2.5, zoomLevel + delta));
-    applyTransform(svgBefore);
-    applyTransform(svgAfter);
+    if (svgBefore) applyTransform(svgBefore);
+    if (svgAfter) applyTransform(svgAfter);
   }
 
   function resetZoom() {
     zoomLevel = 1.0;
     panX = 0;
     panY = 0;
-    applyTransform(svgBefore);
-    applyTransform(svgAfter);
+    if (svgBefore) applyTransform(svgBefore);
+    if (svgAfter) applyTransform(svgAfter);
   }
 
   function applyTransform(svg) {
@@ -168,18 +260,23 @@
     if (graphBeforeData && graphBeforeData.nodes) {
       const eventNodes = graphBeforeData.nodes.filter(n => n.type === 'event');
       const unresolved = graphBeforeData.nodes.filter(n => n.status === 'UNRESOLVED' || n.status === 'BLOCKED');
-      document.getElementById('metric-events-count').textContent = `${eventNodes.length} Events`;
-      document.getElementById('before-unresolved-count').textContent = `${unresolved.length} Ungeloest`;
+      const elCount = document.getElementById('metric-events-count');
+      const elUnres = document.getElementById('before-unresolved-count');
+      if (elCount) elCount.textContent = `${eventNodes.length} Events`;
+      if (elUnres) elUnres.textContent = `${unresolved.length} Ungeloest`;
     }
 
     if (actionsData) {
       const blocked = actionsData.filter(a => a.status === 'BLOCKED_ON_CHECKPOINT');
-      metricCheckpointsCount.textContent = `${blocked.length} Ausstehend`;
-      checkpointTagText.textContent = `${blocked.length} Blockiert`;
-      if (blocked.length === 0) {
-        metricCheckpointsCount.className = 'metric-val text-emerald';
-        metricCheckpointsCount.textContent = '0 Ausstehend';
-        checkpointTagText.textContent = 'Alle Freigegeben';
+      if (metricCheckpointsCount) {
+        metricCheckpointsCount.textContent = `${blocked.length} Ausstehend`;
+        if (blocked.length === 0) {
+          metricCheckpointsCount.className = 'metric-val text-emerald';
+          metricCheckpointsCount.textContent = '0 Ausstehend';
+        }
+      }
+      if (checkpointTagText) {
+        checkpointTagText.textContent = blocked.length === 0 ? 'Alle Freigegeben' : `${blocked.length} Blockiert`;
       }
     }
   }
@@ -236,7 +333,6 @@
       layers[idx].push(n);
     });
 
-    // Active layers count
     const activeLayers = layers.filter(l => l.length > 0).length;
     const colWidth = Math.max(140, (width - 80) / Math.max(1, activeLayers));
     const nodeCoords = {};
@@ -282,7 +378,6 @@
       path.setAttribute('marker-end', `url(#arrow-${markerType}-${stage})`);
       edgesGroup.appendChild(path);
 
-      // Edge Label
       if (edge.relation) {
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', (src.x + tgt.x) / 2);
@@ -307,7 +402,6 @@
       g.setAttribute('transform', `translate(${coord.x}, ${coord.y})`);
       g.setAttribute('data-id', node.id);
 
-      // Node style and colors by type and status
       const style = getNodeVisuals(node, stage);
 
       if (node.type === 'agent') {
@@ -371,7 +465,6 @@
         g.appendChild(badge);
       }
 
-      // Click to inspect
       g.addEventListener('click', (e) => {
         e.stopPropagation();
         openInspector(node);
@@ -404,7 +497,6 @@
       return { fill: '#083344', stroke: '#06b6d4', badgeColor: '#67e8f9' };
     }
 
-    // Events
     if (stage === 'AFTER' || node.status === 'RESOLVED') {
       return { fill: '#022c22', stroke: '#059669', badgeColor: '#34d399' };
     }
@@ -424,19 +516,19 @@
   // ==========================================
   function openInspector(node) {
     selectedNode = node;
-    inspId.textContent = node.id;
-    inspStatus.textContent = node.status;
-    inspType.textContent = node.type;
-    inspTitle.textContent = node.label;
-    inspDetails.textContent = node.details || 'Keine zusaetzlichen Details.';
-    inspTypeBadge.textContent = node.type.toUpperCase();
-    inspJson.textContent = JSON.stringify(node, null, 2);
+    if (inspId) inspId.textContent = node.id;
+    if (inspStatus) inspStatus.textContent = node.status;
+    if (inspType) inspType.textContent = node.type;
+    if (inspTitle) inspTitle.textContent = node.label;
+    if (inspDetails) inspDetails.textContent = node.details || 'Keine zusaetzlichen Details.';
+    if (inspTypeBadge) inspTypeBadge.textContent = node.type.toUpperCase();
+    if (inspJson) inspJson.textContent = JSON.stringify(node, null, 2);
 
-    nodeInspector.classList.add('open');
+    if (nodeInspector) nodeInspector.classList.add('open');
   }
 
   function closeInspector() {
-    nodeInspector.classList.remove('open');
+    if (nodeInspector) nodeInspector.classList.remove('open');
     selectedNode = null;
   }
 
@@ -444,6 +536,7 @@
   // 60-Second Call Transcript & Audio Player
   // ==========================================
   function renderTranscript() {
+    if (!transcriptScroll) return;
     if (!transcriptData || !transcriptData.turns) {
       transcriptScroll.innerHTML = '<div class="transcript-loading">Kein Transcript vorhanden</div>';
       return;
@@ -465,7 +558,7 @@
           </span>
           <div style="display:flex; gap:6px; align-items:center;">
             ${turn.tag ? `<span class="turn-tag ${tagClass}">${turn.tag}</span>` : ''}
-            <span class="turn-time">${turn.time}</span>
+            <span class="turn-time">${turn.time || ''}</span>
           </div>
         </div>
         <p class="turn-text">${turn.text}</p>
@@ -489,10 +582,10 @@
 
   function startAudioPlayback() {
     audioPlaying = true;
-    btnAudioPlay.classList.add('playing');
-    playIcon.textContent = '⏸';
-    playText.textContent = 'Pause';
-    soundWave.classList.add('active');
+    if (btnAudioPlay) btnAudioPlay.classList.add('playing');
+    if (playIcon) playIcon.textContent = '⏸';
+    if (playText) playText.textContent = 'Pause';
+    if (soundWave) soundWave.classList.add('active');
 
     if (currentTurnIndex >= (transcriptData?.turns?.length || 0)) {
       currentTurnIndex = 0;
@@ -503,9 +596,8 @@
       playbackSeconds += 1;
       const mins = String(Math.floor(playbackSeconds / 60)).padStart(2, '0');
       const secs = String(playbackSeconds % 60).padStart(2, '0');
-      audioTimer.textContent = `${mins}:${secs} / 01:00`;
+      if (audioTimer) audioTimer.textContent = `${mins}:${secs} / 01:00`;
 
-      // Advance turn every 5-6 seconds
       const turns = transcriptData?.turns || [];
       const targetTurnIndex = Math.min(turns.length - 1, Math.floor(playbackSeconds / 6.5));
       if (targetTurnIndex !== currentTurnIndex) {
@@ -523,10 +615,10 @@
 
   function pauseAudioPlayback() {
     audioPlaying = false;
-    btnAudioPlay.classList.remove('playing');
-    playIcon.textContent = '▶';
-    playText.textContent = 'Transcript abspielen';
-    soundWave.classList.remove('active');
+    if (btnAudioPlay) btnAudioPlay.classList.remove('playing');
+    if (playIcon) playIcon.textContent = '▶';
+    if (playText) playText.textContent = 'Transcript abspielen';
+    if (soundWave) soundWave.classList.remove('active');
     clearInterval(audioTimerInterval);
   }
 
@@ -543,6 +635,7 @@
   // Human Checkpoint Action Cards Engine
   // ==========================================
   function renderCheckpoints() {
+    if (!checkpointsList) return;
     if (!actionsData || actionsData.length === 0) {
       checkpointsList.innerHTML = '<div class="checkpoints-loading">Keine Checkpoints registriert</div>';
       return;
@@ -550,7 +643,7 @@
 
     checkpointsList.innerHTML = '';
     actionsData.forEach(action => {
-      const isBlocked = action.status === 'BLOCKED_ON_CHECKPOINT';
+      const isBlocked = action.status === 'BLOCKED_ON_CHECKPOINT' || action.status === 'BLOCKED';
       const isTarget = window.targetCheckpointId && (action.item_id === window.targetCheckpointId || action.action_id === window.targetCheckpointId);
 
       const card = document.createElement('div');
@@ -614,18 +707,15 @@
     }
 
     try {
-      const res = await fetch(`/api/actions/${encodeURIComponent(actionId)}/confirm`, {
-        method: 'POST',
-      });
-
+      let res = await fetch(`/api/actions/${encodeURIComponent(actionId)}/confirm`, { method: 'POST' });
+      if (!res.ok) {
+        res = await fetch(`/api/checkpoint/${encodeURIComponent(actionId)}/confirm`, { method: 'POST' });
+      }
       if (!res.ok) {
         throw new Error(`Server returned ${res.status}`);
       }
 
-      const result = await res.json();
       showToast(`Checkpoint ${actionId} freigegeben und ausgefuehrt!`, 'success');
-
-      // Refresh data
       await loadAllData();
     } catch (err) {
       console.error('Failed to confirm checkpoint:', err);
@@ -641,6 +731,7 @@
   // Toasts
   // ==========================================
   function showToast(message, type = 'info') {
+    if (!toastContainer) return;
     const toast = document.createElement('div');
     toast.className = 'toast';
     if (type === 'error') toast.style.borderColor = '#f43f5e';
@@ -659,5 +750,9 @@
   }
 
   // Run on DOM ready
-  document.addEventListener('DOMContentLoaded', init);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
