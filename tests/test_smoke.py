@@ -75,6 +75,33 @@ class SmokeTest(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertIn("call", res.json())
 
+    def test_collisions_between_standalone_apps_are_resolved(self):
+        """src/voice/app.py and src/dashboard/app.py both define /, /api/agenda, /api/transcript, /api/health
+        and mount /static and /assets. The combined app keeps exactly one of each."""
+        from src.app import _existing_paths
+
+        paths = _existing_paths()
+        for path in ("/", "/api/health", "/api/agenda", "/api/transcript", "/call", "/dashboard"):
+            self.assertIn(path, paths, path)
+        # one route object per colliding path (no shadowed duplicates in the route table)
+        flat = []
+        for r in app.routes:
+            inner = getattr(r, "original_router", None)
+            flat.extend(inner.routes if inner is not None else [r])
+        for path in ("/", "/api/health", "/api/agenda", "/api/transcript", "/call"):
+            self.assertEqual(sum(1 for r in flat if getattr(r, "path", None) == path), 1, path)
+        mounts = [getattr(r, "path", None) for r in app.routes if type(r).__name__ == "Mount"]
+        self.assertEqual(mounts.count("/static"), 1)
+        self.assertEqual(mounts.count("/assets"), 1)
+        # winners: our redirect + health, the dashboard's agenda/transcript, our /call
+        self.assertIn("mounted", self.client.get("/api/health").json())
+        self.assertEqual(self.client.get("/", follow_redirects=False).headers["location"], "/dashboard")
+        self.assertIsInstance(self.client.get("/api/agenda").json(), list)
+        self.assertIn("turns", self.client.get("/api/transcript").json())
+        self.assertEqual(self.client.get("/static/style.css").status_code, 200)      # dashboard css
+        self.assertEqual(self.client.get("/static/voice/call.css").status_code, 200)  # voice css
+        self.assertEqual(self.client.get("/assets/titelbild-v3.jpg").status_code, 200)
+
     def test_ws_chat_route_exists(self):
         # FastAPI >= 0.143 keeps included routers nested, so look at the voice router itself
         from src.voice.server import router as voice_router
