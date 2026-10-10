@@ -1,6 +1,7 @@
 /**
  * DawnDispatch Desktop Web Dashboard
  * Interactive Knowledge Graph, Audio Transcript & Human Checkpoint Engine
+ * Enhanced with v1 vs v2 Evolution Contrast & "Show me, don't tell me" Checkpoint Gates
  */
 
 (function () {
@@ -14,6 +15,7 @@
   let actionsData = [];
   let selectedNode = null;
   let viewMode = 'split'; // 'split', 'before', 'after'
+  let currentFilter = 'all'; // 'all', 'v1', 'v2', 'checkpoints'
   let zoomLevel = 1.0;
   let panX = 0;
   let panY = 0;
@@ -32,6 +34,11 @@
   const btnZoomReset = document.getElementById('btn-zoom-reset');
   const btnRefresh = document.getElementById('btn-refresh');
 
+  const btnFilterAll = document.getElementById('btn-filter-all');
+  const btnFilterV1 = document.getElementById('btn-filter-v1');
+  const btnFilterV2 = document.getElementById('btn-filter-v2');
+  const btnFilterCheckpoints = document.getElementById('btn-filter-checkpoints');
+
   const graphsWorkspace = document.getElementById('graphs-workspace');
   const svgBefore = document.getElementById('svg-before');
   const svgAfter = document.getElementById('svg-after');
@@ -41,6 +48,9 @@
   const inspId = document.getElementById('insp-id');
   const inspStatus = document.getElementById('insp-status');
   const inspType = document.getElementById('insp-type');
+  const inspEvolution = document.getElementById('insp-evolution');
+  const inspCheckpointRow = document.getElementById('insp-checkpoint-row');
+  const inspCheckpointAlert = document.getElementById('insp-checkpoint-alert');
   const inspTitle = document.getElementById('insp-title');
   const inspDetails = document.getElementById('insp-details');
   const inspJson = document.getElementById('insp-json');
@@ -76,6 +86,11 @@
     if (btnZoomReset) btnZoomReset.addEventListener('click', () => resetZoom());
     if (btnRefresh) btnRefresh.addEventListener('click', () => loadAllData());
 
+    if (btnFilterAll) btnFilterAll.addEventListener('click', () => setFilter('all'));
+    if (btnFilterV1) btnFilterV1.addEventListener('click', () => setFilter('v1'));
+    if (btnFilterV2) btnFilterV2.addEventListener('click', () => setFilter('v2'));
+    if (btnFilterCheckpoints) btnFilterCheckpoints.addEventListener('click', () => setFilter('checkpoints'));
+
     if (btnCloseInspector) btnCloseInspector.addEventListener('click', () => closeInspector());
 
     if (btnAudioPlay) btnAudioPlay.addEventListener('click', toggleAudioPlayback);
@@ -105,7 +120,7 @@
     }
   }
 
-  // Load API Data (supporting /api/state as well as dedicated endpoints)
+  // Load API Data
   async function loadAllData() {
     try {
       let stateData = null;
@@ -115,128 +130,141 @@
           stateData = await stateRes.json();
         }
       } catch (e) {
-        // Optional /api/state
+        // Optional endpoint
       }
 
-      if (stateData) {
-        if (stateData.actions && stateData.actions.length > 0) {
-          actionsData = stateData.actions;
-        }
-        if (stateData.call && stateData.call.transcript && stateData.call.transcript.length > 0) {
-          transcriptData = { turns: stateData.call.transcript };
-        }
+      const [resBefore, resAfter, resTrans, resActions] = await Promise.all([
+        fetch('/api/graph/before').catch(() => null),
+        fetch('/api/graph/after').catch(() => null),
+        fetch('/api/transcript').catch(() => null),
+        fetch('/api/actions').catch(() => null),
+      ]);
+
+      if (resBefore && resBefore.ok) {
+        graphBeforeData = await resBefore.json();
+      } else if (stateData?.graph_before) {
+        graphBeforeData = stateData.graph_before;
       }
 
-      // Fetch Before Graph
-      try {
-        const beforeRes = await fetch('/api/graph?phase=before').then(r => r.ok ? r : fetch('/api/graph/before'));
-        if (beforeRes && beforeRes.ok) graphBeforeData = await beforeRes.json();
-      } catch (e) {}
-
-      // Fetch After Graph
-      try {
-        const afterRes = await fetch('/api/graph?phase=after').then(r => r.ok ? r : fetch('/api/graph/after'));
-        if (afterRes && afterRes.ok) graphAfterData = await afterRes.json();
-      } catch (e) {}
-
-      // Fallback transcript
-      if (!transcriptData) {
-        try {
-          const transRes = await fetch('/api/transcript');
-          if (transRes.ok) transcriptData = await transRes.json();
-        } catch (e) {}
+      if (resAfter && resAfter.ok) {
+        graphAfterData = await resAfter.json();
+      } else if (stateData?.graph_after) {
+        graphAfterData = stateData.graph_after;
       }
 
-      // Fallback actions
-      if (!actionsData || actionsData.length === 0) {
-        try {
-          const actsRes = await fetch('/api/actions');
-          if (actsRes.ok) actionsData = await actsRes.json();
-        } catch (e) {}
+      if (resTrans && resTrans.ok) {
+        transcriptData = await resTrans.json();
+      } else if (stateData?.transcript) {
+        transcriptData = stateData.transcript;
       }
 
-      // If graph is still missing, synthesize from stateData
-      if (!graphBeforeData && stateData && stateData.events) {
-        graphBeforeData = synthesizeGraphBefore(stateData.events, stateData.agenda || []);
-      }
-      if (!graphAfterData && graphBeforeData && stateData) {
-        graphAfterData = synthesizeGraphAfter(graphBeforeData, stateData.decisions || [], actionsData);
+      if (resActions && resActions.ok) {
+        actionsData = await resActions.json();
+      } else if (stateData?.actions) {
+        actionsData = stateData.actions;
       }
 
       updateMetrics();
-      if (svgBefore && graphBeforeData) renderGraph(svgBefore, graphBeforeData, 'BEFORE');
-      if (svgAfter && graphAfterData) renderGraph(svgAfter, graphAfterData, 'AFTER');
-      renderTranscript();
-      renderCheckpoints();
+      renderAll();
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
-      showToast('Fehler beim Laden der Daten', 'error');
+      showToast('Fehler beim Laden der Dashboard-Daten: ' + err.message, 'error');
     }
   }
 
-  function synthesizeGraphBefore(events, agenda) {
-    const nodes = [];
-    const edges = [];
-    const seenAgents = new Set();
-
-    events.forEach(evt => {
-      const agentId = evt.agent_id || 'hack-agent';
-      if (!seenAgents.has(agentId)) {
-        seenAgents.add(agentId);
-        nodes.push({ id: `agent-${agentId}`, label: agentId, type: 'agent', status: 'ACTIVE', details: `Agent ${agentId}` });
-      }
-      nodes.push({ id: evt.id || `evt-${Math.random()}`, label: evt.title || 'Event', type: 'event', status: 'UNRESOLVED', details: evt.details || '' });
-      edges.push({ source: `agent-${agentId}`, target: evt.id, relation: 'PRODUCED', status: 'PENDING' });
-    });
-
-    agenda.forEach((ag, idx) => {
-      nodes.push({ id: ag.item_id || `agenda-${idx}`, label: ag.topic || 'Agenda Item', type: 'agenda', status: 'PENDING_TRIAGE', details: ag.question_for_lead || '' });
-      if (events[idx]) {
-        edges.push({ source: events[idx].id, target: ag.item_id, relation: 'TRIGGERS', status: 'PENDING' });
-      }
-    });
-
-    return { stage: 'BEFORE', nodes, edges };
+  function renderAll() {
+    if (graphBeforeData) renderGraph(svgBefore, graphBeforeData, 'BEFORE');
+    if (graphAfterData) renderGraph(svgAfter, graphAfterData, 'AFTER');
+    renderTranscript();
+    renderCheckpoints();
+    applyFilterToGraphs();
   }
 
-  function synthesizeGraphAfter(before, decisions, actions) {
-    const nodes = JSON.parse(JSON.stringify(before.nodes));
-    const edges = JSON.parse(JSON.stringify(before.edges));
-
-    nodes.forEach(n => {
-      if (n.type === 'event') n.status = 'RESOLVED';
-    });
-
-    decisions.forEach(d => {
-      const decId = `dec-${d.item_id}`;
-      nodes.push({ id: decId, label: `Decision: ${d.decision_type}`, type: 'decision', status: 'RECORDED', details: d.voice_notes || '' });
-      edges.push({ source: d.item_id, target: decId, relation: 'DECIDED_BY', status: 'RESOLVED' });
-    });
-
-    actions.forEach(a => {
-      nodes.push({ id: a.action_id, label: a.action_type, type: 'action', status: a.status, details: a.artifacts?.reason || '' });
-      edges.push({ source: `dec-${a.item_id}`, target: a.action_id, relation: 'DISPATCHES', status: a.status === 'COMPLETED' ? 'RESOLVED' : 'BLOCKED' });
-    });
-
-    return { stage: 'AFTER', nodes, edges };
-  }
-
+  // View Mode Controls
   function setViewMode(mode) {
     viewMode = mode;
-    if (btnViewSplit) btnViewSplit.classList.toggle('active', mode === 'split');
-    if (btnViewBefore) btnViewBefore.classList.toggle('active', mode === 'before');
-    if (btnViewAfter) btnViewAfter.classList.toggle('active', mode === 'after');
+    [btnViewSplit, btnViewBefore, btnViewAfter].forEach(b => b?.classList.remove('active'));
 
-    if (graphsWorkspace) graphsWorkspace.className = 'graphs-workspace layout-' + mode;
+    if (mode === 'split') {
+      btnViewSplit?.classList.add('active');
+      graphsWorkspace.className = 'graphs-workspace';
+    } else if (mode === 'before') {
+      btnViewBefore?.classList.add('active');
+      graphsWorkspace.className = 'graphs-workspace mode-before';
+    } else if (mode === 'after') {
+      btnViewAfter?.classList.add('active');
+      graphsWorkspace.className = 'graphs-workspace mode-after';
+    }
 
     setTimeout(() => {
-      if (graphBeforeData && svgBefore) renderGraph(svgBefore, graphBeforeData, 'BEFORE');
-      if (graphAfterData && svgAfter) renderGraph(svgAfter, graphAfterData, 'AFTER');
-    }, 150);
+      if (graphBeforeData) renderGraph(svgBefore, graphBeforeData, 'BEFORE');
+      if (graphAfterData) renderGraph(svgAfter, graphAfterData, 'AFTER');
+      applyFilterToGraphs();
+    }, 50);
   }
 
+  // Evolution & Checkpoint Filter
+  function setFilter(filter) {
+    currentFilter = filter;
+    [btnFilterAll, btnFilterV1, btnFilterV2, btnFilterCheckpoints].forEach(b => b?.classList.remove('active'));
+    if (filter === 'all') btnFilterAll?.classList.add('active');
+    else if (filter === 'v1') btnFilterV1?.classList.add('active');
+    else if (filter === 'v2') btnFilterV2?.classList.add('active');
+    else if (filter === 'checkpoints') btnFilterCheckpoints?.classList.add('active');
+
+    applyFilterToGraphs();
+    const filterNames = {
+      all: 'Alle Knoten',
+      v1: 'v1 MVP Baseline (Heute gebaut)',
+      v2: 'v2 Next-Gen Evolution (Roadmap)',
+      checkpoints: 'Human Checkpoints („Show me, don't tell me“)',
+    };
+    showToast(`Filter aktiv: ${filterNames[filter] || filter}`, 'info');
+  }
+
+  function applyFilterToGraphs() {
+    const nodes = document.querySelectorAll('.graph-node');
+    const edges = document.querySelectorAll('.graph-edge');
+
+    nodes.forEach(el => {
+      const v = el.getAttribute('data-version');
+      const isCp = el.getAttribute('data-checkpoint') === 'true';
+
+      let match = true;
+      if (currentFilter === 'v1') match = (v === 'v1');
+      else if (currentFilter === 'v2') match = (v === 'v2');
+      else if (currentFilter === 'checkpoints') match = isCp;
+
+      if (match) {
+        el.classList.remove('dimmed');
+        if (currentFilter !== 'all') el.classList.add('highlighted');
+        else el.classList.remove('highlighted');
+      } else {
+        el.classList.add('dimmed');
+        el.classList.remove('highlighted');
+      }
+    });
+
+    edges.forEach(el => {
+      const v = el.getAttribute('data-version');
+      const isCp = el.getAttribute('data-checkpoint') === 'true';
+
+      let match = true;
+      if (currentFilter === 'v1') match = (v === 'v1');
+      else if (currentFilter === 'v2') match = (v === 'v2');
+      else if (currentFilter === 'checkpoints') match = isCp;
+
+      if (match) {
+        el.classList.remove('dimmed');
+      } else {
+        el.classList.add('dimmed');
+      }
+    });
+  }
+
+  // Zoom Controls
   function adjustZoom(delta) {
-    zoomLevel = Math.max(0.4, Math.min(2.5, zoomLevel + delta));
+    zoomLevel = Math.max(0.5, Math.min(2.5, zoomLevel + delta));
     if (svgBefore) applyTransform(svgBefore);
     if (svgAfter) applyTransform(svgAfter);
   }
@@ -256,29 +284,222 @@
     }
   }
 
+  // Metrics Update
   function updateMetrics() {
     if (graphBeforeData && graphBeforeData.nodes) {
       const eventNodes = graphBeforeData.nodes.filter(n => n.type === 'event');
       const unresolved = graphBeforeData.nodes.filter(n => n.status === 'UNRESOLVED' || n.status === 'BLOCKED');
       const elCount = document.getElementById('metric-events-count');
+      const elUnresFoot = document.getElementById('metric-unresolved-foot');
       const elUnres = document.getElementById('before-unresolved-count');
       if (elCount) elCount.textContent = `${eventNodes.length} Events`;
+      if (elUnresFoot) elUnresFoot.textContent = `${unresolved.length} ungeloeste Blocker`;
       if (elUnres) elUnres.textContent = `${unresolved.length} Ungeloest`;
     }
 
+    if (graphAfterData && graphAfterData.nodes) {
+      let v1Count = 0;
+      let v2Count = 0;
+      graphAfterData.nodes.forEach(n => {
+        const meta = getNodeClassification(n, 'AFTER');
+        if (meta.version === 'v2') v2Count++;
+        else v1Count++;
+      });
+      const elEvo = document.getElementById('metric-evolution-count');
+      const elEvoFoot = document.getElementById('metric-evolution-foot');
+      if (elEvo) elEvo.textContent = `${v1Count} v1 ➔ ${v2Count} v2`;
+      if (elEvoFoot) elEvoFoot.textContent = `${v2Count} Next-Gen Weichen freigegeben`;
+    }
+
     if (actionsData) {
-      const blocked = actionsData.filter(a => a.status === 'BLOCKED_ON_CHECKPOINT');
+      const blocked = actionsData.filter(a => a.status === 'BLOCKED_ON_CHECKPOINT' || a.status === 'BLOCKED');
       if (metricCheckpointsCount) {
-        metricCheckpointsCount.textContent = `${blocked.length} Ausstehend`;
         if (blocked.length === 0) {
           metricCheckpointsCount.className = 'metric-val text-emerald';
           metricCheckpointsCount.textContent = '0 Ausstehend';
+        } else {
+          metricCheckpointsCount.className = 'metric-val text-rose';
+          metricCheckpointsCount.textContent = `${blocked.length} Ausstehend`;
         }
       }
       if (checkpointTagText) {
         checkpointTagText.textContent = blocked.length === 0 ? 'Alle Freigegeben' : `${blocked.length} Blockiert`;
       }
     }
+  }
+
+  // ==========================================
+  // Classification Engine: v1 vs v2 & Checkpoints
+  // ==========================================
+  function getNodeClassification(node, stage) {
+    const isAgent = node.type === 'agent';
+    const isDecision = node.type === 'decision';
+    const isAction = node.type === 'action';
+    const isAgenda = node.type === 'agenda';
+    const isEvent = node.type === 'event';
+
+    const fullText = `${node.id} ${node.label || ''} ${node.details || ''} ${JSON.stringify(node.metadata || {})}`.toLowerCase();
+
+    // Human Checkpoint Gate ("Show me, don't tell me")
+    const isCheckpoint = !!(
+      node.metadata?.is_irreversible === true ||
+      node.metadata?.requires_checkpoint === true ||
+      node.status === 'BLOCKED_ON_CHECKPOINT' ||
+      (node.status === 'BLOCKED' && (isAction || isAgenda)) ||
+      fullText.includes('checkpoint') ||
+      fullText.includes('irreversible') ||
+      fullText.includes('desk sign-off') ||
+      fullText.includes('schreibtisch') ||
+      fullText.includes('public release')
+    );
+
+    // Version Classification: v1 (MVP Built Today) vs v2 (Next-Gen Autonomous Evolution)
+    let version = 'v1';
+    if (
+      node.version === 'v2' ||
+      node.metadata?.version === 'v2' ||
+      fullText.includes('version 2') ||
+      fullText.includes('v2') ||
+      fullText.includes('whatsapp') ||
+      fullText.includes('night shift') ||
+      fullText.includes('voice clone') ||
+      fullText.includes('cloned voice') ||
+      fullText.includes('build queue') ||
+      fullText.includes('autonomous write')
+    ) {
+      version = 'v2';
+    }
+
+    return { isAgent, isDecision, isAction, isAgenda, isEvent, isCheckpoint, version };
+  }
+
+  function getNodeVisuals(node, stage, classification) {
+    const { isCheckpoint, version } = classification;
+
+    if (isCheckpoint) {
+      return {
+        fill: '#380c1a',
+        stroke: '#f43f5e',
+        badgeColor: '#fca5a5',
+        versionBadge: version.toUpperCase(),
+        versionColor: '#fca5a5',
+        auraColor: '#f43f5e',
+      };
+    }
+
+    if (node.type === 'agent') {
+      return {
+        fill: '#0f172a',
+        stroke: '#38bdf8',
+        badgeColor: '#7dd3fc',
+        versionBadge: version.toUpperCase(),
+        versionColor: '#38bdf8',
+      };
+    }
+
+    if (node.type === 'decision') {
+      if (version === 'v2') {
+        return {
+          fill: '#2e1065',
+          stroke: '#c084fc',
+          badgeColor: '#f3e8ff',
+          versionBadge: 'v2 EVO',
+          versionColor: '#c084fc',
+        };
+      }
+      return {
+        fill: '#022c22',
+        stroke: '#10b981',
+        badgeColor: '#6ee7b7',
+        versionBadge: 'v1 DEC',
+        versionColor: '#10b981',
+      };
+    }
+
+    if (node.type === 'action') {
+      if (node.status === 'COMPLETED') {
+        return {
+          fill: '#064e3b',
+          stroke: '#10b981',
+          badgeColor: '#6ee7b7',
+          versionBadge: version.toUpperCase(),
+          versionColor: '#6ee7b7',
+        };
+      }
+      return {
+        fill: '#4c0519',
+        stroke: '#f43f5e',
+        badgeColor: '#fca5a5',
+        versionBadge: version.toUpperCase(),
+        versionColor: '#fca5a5',
+      };
+    }
+
+    if (version === 'v2') {
+      return {
+        fill: '#1e0d36',
+        stroke: '#c084fc',
+        badgeColor: '#e9d5ff',
+        versionBadge: 'v2 EVO',
+        versionColor: '#c084fc',
+      };
+    }
+
+    if (node.type === 'agenda') {
+      if (node.status && node.status.startsWith('DECIDED_')) {
+        return {
+          fill: '#042f2e',
+          stroke: '#14b8a6',
+          badgeColor: '#5eead4',
+          versionBadge: 'v1 MVP',
+          versionColor: '#14b8a6',
+        };
+      }
+      return {
+        fill: '#083344',
+        stroke: '#06b6d4',
+        badgeColor: '#67e8f9',
+        versionBadge: 'v1 MVP',
+        versionColor: '#06b6d4',
+      };
+    }
+
+    if (stage === 'AFTER' || node.status === 'RESOLVED') {
+      return {
+        fill: '#022c22',
+        stroke: '#059669',
+        badgeColor: '#34d399',
+        versionBadge: 'v1 MVP',
+        versionColor: '#34d399',
+      };
+    }
+
+    if (node.status === 'BLOCKED') {
+      return {
+        fill: '#450a0a',
+        stroke: '#ef4444',
+        badgeColor: '#f87171',
+        versionBadge: 'v1 MVP',
+        versionColor: '#f87171',
+      };
+    }
+    if (node.status === 'UNRESOLVED') {
+      return {
+        fill: '#451a03',
+        stroke: '#f59e0b',
+        badgeColor: '#fbbf24',
+        versionBadge: 'v1 MVP',
+        versionColor: '#fbbf24',
+      };
+    }
+
+    return {
+      fill: '#091e36',
+      stroke: '#38bdf8',
+      badgeColor: '#7dd3fc',
+      versionBadge: 'v1 MVP',
+      versionColor: '#38bdf8',
+    };
   }
 
   // ==========================================
@@ -291,7 +512,7 @@
     const width = svg.clientWidth || 600;
     const height = svg.clientHeight || 420;
 
-    // Defs: Arrow heads & glowing filters
+    // SVG Defs: Glowing filters and arrowheads
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
     defs.innerHTML = `
       <marker id="arrow-pending-${stage}" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -300,10 +521,17 @@
       <marker id="arrow-resolved-${stage}" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
         <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
       </marker>
-      <marker id="arrow-blocked-${stage}" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <marker id="arrow-v2-${stage}" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+      </marker>
+      <marker id="arrow-checkpoint-${stage}" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
         <path d="M 0 1 L 10 5 L 0 9 z" fill="#f43f5e" />
       </marker>
-      <filter id="glow-${stage}" x="-20%" y="-20%" width="140%" height="140%">
+      <filter id="glow-checkpoint-${stage}" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="4" result="blur" />
+        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      </filter>
+      <filter id="glow-v2-${stage}" x="-20%" y="-20%" width="140%" height="140%">
         <feGaussianBlur stdDeviation="3" result="blur" />
         <feComposite in="SourceGraphic" in2="blur" operator="over" />
       </filter>
@@ -334,13 +562,13 @@
     });
 
     const activeLayers = layers.filter(l => l.length > 0).length;
-    const colWidth = Math.max(140, (width - 80) / Math.max(1, activeLayers));
+    const colWidth = Math.max(150, (width - 80) / Math.max(1, activeLayers));
     const nodeCoords = {};
 
     let currentLayerCol = 0;
-    layers.forEach((layerNodes, lIdx) => {
+    layers.forEach((layerNodes) => {
       if (layerNodes.length === 0) return;
-      const x = 50 + currentLayerCol * colWidth + colWidth * 0.4;
+      const x = 50 + currentLayerCol * colWidth + colWidth * 0.45;
       const count = layerNodes.length;
       const rowHeight = (height - 60) / (count + 1);
 
@@ -361,6 +589,11 @@
       const tgt = nodeCoords[edge.target];
       if (!src || !tgt) return;
 
+      const srcClass = getNodeClassification(src.node, stage);
+      const tgtClass = getNodeClassification(tgt.node, stage);
+      const isV2Edge = (srcClass.version === 'v2' || tgtClass.version === 'v2');
+      const isCpEdge = (srcClass.isCheckpoint || tgtClass.isCheckpoint);
+
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       const dx = tgt.x - src.x;
       const dy = tgt.y - src.y;
@@ -372,9 +605,29 @@
       const d = `M ${src.x} ${src.y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${tgt.x} ${tgt.y}`;
       path.setAttribute('d', d);
 
-      const statusClass = edge.status === 'RESOLVED' ? 'edge-resolved' : (edge.status === 'BLOCKED' ? 'edge-blocked' : 'edge-pending');
-      path.setAttribute('class', `graph-edge ${statusClass}`);
-      const markerType = edge.status === 'RESOLVED' ? 'resolved' : (edge.status === 'BLOCKED' ? 'blocked' : 'pending');
+      let edgeClass = 'graph-edge';
+      let markerType = 'pending';
+
+      if (isCpEdge) {
+        edgeClass += ' edge-checkpoint';
+        markerType = 'checkpoint';
+      } else if (isV2Edge) {
+        edgeClass += ' edge-v2';
+        markerType = 'v2';
+      } else if (edge.status === 'RESOLVED') {
+        edgeClass += ' edge-resolved';
+        markerType = 'resolved';
+      } else if (edge.status === 'BLOCKED') {
+        edgeClass += ' edge-blocked';
+        markerType = 'checkpoint';
+      } else {
+        edgeClass += ' edge-pending';
+        markerType = 'pending';
+      }
+
+      path.setAttribute('class', edgeClass);
+      path.setAttribute('data-version', isV2Edge ? 'v2' : 'v1');
+      path.setAttribute('data-checkpoint', isCpEdge ? 'true' : 'false');
       path.setAttribute('marker-end', `url(#arrow-${markerType}-${stage})`);
       edgesGroup.appendChild(path);
 
@@ -397,18 +650,37 @@
       const coord = nodeCoords[node.id];
       if (!coord) return;
 
+      const classification = getNodeClassification(node, stage);
+      const visuals = getNodeVisuals(node, stage, classification);
+
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.setAttribute('class', 'graph-node');
+      let nodeClassList = `graph-node node-${classification.version}`;
+      if (classification.isCheckpoint) nodeClassList += ' node-checkpoint';
+
+      g.setAttribute('class', nodeClassList);
       g.setAttribute('transform', `translate(${coord.x}, ${coord.y})`);
       g.setAttribute('data-id', node.id);
+      g.setAttribute('data-version', classification.version);
+      g.setAttribute('data-checkpoint', classification.isCheckpoint ? 'true' : 'false');
 
-      const style = getNodeVisuals(node, stage);
+      // Checkpoint Animated Aura Ring / Rect
+      if (classification.isCheckpoint) {
+        const aura = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        aura.setAttribute('x', '-76');
+        aura.setAttribute('y', '-26');
+        aura.setAttribute('width', '152');
+        aura.setAttribute('height', '52');
+        aura.setAttribute('rx', '10');
+        aura.setAttribute('class', 'checkpoint-aura');
+        g.appendChild(aura);
+      }
 
       if (node.type === 'agent') {
+        // Agent Circular Node
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('r', '22');
-        circle.setAttribute('fill', style.fill);
-        circle.setAttribute('stroke', style.stroke);
+        circle.setAttribute('fill', visuals.fill);
+        circle.setAttribute('stroke', visuals.stroke);
         circle.setAttribute('stroke-width', '2.5');
         circle.setAttribute('class', 'node-shape');
         g.appendChild(circle);
@@ -419,117 +691,140 @@
         icon.setAttribute('font-size', '16');
         icon.textContent = '🤖';
         g.appendChild(icon);
+
+        // Small Version Pill Badge
+        const vPill = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        vPill.setAttribute('class', 'node-version-badge-text');
+        vPill.setAttribute('x', '0');
+        vPill.setAttribute('y', '32');
+        vPill.setAttribute('fill', visuals.versionColor);
+        vPill.textContent = visuals.versionBadge;
+        g.appendChild(vPill);
+
       } else if (node.type === 'decision') {
+        // Decision Pill Shape
         const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', '-50');
+        rect.setAttribute('x', '-55');
         rect.setAttribute('y', '-16');
-        rect.setAttribute('width', '100');
+        rect.setAttribute('width', '110');
         rect.setAttribute('height', '32');
         rect.setAttribute('rx', '16');
-        rect.setAttribute('fill', style.fill);
-        rect.setAttribute('stroke', style.stroke);
+        rect.setAttribute('fill', visuals.fill);
+        rect.setAttribute('stroke', visuals.stroke);
         rect.setAttribute('stroke-width', '2');
         rect.setAttribute('class', 'node-shape');
         g.appendChild(rect);
 
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('class', 'node-label');
-        text.setAttribute('y', '4');
-        text.textContent = '✓ ' + (node.label.replace('Decision: ', ''));
+        text.setAttribute('y', '3');
+        const decLabel = node.label.replace('Decision: ', '');
+        text.textContent = '✓ ' + decLabel;
         g.appendChild(text);
+
+        // Version badge above
+        const vPill = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        vPill.setAttribute('class', 'node-version-badge-text');
+        vPill.setAttribute('y', '-20');
+        vPill.setAttribute('fill', visuals.versionColor);
+        vPill.textContent = visuals.versionBadge;
+        g.appendChild(vPill);
+
       } else {
+        // Standard Card Node (Event / Agenda / Action)
         const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', '-60');
-        rect.setAttribute('y', '-18');
-        rect.setAttribute('width', '120');
-        rect.setAttribute('height', '36');
+        rect.setAttribute('x', '-70');
+        rect.setAttribute('y', '-20');
+        rect.setAttribute('width', '140');
+        rect.setAttribute('height', '40');
         rect.setAttribute('rx', '8');
-        rect.setAttribute('fill', style.fill);
-        rect.setAttribute('stroke', style.stroke);
+        rect.setAttribute('fill', visuals.fill);
+        rect.setAttribute('stroke', visuals.stroke);
         rect.setAttribute('stroke-width', '2');
         rect.setAttribute('class', 'node-shape');
         g.appendChild(rect);
 
+        // Title Label
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('class', 'node-label');
-        text.setAttribute('y', '-2');
-        const truncatedLabel = node.label.length > 18 ? node.label.substring(0, 16) + '…' : node.label;
+        text.setAttribute('y', '-4');
+        const truncatedLabel = node.label.length > 20 ? node.label.substring(0, 18) + '…' : node.label;
         text.textContent = truncatedLabel;
         g.appendChild(text);
 
+        // Subtitle / Status / Checkpoint Banner
         const badge = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         badge.setAttribute('class', 'node-badge-text');
         badge.setAttribute('y', '11');
-        badge.setAttribute('fill', style.badgeColor);
-        badge.textContent = node.status;
+        badge.setAttribute('fill', visuals.badgeColor);
+
+        if (classification.isCheckpoint) {
+          badge.textContent = '🛡️ SHOW ME GATE';
+        } else {
+          badge.textContent = `${visuals.versionBadge} • ${node.status}`;
+        }
         g.appendChild(badge);
       }
 
+      // Interaction
       g.addEventListener('click', (e) => {
         e.stopPropagation();
-        openInspector(node);
+        openInspector(node, classification);
+        if (classification.isCheckpoint) {
+          focusActionCard(node.id);
+          showToast(`Human Checkpoint gewählt: „Show me, don't tell me“`, 'info');
+        }
       });
 
       nodesGroup.appendChild(g);
     });
   }
 
-  function getNodeVisuals(node, stage) {
-    if (node.type === 'agent') {
-      return { fill: '#1e1b4b', stroke: '#818cf8', badgeColor: '#c7d2fe' };
-    }
-
-    if (node.type === 'decision') {
-      return { fill: '#312e81', stroke: '#a855f7', badgeColor: '#f3e8ff' };
-    }
-
-    if (node.type === 'action') {
-      if (node.status === 'COMPLETED') {
-        return { fill: '#064e3b', stroke: '#10b981', badgeColor: '#6ee7b7' };
-      }
-      return { fill: '#4c0519', stroke: '#f43f5e', badgeColor: '#fca5a5' };
-    }
-
-    if (node.type === 'agenda') {
-      if (node.status.startsWith('DECIDED_')) {
-        return { fill: '#042f2e', stroke: '#14b8a6', badgeColor: '#5eead4' };
-      }
-      return { fill: '#083344', stroke: '#06b6d4', badgeColor: '#67e8f9' };
-    }
-
-    if (stage === 'AFTER' || node.status === 'RESOLVED') {
-      return { fill: '#022c22', stroke: '#059669', badgeColor: '#34d399' };
-    }
-
-    if (node.status === 'BLOCKED') {
-      return { fill: '#450a0a', stroke: '#ef4444', badgeColor: '#f87171' };
-    }
-    if (node.status === 'UNRESOLVED') {
-      return { fill: '#451a03', stroke: '#f59e0b', badgeColor: '#fbbf24' };
-    }
-
-    return { fill: '#0f172a', stroke: '#38bdf8', badgeColor: '#7dd3fc' };
-  }
-
   // ==========================================
   // Node Inspector Drawer
   // ==========================================
-  function openInspector(node) {
+  function openInspector(node, classification) {
     selectedNode = node;
+    const meta = classification || getNodeClassification(node, 'INSPECTOR');
+
     if (inspId) inspId.textContent = node.id;
     if (inspStatus) inspStatus.textContent = node.status;
     if (inspType) inspType.textContent = node.type;
     if (inspTitle) inspTitle.textContent = node.label;
-    if (inspDetails) inspDetails.textContent = node.details || 'Keine zusaetzlichen Details.';
+    if (inspDetails) inspDetails.textContent = node.details || 'Keine zusätzlichen Details hinterlegt.';
     if (inspTypeBadge) inspTypeBadge.textContent = node.type.toUpperCase();
-    if (inspJson) inspJson.textContent = JSON.stringify(node, null, 2);
 
+    if (inspEvolution) {
+      if (meta.version === 'v2') {
+        inspEvolution.innerHTML = '<span class="text-violet">v2 Next-Gen (Autonomous Evolution)</span>';
+      } else {
+        inspEvolution.innerHTML = '<span class="text-cyan">v1 MVP (Heute gebaut • Web & Ray-Ban)</span>';
+      }
+    }
+
+    if (inspCheckpointRow) {
+      inspCheckpointRow.style.display = meta.isCheckpoint ? 'flex' : 'none';
+    }
+    if (inspCheckpointAlert) {
+      inspCheckpointAlert.style.display = meta.isCheckpoint ? 'flex' : 'none';
+    }
+
+    if (inspJson) inspJson.textContent = JSON.stringify(node, null, 2);
     if (nodeInspector) nodeInspector.classList.add('open');
   }
 
   function closeInspector() {
     if (nodeInspector) nodeInspector.classList.remove('open');
     selectedNode = null;
+  }
+
+  function focusActionCard(nodeId) {
+    const card = document.querySelector(`[data-item-id="${nodeId}"], #action-card-${nodeId}`);
+    if (card) {
+      document.querySelectorAll('.action-card').forEach(c => c.classList.remove('highlight-focus'));
+      card.classList.add('highlight-focus');
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 
   // ==========================================
@@ -649,15 +944,19 @@
       const card = document.createElement('div');
       card.className = `action-card ${isBlocked ? 'status-blocked' : 'status-completed'} ${isTarget ? 'highlight-focus' : ''}`;
       card.id = `action-card-${action.action_id}`;
+      card.setAttribute('data-item-id', action.item_id || action.action_id);
 
-      const reason = action.artifacts?.reason || action.artifacts?.dispatch_status || 'Keine Begruendung hinterlegt.';
+      const reason = action.artifacts?.reason || action.artifacts?.dispatch_status || 'Keine Begründung hinterlegt.';
       const port = action.artifacts?.port ? `Port: ${action.artifacts.port}` : '';
       const commit = action.artifacts?.commit ? `Commit: ${action.artifacts.commit}` : '';
 
       card.innerHTML = `
         <div class="card-top">
           <div class="action-code-wrap">
-            <span class="action-type">${action.action_type}</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="action-type">${action.action_type}</span>
+              <span class="card-checkpoint-stamp">🛡️ SHOW ME, DON'T TELL ME</span>
+            </div>
             <span class="action-id">${action.action_id} • Ref: ${action.item_id}</span>
           </div>
           <span class="action-status-badge ${isBlocked ? 'badge-blocked' : 'badge-completed'}">
@@ -675,7 +974,7 @@
           ${
             isBlocked
               ? `<button class="btn-confirm-cp" data-id="${action.action_id}">
-                  <span>⚡</span> Freigeben & Ausfuehren (1-Klick)
+                  <span>⚡</span> Freigeben & Ausführen (1-Klick)
                 </button>`
               : `<span class="btn-confirmed-ok">✓ Human-Verified & Executed</span>`
           }
@@ -684,8 +983,19 @@
 
       if (isBlocked) {
         const btn = card.querySelector('.btn-confirm-cp');
-        btn.addEventListener('click', () => confirmCheckpoint(action.action_id));
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          confirmCheckpoint(action.action_id);
+        });
       }
+
+      card.addEventListener('click', () => {
+        // Highlight corresponding node in SVG
+        const matchingNode = document.querySelector(`[data-id="${action.item_id}"], [data-id="${action.action_id}"]`);
+        if (matchingNode) {
+          matchingNode.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        }
+      });
 
       checkpointsList.appendChild(card);
     });
@@ -702,7 +1012,7 @@
     const card = document.getElementById(`action-card-${actionId}`);
     const btn = card?.querySelector('.btn-confirm-cp');
     if (btn) {
-      btn.innerHTML = '⏳ Wird bestaetigt...';
+      btn.innerHTML = '⏳ Wird bestätigt...';
       btn.disabled = true;
     }
 
@@ -715,7 +1025,7 @@
         throw new Error(`Server returned ${res.status}`);
       }
 
-      showToast(`Checkpoint ${actionId} freigegeben und ausgefuehrt!`, 'success');
+      showToast(`Checkpoint ${actionId} erfolgreich freigegeben und ausgeführt!`, 'success');
       await loadAllData();
     } catch (err) {
       console.error('Failed to confirm checkpoint:', err);
@@ -735,6 +1045,7 @@
     const toast = document.createElement('div');
     toast.className = 'toast';
     if (type === 'error') toast.style.borderColor = '#f43f5e';
+    if (type === 'info') toast.style.borderColor = '#38bdf8';
     toast.innerHTML = `
       <span>${type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️')}</span>
       <span>${message}</span>
