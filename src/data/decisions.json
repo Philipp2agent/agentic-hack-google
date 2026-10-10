@@ -1,0 +1,16 @@
+[
+  {
+    "item_id": "agenda-01",
+    "decision_type": "APPROVE",
+    "voice_notes": "Lead approved via Ray-Ban glasses audio call during morning walk.",
+    "timestamp": "2026-10-10T16:10:00Z",
+    "human_verified": true
+  },
+  {
+    "item_id": "agenda-02",
+    "decision_type": "HOLD",
+    "voice_notes": "Lead requested manual dashboard checkpoint confirmation before wiping database.",
+    "timestamp": "2026-10-10T16:10:45Z",
+    "human_verified": true
+  }
+]

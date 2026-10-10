@@ -1,0 +1,23 @@
+[
+  {
+    "item_id": "agenda-01",
+    "topic": "Voice WebSocket Deployment & Audio Routing",
+    "question_for_lead": "Deploy gradbot voice streaming backend to port 8090 for smartphone Ray-Ban connection?",
+    "recommended_action": "APPROVE - tests pass, latency is under 350ms",
+    "is_irreversible": false
+  },
+  {
+    "item_id": "agenda-02",
+    "topic": "Database & State Reset on VPS",
+    "question_for_lead": "Purge overnight ephemeral logs and apply schema migration before live commute demo?",
+    "recommended_action": "APPROVE - requires explicit lead sign-off due to irreversible wipe",
+    "is_irreversible": true
+  },
+  {
+    "item_id": "agenda-03",
+    "topic": "Nano Banana Visual Brand Release",
+    "question_for_lead": "Publish DawnDispatch hero banner and logo to public repo README?",
+    "recommended_action": "APPROVE - visual identity approved",
+    "is_irreversible": false
+  }
+]

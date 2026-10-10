@@ -1,0 +1,23 @@
+[
+  {
+    "action_id": "act-101",
+    "item_id": "agenda-01",
+    "action_type": "DEPLOY_VOICE_SERVICE",
+    "status": "COMPLETED",
+    "artifacts": {
+      "port": 8090,
+      "commit": "3cdd23d",
+      "logs": "Service started successfully on ws://0.0.0.0:8090/ws/chat"
+    }
+  },
+  {
+    "action_id": "act-102",
+    "item_id": "agenda-02",
+    "action_type": "PURGE_STATE_AND_MIGRATE",
+    "status": "BLOCKED_ON_CHECKPOINT",
+    "artifacts": {
+      "reason": "Irreversible action requires Web Dashboard 1-click confirmation",
+      "pending_url": "/dashboard/checkpoint/agenda-02"
+    }
+  }
+]
