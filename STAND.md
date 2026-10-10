@@ -27,7 +27,7 @@
 | S-MKTG | Video-2-Skript (2 Min) & README-Erzaehlung "Try in 3 min" | hack-marketing | agent/hack-marketing | vergeben | docs/VIDEO_SCRIPT_V2.md |
 | S-VISUAL | Neutrale Titelkarte & Abspann ("8 Gemini agents + Claude") | hack-visual | agent/hack-visual | vergeben | assets/brand/video2_* |
 | S-LIVE-UI | Live-Ansicht verfeinern (Fokus zentriert, Rest gedimmt) | hack-bau2 | agent/hack-bau2 | vergeben | src/live/static/ |
-| S-NACHHER | Nachher-Ansicht Live-Seite ("Das hat das Gespraech gebracht") | hack-bau3 | agent/hack-bau3 | vergeben | src/live/static/ / /dashboard |
+| S-NACHHER | Nachher-Ansicht Live-Seite ("Das hat das Gespraech gebracht") | hack-bau3 | main | fertig, gemerged | 3 Vorher->Nachher Karten live in /live |
 | S-EXAMPLE | Realistic Example Repo unter examples/ fuer Plug-and-Play | hack-bau1 | main | fertig, gemerged | PayPulse mit 30 Commits & Tests live |
 | S-REVIEW | Frischer Klon E2E Test fuer claude-05 (setup.sh/start.sh) | hack-review | agent/hack-review | wartet | wartet auf claude-05 PR |
 
@@ -52,7 +52,7 @@ gantt
   S-MKTG Video-2-Skript & Story  :active, p_mkt, 17:55, 18:15
   S-VISUAL Titelkarte & Abspann  :active, p_vis, 17:55, 18:15
   S-LIVE-UI Brillen-Fokus Screen :active, p_b2, 17:55, 18:15
-  S-NACHHER Nachher-Ansicht      :active, p_b3, 17:55, 18:15
+  S-NACHHER Nachher-Ansicht      :done, p_b3, 17:55, 18:03
   S-EXAMPLE Example Target Repo  :done, p_b1, 17:55, 18:00
   S-REVIEW Klon & Setup Test     :p_rev, 18:15, 18:25
 ```

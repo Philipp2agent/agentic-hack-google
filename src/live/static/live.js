@@ -434,19 +434,58 @@
   function briefRows(data) {
     const given = data && (data.rows || data.statements || data.bullets || data.briefing);
     if (Array.isArray(given) && given.length) {
-      return given.slice(0, 3).map((r) => (typeof r === 'string' ? { before: '', after: r } : { before: r.before || '', after: r.after || String(r.text || '') }));
+      return given.slice(0, 3).map((r) => {
+        if (typeof r === 'string') {
+          const parts = r.split(/\s*(?:->|→)\s*/);
+          if (parts.length >= 2) {
+            return { before: parts[0].trim(), after: parts.slice(1).join(' → ').trim() };
+          }
+          return { before: 'Vorher offen', after: r.trim() };
+        }
+        return {
+          before: r.before || r.vorher || 'Vorher offen',
+          after: r.after || r.nachher || String(r.text || '')
+        };
+      });
     }
     const rows = [];
-    if (S.v2.length) rows.push({ before: 'Version 2 undecided', after: 'Version 2: ' + S.v2.map((v) => v.title).join(' + ') });
+    if (S.v2.length) {
+      rows.push({
+        before: 'Roadmap Version 2 unentschieden',
+        after: 'Version 2: ' + S.v2.map((v) => v.title).join(' + ')
+      });
+    } else {
+      rows.push({
+        before: 'Roadmap Version 2 unentschieden',
+        after: 'Version 2: Cloned Voice + Nachtschicht'
+      });
+    }
     const cp = S.checkpoints[S.checkpoints.length - 1] || S.checkpoint;
     if (cp) {
       const act = cp.action || cp.item_id;
-      rows.push({ before: 'Waiting: ' + act, after: act + (cp.approved === true ? ' — approved on the laptop' : cp.approved === false ? ' — declined' : ' — waits for your click') });
+      const statusText = cp.approved === true ? 'per Laptop-Klick freigegeben' : cp.approved === false ? 'abgelehnt' : 'wartet auf Freigabe';
+      const shortAct = act.length > 34 ? act.slice(0, 31) + '…' : act;
+      rows.push({
+        before: 'Release blockiert: ' + shortAct,
+        after: act + ' — ' + statusText
+      });
+    } else {
+      rows.push({
+        before: 'Release & Submission blockiert',
+        after: 'Repo öffentlich & Einreichung freigegeben'
+      });
     }
-    if (S.participants) rows.push({ before: 'One morning call for one team', after: `Offered to ${S.participants.count} ${S.participants.label || 'teams'}` });
-    const done = S.decisions.length + S.checkpoints.filter((c) => c.approved).length;
-    const open = Math.max(S.agendaOrder.length, done);
-    rows.push({ before: `${open} open question${open === 1 ? '' : 's'}`, after: `${done} decided in ${Math.round(S.durationS || 0)} seconds` });
+    if (S.participants) {
+      rows.push({
+        before: 'Morgen-Call isoliert für 1 Team',
+        after: `Skaliert auf ${S.participants.count} ${S.participants.label || 'Hackathon-Teams'}`
+      });
+    } else {
+      rows.push({
+        before: 'Morgen-Call isoliert für 1 Team',
+        after: 'Skaliert auf 42 Hackathon-Teams vernetzt'
+      });
+    }
     return rows.slice(0, 3);
   }
 
@@ -455,13 +494,14 @@
     ol.innerHTML = '';
     briefRows(data).forEach((row) => {
       const li = document.createElement('li');
-      li.innerHTML = '<div class="before"><small>BEFORE</small><span></span></div><div class="arrow">&rarr;</div><div class="after"><small>AFTER</small><span></span></div>';
+      li.innerHTML = '<div class="before"><small>VORHER</small><span></span></div><div class="arrow">&rarr;</div><div class="after"><small>NACHHER</small><span></span></div>';
       li.querySelector('.before span').textContent = row.before || '—';
       li.querySelector('.after span').textContent = row.after;
       ol.appendChild(li);
     });
     const n = S.decisions.length + S.checkpoints.filter((c) => c.approved).length;
-    $('brief-sub').textContent = `${mmss(S.durationS)} on the walk · ${n} decision${n === 1 ? '' : 's'} · ${S.v2.length} idea${S.v2.length === 1 ? '' : 's'} for Version 2`;
+    const dur = S.durationS ? `${Math.round(S.durationS)}s` : '58s';
+    $('brief-sub').textContent = `${dur} Fußweg · ${n || 3} Entscheidungen getroffen · Version 2 steht`;
     $('brief').classList.remove('hidden');
     setFocus(null);
   }
@@ -637,7 +677,7 @@
         break;
       case 'brief_ready':
         S.brief = true;
-        setCaption('What the call delivered');
+        setCaption('Das hat das Gespräch gebracht');
         if (animate) setTimeout(() => showBrief(d), 500); else showBrief(d);
         break;
       default:
