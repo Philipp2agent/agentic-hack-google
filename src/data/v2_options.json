@@ -1,0 +1,29 @@
+[
+  {
+    "id": "v2-opt-a",
+    "key": "A",
+    "title": "Real phone or WhatsApp calling",
+    "description": "Native mobile telephony & WhatsApp Business Voice Gateway instead of simulated browser Web Audio.",
+    "linked_to": "agenda-02",
+    "status": "selected",
+    "lead_choice": true
+  },
+  {
+    "id": "v2-opt-b",
+    "key": "B",
+    "title": "Autonomous night shift call trigger",
+    "description": "Night shift agents build code overnight and trigger the morning triage call automatically at 08:30.",
+    "linked_to": "agenda-02",
+    "status": "candidate",
+    "lead_choice": false
+  },
+  {
+    "id": "v2-opt-c",
+    "key": "C",
+    "title": "User's cloned voice",
+    "description": "Custom voice model clone of lead's own voice synthesized via Gradium Voice Design.",
+    "linked_to": "agenda-02",
+    "status": "candidate",
+    "lead_choice": false
+  }
+]

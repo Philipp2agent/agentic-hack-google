@@ -1,0 +1,355 @@
+{
+  "total_count": 42,
+  "label": "42 Hackathon Teams Connected",
+  "hub": "team-01",
+  "teams": [
+    {
+      "id": "team-01",
+      "name": "DawnDispatch",
+      "project": "Voice Front-Door Commute Dispatcher",
+      "cluster": "Autonomous Agents",
+      "lead": "Philipp",
+      "agents": 8,
+      "hub": true
+    },
+    {
+      "id": "team-02",
+      "name": "DeepMind Agents Alpha",
+      "project": "Self-healing Codebase Swarm",
+      "cluster": "Autonomous Agents",
+      "lead": "Sarah Lin",
+      "agents": 6
+    },
+    {
+      "id": "team-03",
+      "name": "Gradium Voice Lab",
+      "project": "Sub-50ms Ultra Low Latency STT/TTS",
+      "cluster": "Voice & Audio",
+      "lead": "Marco Keller",
+      "agents": 4
+    },
+    {
+      "id": "team-04",
+      "name": "Ray-Ban HUD Hub",
+      "project": "Smart Glasses Live Audio Guidance",
+      "cluster": "Wearables",
+      "lead": "Elena Rostova",
+      "agents": 5
+    },
+    {
+      "id": "team-05",
+      "name": "Zürich Swarm AI",
+      "project": "Multi-agent Microservices Governance",
+      "cluster": "Infrastructure",
+      "lead": "Lukas Meyer",
+      "agents": 7
+    },
+    {
+      "id": "team-06",
+      "name": "Gemini Interactions",
+      "project": "Conversational Commute Assistant",
+      "cluster": "Autonomous Agents",
+      "lead": "Chloe Dupont",
+      "agents": 4
+    },
+    {
+      "id": "team-07",
+      "name": "Mission Control D3",
+      "project": "Live Topological Knowledge Graph Visualizer",
+      "cluster": "Visualization",
+      "lead": "David Zhao",
+      "agents": 3
+    },
+    {
+      "id": "team-08",
+      "name": "PromptOps Pipeline",
+      "project": "Autonomous Git PR Review Bot",
+      "cluster": "DevOps",
+      "lead": "Anna Schmidt",
+      "agents": 5
+    },
+    {
+      "id": "team-09",
+      "name": "Hackathon Team #9",
+      "project": "Agentic Pipeline Solution #9",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-9",
+      "agents": 7
+    },
+    {
+      "id": "team-10",
+      "name": "Hackathon Team #10",
+      "project": "Agentic Pipeline Solution #10",
+      "cluster": "General Track",
+      "lead": "Hacker-10",
+      "agents": 3
+    },
+    {
+      "id": "team-11",
+      "name": "Hackathon Team #11",
+      "project": "Agentic Pipeline Solution #11",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-11",
+      "agents": 4
+    },
+    {
+      "id": "team-12",
+      "name": "Hackathon Team #12",
+      "project": "Agentic Pipeline Solution #12",
+      "cluster": "General Track",
+      "lead": "Hacker-12",
+      "agents": 5
+    },
+    {
+      "id": "team-13",
+      "name": "Hackathon Team #13",
+      "project": "Agentic Pipeline Solution #13",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-13",
+      "agents": 6
+    },
+    {
+      "id": "team-14",
+      "name": "Hackathon Team #14",
+      "project": "Agentic Pipeline Solution #14",
+      "cluster": "General Track",
+      "lead": "Hacker-14",
+      "agents": 7
+    },
+    {
+      "id": "team-15",
+      "name": "Hackathon Team #15",
+      "project": "Agentic Pipeline Solution #15",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-15",
+      "agents": 3
+    },
+    {
+      "id": "team-16",
+      "name": "Hackathon Team #16",
+      "project": "Agentic Pipeline Solution #16",
+      "cluster": "General Track",
+      "lead": "Hacker-16",
+      "agents": 4
+    },
+    {
+      "id": "team-17",
+      "name": "Hackathon Team #17",
+      "project": "Agentic Pipeline Solution #17",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-17",
+      "agents": 5
+    },
+    {
+      "id": "team-18",
+      "name": "Hackathon Team #18",
+      "project": "Agentic Pipeline Solution #18",
+      "cluster": "General Track",
+      "lead": "Hacker-18",
+      "agents": 6
+    },
+    {
+      "id": "team-19",
+      "name": "Hackathon Team #19",
+      "project": "Agentic Pipeline Solution #19",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-19",
+      "agents": 7
+    },
+    {
+      "id": "team-20",
+      "name": "Hackathon Team #20",
+      "project": "Agentic Pipeline Solution #20",
+      "cluster": "General Track",
+      "lead": "Hacker-20",
+      "agents": 3
+    },
+    {
+      "id": "team-21",
+      "name": "Hackathon Team #21",
+      "project": "Agentic Pipeline Solution #21",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-21",
+      "agents": 4
+    },
+    {
+      "id": "team-22",
+      "name": "Hackathon Team #22",
+      "project": "Agentic Pipeline Solution #22",
+      "cluster": "General Track",
+      "lead": "Hacker-22",
+      "agents": 5
+    },
+    {
+      "id": "team-23",
+      "name": "Hackathon Team #23",
+      "project": "Agentic Pipeline Solution #23",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-23",
+      "agents": 6
+    },
+    {
+      "id": "team-24",
+      "name": "Hackathon Team #24",
+      "project": "Agentic Pipeline Solution #24",
+      "cluster": "General Track",
+      "lead": "Hacker-24",
+      "agents": 7
+    },
+    {
+      "id": "team-25",
+      "name": "Hackathon Team #25",
+      "project": "Agentic Pipeline Solution #25",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-25",
+      "agents": 3
+    },
+    {
+      "id": "team-26",
+      "name": "Hackathon Team #26",
+      "project": "Agentic Pipeline Solution #26",
+      "cluster": "General Track",
+      "lead": "Hacker-26",
+      "agents": 4
+    },
+    {
+      "id": "team-27",
+      "name": "Hackathon Team #27",
+      "project": "Agentic Pipeline Solution #27",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-27",
+      "agents": 5
+    },
+    {
+      "id": "team-28",
+      "name": "Hackathon Team #28",
+      "project": "Agentic Pipeline Solution #28",
+      "cluster": "General Track",
+      "lead": "Hacker-28",
+      "agents": 6
+    },
+    {
+      "id": "team-29",
+      "name": "Hackathon Team #29",
+      "project": "Agentic Pipeline Solution #29",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-29",
+      "agents": 7
+    },
+    {
+      "id": "team-30",
+      "name": "Hackathon Team #30",
+      "project": "Agentic Pipeline Solution #30",
+      "cluster": "General Track",
+      "lead": "Hacker-30",
+      "agents": 3
+    },
+    {
+      "id": "team-31",
+      "name": "Hackathon Team #31",
+      "project": "Agentic Pipeline Solution #31",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-31",
+      "agents": 4
+    },
+    {
+      "id": "team-32",
+      "name": "Hackathon Team #32",
+      "project": "Agentic Pipeline Solution #32",
+      "cluster": "General Track",
+      "lead": "Hacker-32",
+      "agents": 5
+    },
+    {
+      "id": "team-33",
+      "name": "Hackathon Team #33",
+      "project": "Agentic Pipeline Solution #33",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-33",
+      "agents": 6
+    },
+    {
+      "id": "team-34",
+      "name": "Hackathon Team #34",
+      "project": "Agentic Pipeline Solution #34",
+      "cluster": "General Track",
+      "lead": "Hacker-34",
+      "agents": 7
+    },
+    {
+      "id": "team-35",
+      "name": "Hackathon Team #35",
+      "project": "Agentic Pipeline Solution #35",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-35",
+      "agents": 3
+    },
+    {
+      "id": "team-36",
+      "name": "Hackathon Team #36",
+      "project": "Agentic Pipeline Solution #36",
+      "cluster": "General Track",
+      "lead": "Hacker-36",
+      "agents": 4
+    },
+    {
+      "id": "team-37",
+      "name": "Hackathon Team #37",
+      "project": "Agentic Pipeline Solution #37",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-37",
+      "agents": 5
+    },
+    {
+      "id": "team-38",
+      "name": "Hackathon Team #38",
+      "project": "Agentic Pipeline Solution #38",
+      "cluster": "General Track",
+      "lead": "Hacker-38",
+      "agents": 6
+    },
+    {
+      "id": "team-39",
+      "name": "Hackathon Team #39",
+      "project": "Agentic Pipeline Solution #39",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-39",
+      "agents": 7
+    },
+    {
+      "id": "team-40",
+      "name": "Hackathon Team #40",
+      "project": "Agentic Pipeline Solution #40",
+      "cluster": "General Track",
+      "lead": "Hacker-40",
+      "agents": 3
+    },
+    {
+      "id": "team-41",
+      "name": "Hackathon Team #41",
+      "project": "Agentic Pipeline Solution #41",
+      "cluster": "Voice & Reasoning Track",
+      "lead": "Hacker-41",
+      "agents": 4
+    },
+    {
+      "id": "team-42",
+      "name": "Hackathon Team #42",
+      "project": "Agentic Pipeline Solution #42",
+      "cluster": "General Track",
+      "lead": "Hacker-42",
+      "agents": 5
+    }
+  ],
+  "clusters": [
+    "Autonomous Agents",
+    "Voice & Audio",
+    "Wearables",
+    "Infrastructure",
+    "Visualization",
+    "DevOps",
+    "General Track",
+    "Voice & Reasoning Track"
+  ],
+  "summary": "DawnDispatch morning triage network scaled to 42 participating hackathon teams."
+}
