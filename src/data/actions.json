@@ -67,35 +67,5 @@
     "checkpoint_reason": null,
     "created_at": "2026-10-10T14:52:50Z",
     "updated_at": "2026-10-10T14:52:50Z"
-  },
-  {
-    "action_id": "act-101",
-    "item_id": "agenda-01",
-    "action_type": "NOTE",
-    "status": "COMPLETED",
-    "artifacts": {
-      "note": "Version 1 baseline confirmed: mobile call screen, voice WebSocket, and knowledge graph engine operational",
-      "decision_id": "dec-v1-baseline",
-      "execution_timestamp": "2026-10-10T14:52:10Z"
-    },
-    "description": "Confirmed Version 1 baseline from overnight swarm build",
-    "checkpoint_reason": null,
-    "created_at": "2026-10-10T14:52:10Z",
-    "updated_at": "2026-10-10T14:52:10Z"
-  },
-  {
-    "action_id": "act-101",
-    "item_id": "agenda-01",
-    "action_type": "NOTE",
-    "status": "COMPLETED",
-    "artifacts": {
-      "note": "Version 1 baseline confirmed: mobile call screen, voice WebSocket, and knowledge graph engine operational",
-      "decision_id": "dec-v1-baseline",
-      "execution_timestamp": "2026-10-10T14:52:10Z"
-    },
-    "description": "Confirmed Version 1 baseline from overnight swarm build",
-    "checkpoint_reason": null,
-    "created_at": "2026-10-10T14:52:10Z",
-    "updated_at": "2026-10-10T14:52:10Z"
   }
 ]

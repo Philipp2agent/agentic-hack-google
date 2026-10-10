@@ -205,3 +205,55 @@ Read the full development narrative and swarm metrics in [`docs/META.md`](docs/M
 
 Built at the **{Tech: Europe} Agentic AI Hackathon Zürich (10.10.2026)**.  
 Sponsored by Google DeepMind and Gradium.
+
+## Run locally (claude-03)
+
+Requirements: Python 3.12+, keys in the environment (never in the repo, see `.env.example`).
+
+```bash
+python3 -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt
+
+# keys: on the VPS
+set -a; . /home/buzzagent/hack/secrets.env; set +a
+# or by hand (LLM_BASE_URL without a trailing slash, otherwise 404)
+export GRADIUM_API_KEY=... LLM_API_KEY=... LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai LLM_MODEL=gemini-3.8-flash
+export GEMINI_API_KEY=...            # optional: agenda synthesis + tools/
+export DAWN_VOICE_ID=...             # optional: custom Gradium voice
+
+python -m src.core.state --reset                        # fresh demo state (keeps events + agenda)
+uvicorn src.app:app --host 127.0.0.1 --port 8090        # or: python -m src.main
+```
+
+Then open:
+
+| URL | What |
+|---|---|
+| `http://127.0.0.1:8090/call` | phone page (redirects to `/voice/`, the proven `dawn/` client): round call button, Dawn speaks first (mic needs HTTPS on a phone, see tunnel) |
+| `http://127.0.0.1:8090/dashboard` | laptop: knowledge graph before/after, transcript, human checkpoints |
+| `http://127.0.0.1:8090/live` | laptop: live mission-control screen (when `src/live` is merged) |
+| `http://127.0.0.1:8090/call/sim` | static call simulation without backend audio (hack-bau2) |
+| `http://127.0.0.1:8090/api/health` | what is mounted |
+
+Phone over the internet (microphone requires HTTPS): `cloudflared tunnel --url http://127.0.0.1:8090` and open
+`https://<tunnel>/call` on the phone; audio routes through the connected glasses or headset.
+
+Tests (no network, no keys, seeds are restored afterwards):
+
+```bash
+python -m pytest -q
+```
+
+## How the call works
+
+`src/voice/server.py` is `dawn/main.py` (the proven gradbot simple_chat base: init_logging, config, make_config, handle_session, routes.setup, client `dawn/static/index.html`) plus tools and live events. The app is mounted at `/voice` like the gradbot demos launcher; `/ws/chat` and `/api/call/*` are also served at the root. Gemini (`LLM_MODEL`
+over `LLM_BASE_URL`) leads the dialog from `src/voice/prompt.py`; Gradium does STT and TTS. Tools the agent calls:
+
+| Tool | Effect |
+|---|---|
+| `log_decision(item_id, decision, notes, option?)` | `src/data/decisions.json` + `actions.json` via `src/core`; events `decision`, `v2_idea`, `participants_scaled` |
+| `mark_irreversible_checkpoint(item_id, reason)` | action `BLOCKED_ON_CHECKPOINT`, waits for the dashboard click; event `checkpoint` |
+| `end_call(summary)` | post-call: `knowledge_graph_after.json`, `actions.json`, `transcript.json`, briefing; events `call_ended`, `brief_ready` |
+
+Every event follows `docs/LIVE-EVENTS.md` and goes to `src.live.bus.publish` (try-import, no-op if absent) and to the
+phone page. Data contract: `docs/SCHNITTSTELLE.md`, architecture: `docs/ARCHITEKTUR.md`, video tools: `tools/video/README.md`.
