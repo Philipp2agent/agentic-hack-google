@@ -4,6 +4,7 @@ Mounts whatever has been merged so far; each package is optional, so the app
 starts with any subset of src/voice, src/dashboard and src/core present.
 
 Run:  uvicorn src.app:app --host 0.0.0.0 --port 8000
+Routes: /call (voice, hack-bau2) · /dashboard (hack-bau3) · / -> /dashboard
 """
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ import logging
 import pathlib
 
 import fastapi
+import fastapi.responses
 import fastapi.staticfiles
 
 log = logging.getLogger("dawndispatch")
@@ -24,7 +26,12 @@ async def health():
     return {"status": "ok", "app": "DawnDispatch"}
 
 
-# --- voice (hack-bau2): /ws/chat, /ws/tts, /api/voices, /api/audio-config ---
+@app.get("/")
+async def index():
+    return fastapi.responses.RedirectResponse("/dashboard")
+
+
+# --- voice (hack-bau2): /call, /ws/chat, /ws/tts, /api/voices, /api/audio-config ---
 try:
     from src.voice.server import router as voice_router  # noqa: E402
 
@@ -33,7 +40,7 @@ try:
 except Exception as exc:  # module missing until agent/hack-bau2 is merged
     log.warning("voice router not mounted: %s", exc)
 
-# --- dashboard (hack-bau3): /, /call, /api/state, /api/actions/{id}/confirm ---
+# --- dashboard (hack-bau3): /dashboard, /api/state, /api/graph, /api/actions/{id}/confirm ---
 try:
     from src.dashboard.app import router as dashboard_router  # noqa: E402
 
@@ -42,7 +49,7 @@ try:
 except Exception as exc:  # module missing until agent/hack-bau3 is merged
     log.warning("dashboard router not mounted: %s", exc)
 
-# --- static files: gradbot's bundled audio JS first (more specific prefix) ---
+# --- static files: gradbot's bundled audio JS first (more specific prefix wins) ---
 try:
     import gradbot.routes  # noqa: E402
 
@@ -50,13 +57,13 @@ try:
 except Exception as exc:
     log.warning("gradbot js not mounted: %s", exc)
 
-_dash_static = REPO_ROOT / "src" / "dashboard" / "static"
-if _dash_static.is_dir():
-    app.mount("/static", fastapi.staticfiles.StaticFiles(directory=_dash_static), name="static")
-
-_assets = REPO_ROOT / "assets"
-if _assets.is_dir():
-    app.mount("/assets", fastapi.staticfiles.StaticFiles(directory=_assets), name="assets")
+for prefix, folder in (
+    ("/static/voice", REPO_ROOT / "src" / "voice" / "static"),
+    ("/static", REPO_ROOT / "src" / "dashboard" / "static"),
+    ("/assets", REPO_ROOT / "assets"),
+):
+    if folder.is_dir():
+        app.mount(prefix, fastapi.staticfiles.StaticFiles(directory=folder), name=prefix.strip("/").replace("/", "_"))
 
 _audio = REPO_ROOT / "src" / "data" / "audio"
 _audio.mkdir(parents=True, exist_ok=True)

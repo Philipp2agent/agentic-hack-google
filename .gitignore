@@ -10,6 +10,8 @@ __pycache__/
 *.pyc
 
 
-# DawnDispatch runtime state (regenerate with: python -m src.core.state --reset)
-src/data/state.json
+# DawnDispatch runtime files (python -m src.core.state --reset); decisions/actions seeds stay tracked
+src/data/call.json
+src/data/meta.json
 src/data/audio/
+src/data/*.tmp
