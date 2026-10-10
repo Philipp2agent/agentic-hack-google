@@ -1,8 +1,9 @@
-# Runtime (already installed in /home/buzzagent/hack/.venv on the VPS).
+# Runtime for the call (dawn/), the live screen (src/live) and the tests. Python 3.12+ (gradbot wheels: 3.12, 3.13).
+# Install:  ./setup.sh   (creates .venv and runs: pip install -r requirements.txt)
 fastapi>=0.115
 uvicorn[standard]>=0.30
 pydantic>=2.6
 google-genai>=2.3.0
 httpx>=0.27
-# gradbot: Python bindings built from https://github.com/gradium-ai/gradbot (gradbot_py, maturin);
-# not on PyPI - see docs/ARCHITEKTUR.md section 7.
+# gradbot: Gradium's realtime voice library (STT -> LLM -> TTS over one WebSocket), https://github.com/gradium-ai/gradbot
+gradbot>=0.2.0

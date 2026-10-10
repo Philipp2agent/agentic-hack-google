@@ -15,6 +15,9 @@ src/data/call.json
 src/data/meta.json
 src/data/audio/
 src/data/*.tmp
-
 # live screen recording (src/live/bus.py); replayed via POST /api/live/replay
 src/data/live_session*.jsonl
+
+.venv/
+run/
+.repos/

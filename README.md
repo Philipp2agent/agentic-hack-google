@@ -14,9 +14,9 @@
 
 ---
 
-## ⚡ Try it on your own repo in 3 minutes
+## ⏱️ Try it on your own repo in 3 minutes
 
-Turn any GitHub repository or local codebase into an interactive voice standup agent. In 3 minutes, you receive an incoming voice call on your phone and an active live synchronization on your laptop screen.
+Clone, enter **your own** keys, point it at **your** repository, get called about it, watch the live screen fill up. Turn any GitHub repository or local codebase into an interactive voice standup agent.
 
 ```bash
 # 1. Clone this repository
@@ -24,19 +24,22 @@ git clone https://github.com/Philipp2agent/agentic-hack-google.git
 cd agentic-hack-google
 
 # 2. Setup virtual environment, keys, and target repository
-./setup.sh
+./setup.sh      # Python 3.12+ venv, asks hidden for Gradium + Gemini keys, asks for repo (path or GitHub URL), writes .env
 
 # 3. Start call server, live visualization, and dispatch bridge
-./start.sh
+./start.sh      # call server + live screen + bridge; prints the PHONE url (HTTPS tunnel via cloudflared) and LAPTOP url
 ```
 
-### Prerequisites
-- **Python 3.11+**
-- **Google Gemini API Key (`GEMINI_API_KEY`):** Synthesizes repository context (`gemini-3.8-flash`) into concise spoken briefings and real-time live events.
-- **Gradium Voice API Key (`GRADIUM_API_KEY`):** Provides sub-second ultra-low latency voice streaming over WebSocket.
-- **Target Repository:** Any local directory path or remote Git repository (or test directly with our built-in demo: `examples/sample-project`).
+Then open the **PHONE** url on your phone (tap once, put the Ray-Bans or any Bluetooth headset on) and the **LAPTOP** url (`/live`) on your laptop. The agent opens with one highlight from your repo and leads a one-minute call. `./start.sh --fresh` re-reads the repo after new commits; `Ctrl-C` stops everything.
 
-> 🔒 **Privacy & Data Security Notice:** Only your repository's high-level status material (README, recent commit log, and status files such as `STAND.md`, `TODO.md`, `CHANGELOG.md`) is sent to the Google Gemini API to prepare your morning phone briefing. Source code files remain strictly local.
+### Prerequisites
+- **Python 3.12+** and **git**
+- **Google Gemini API Key (`GEMINI_API_KEY`):** [Google AI Studio](https://aistudio.google.com/apikey) (dialog, context briefing, and live graph events)
+- **Gradium Voice API Key (`GRADIUM_API_KEY`):** [Gradium AI](https://gradium.ai) (sub-second ultra-low latency voice streaming)
+- **Target Repository:** Any local directory path or remote Git repository (or test directly with our built-in demo: `examples/sample-project`).
+- **HTTPS Tunnel (Optional):** [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/) for an HTTPS url (phones require HTTPS for microphone access).
+
+> 🔒 **Privacy & Data Security Notice:** Only your repository's high-level status material (README, last 30 commit messages, branch names, and root status files like `STAND.md`, `TODO.md`, `CHANGELOG.md`) is sent to the Google Gemini API to prepare your morning phone briefing. Source code files remain strictly local. Keys live exclusively in `.env` (git-ignored).
 
 ---
 
@@ -153,7 +156,7 @@ agentic-hack-google/
 ## 🚀 Quickstart Guide
 
 ### 1. Prerequisites
-* Python 3.10 or higher
+* Python 3.12 or higher for the voice call (`gradbot` wheels), 3.10+ for the core engines and tests
 * Git
 
 ### 2. Installation
@@ -166,8 +169,8 @@ cd agentic-hack-google
 python3 -m venv .venv
 source .venv/bin/activate
 
-# Install required dependencies
-pip install fastapi uvicorn google-genai pydantic starlette httpx
+# Install required dependencies (or simply run ./setup.sh)
+pip install -r requirements.txt
 ```
 
 ### 3. Environment Configuration
