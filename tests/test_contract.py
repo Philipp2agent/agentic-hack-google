@@ -33,6 +33,11 @@ def _seed_tmp():
 
 
 class ContractTest(unittest.TestCase):
+    @classmethod
+    def tearDownClass(cls):
+        os.environ.pop("DAWN_DATA_DIR", None)
+        shutil.rmtree(_tmp, ignore_errors=True)
+
     def setUp(self):
         for f in _tmp.glob("*.json"):
             f.unlink()

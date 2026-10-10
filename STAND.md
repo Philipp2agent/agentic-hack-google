@@ -1,21 +1,21 @@
 # STAND agentic-hack-google
 
 ## FRAGEN AN PHILIPP
-- 1. Agenten hack-bau2 und hack-bau3 in Buzz anlegen? (Option A: Ja, Karten anlegen fuer paralleles Dashboard / Option B: hack-bau1 baut Dashboard nach Voice sequenziell) -> Empfehlung: 1A
-- 2. hack-visual Modell-Fehler: Der fuer hack-visual konfigurierte Modell-Endpunkt existiert nicht. Bitte in Buzz Agent-Settings ein gueltiges Modell (z.B. Gemini) auswaehlen und neustarten. -> Empfehlung: 2A
+- 1. hack-visual Modell-Fehler: Der fuer hack-visual konfigurierte Modell-Endpunkt existiert nicht. Bitte in Buzz Agent-Settings ein gueltiges Modell (z.B. Gemini) auswaehlen und neustarten. -> Empfehlung: 1A
 
 ## CLAUDE-LINKS ZUM KLICKEN
-- [claude-02: Architektur & Bau-Pakete](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-02.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
+- [claude-02: Architektur & Bau-Pakete (gemerged)](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-02.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
 
 | ID | Auftrag | Wer | Branch | Status | Naechster Schritt |
 |---|---|---|---|---|---|
 | Schritt-0 | Datenmodelle & docs/SCHNITTSTELLE.md | hack-chef | main | fertig, gemerged | - |
 | IDEE | Schaerfung: Phone Call UI, Quick Fire, Before/After Graph | hack-chef | main | fertig, gemerged | - |
+| claude-02 | docs/ARCHITEKTUR.md, state.py & Baupakete | Claude-Cloud | main | fertig, gemerged | - |
 | P-CORE | src/core: Aggregator, Agenda-Synthese & Graph Engine | hack-bau1 | agent/hack-bau1 | fertig, gemerged | - |
-| P-VOICE | src/voice: Mobile Call Screen (/call) & Gradium Web Audio | hack-bau1 | agent/hack-bau1 | fertig gebaut & getestet | PR & Merge nach main |
-| P-DASHBOARD | src/dashboard: Vorher-Nachher Graph (/dashboard) & Checkpoints | offen (hack-bau3) | agent/hack-bau3 | wartet auf Agent/Zuweisung | hack-bau3 anlegen |
+| P-VOICE | src/voice: Mobile Call Screen (/call) & Gradium Web Audio | hack-bau1 / hack-bau2 | main | fertig, gemerged | Feinschliff static |
+| P-DASHBOARD | src/dashboard: Vorher-Nachher Graph (/dashboard) & Checkpoints | hack-bau3 | main | fertig, gemerged | Feinschliff static |
+| gemini-01 | Demo-Szenario, Live Repo Events & State-Integration | hack-bau1 | agent/hack-bau1 | vergeben, laeuft | auftraege/gemini-01.md umsetzen |
 | P-VISUAL | assets/brand: Graph Icons, Call Avatar, Banner (Nano Banana) | hack-visual | agent/hack-visual | blockiert (Modellfehler in Buzz) | Modell in Agent-Settings anpassen |
-| claude-02 | docs/ARCHITEKTUR.md & gemini-Pakete | Claude-Cloud | claude/... | laeuft in Cloud | Merge nach PR |
 
 ## ZEITPLAN
 ```mermaid
@@ -31,7 +31,8 @@ gantt
   Phase 5 Politur & Abgabe       :p5, 18:40, 19:00
   section Parallele Spuren
   P-CORE Knowledge Graph Inferenz   :done, p_core, 16:15, 16:20
-  P-VOICE Mobile Call & Gradium     :crit, active, p_voi, 16:20, 17:30
-  P-DASHBOARD Vorher-Nachher UI     :crit, p_dash, 16:30, 17:45
+  P-VOICE Mobile Call & Gradium     :done, p_voi, 16:20, 16:32
+  P-DASHBOARD Vorher-Nachher UI     :done, p_dash, 16:20, 16:30
+  gemini-01 Live Events & State     :crit, active, p_gem1, 16:35, 17:30
   P-VISUAL Graph Icons & Banner     :active, p_vis, 16:15, 17:15
 ```
