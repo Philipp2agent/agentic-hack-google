@@ -24,7 +24,7 @@
 | S-IDEEN | 15 Produktnamen (Agent promptet Menschen, merkbar) | hack-ideen | main | fertig, gemerged | docs/NAMEN.md live, Top 3 zur Wahl |
 | claude-03 | Lauffaehiges MVP E2E Backend & Video-Tools | Claude-Cloud | claude/auftraege-claude-03-jh0o10 | PR #3 bereit | Merge nach Ton-Bestaetigung |
 | claude-05 | Plug-and-Play fuer jedes Repo (setup.sh, start.sh) | Claude-Cloud | claude/claude-05 | vergeben | Claude-Link klicken |
-| S-MKTG | Video-2-Skript (2 Min) & README-Erzaehlung "Try in 3 min" | hack-marketing | agent/hack-marketing | vergeben | docs/VIDEO_SCRIPT_V2.md |
+| S-MKTG | Video-2-Skript (2 Min) & README-Erzaehlung "Try in 3 min" | hack-bau1 | agent/hack-bau1 | vergeben | docs/VIDEO_SCRIPT_V2.md & README |
 | S-VISUAL | Neutrale Titelkarte & Abspann ("8 Gemini agents + Claude") | hack-visual | agent/hack-visual | vergeben | assets/brand/video2_* |
 | S-LIVE-UI | Live-Ansicht verfeinern (Fokus zentriert, Rest gedimmt) | hack-bau2 | agent/hack-bau2 | vergeben | src/live/static/ |
 | S-NACHHER | Nachher-Ansicht Live-Seite ("Das hat das Gespraech gebracht") | hack-bau3 | main | fertig, gemerged | 3 Vorher->Nachher Karten live in /live |
