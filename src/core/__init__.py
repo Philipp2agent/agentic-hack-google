@@ -34,6 +34,16 @@ from src.core.agenda_synth import (
     synthesize_agenda_with_gemini,
     synthesize_and_save,
 )
+from src.core.agenda import (
+    DEFAULT_AGENDA_ITEMS,
+    SLOGAN,
+    TOPICS_V1_TO_V2,
+    format_quickfire_summary,
+    get_agenda,
+    get_quickfire_catalog,
+    get_v2_agenda,
+    sync_agenda_file,
+)
 from src.core.action_engine import (
     confirm_checkpoint,
     log_decision,
@@ -76,6 +86,14 @@ __all__ = [
     "synthesize_agenda_fallback",
     "synthesize_agenda_with_gemini",
     "synthesize_and_save",
+    "DEFAULT_AGENDA_ITEMS",
+    "SLOGAN",
+    "TOPICS_V1_TO_V2",
+    "format_quickfire_summary",
+    "get_agenda",
+    "get_quickfire_catalog",
+    "get_v2_agenda",
+    "sync_agenda_file",
     "confirm_checkpoint",
     "log_decision",
     "mark_irreversible_checkpoint",

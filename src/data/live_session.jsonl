@@ -1,0 +1,20 @@
+{"type": "call_started", "ts": "2026-10-10T14:51:42Z", "data": {"opening": "Good morning Philipp. Overnight your agents kept building DawnDispatch. I have four things for you. How much time do you have?"}}
+{"type": "time_budget", "ts": "2026-10-10T14:51:48Z", "data": {"seconds": 60}}
+{"type": "speed_changed", "ts": "2026-10-10T14:51:50Z", "data": {"speed": 1.15, "reason": "commute cadence accelerated"}}
+{"type": "agenda_item", "ts": "2026-10-10T14:51:52Z", "data": {"item_id": "agenda-01", "title": "Status Version 1: Overnight Swarm Build Baseline", "index": 1, "total": 4}}
+{"type": "user_said", "ts": "2026-10-10T14:52:00Z", "data": {"text": "No, Version 1 baseline looks solid. Let's proceed."}}
+{"type": "decision", "ts": "2026-10-10T14:52:02Z", "data": {"item_id": "agenda-01", "decision": "APPROVE", "summary": "Confirmed Version 1 baseline: voice pipeline, incoming call screen, knowledge graph"}}
+{"type": "agenda_item", "ts": "2026-10-10T14:52:05Z", "data": {"item_id": "agenda-02", "title": "Decision Version 2: Roadmap Options (A/B/C)", "index": 2, "total": 4}}
+{"type": "user_said", "ts": "2026-10-10T14:52:15Z", "data": {"text": "Option A, real WhatsApp and phone calling."}}
+{"type": "decision", "ts": "2026-10-10T14:52:17Z", "data": {"item_id": "agenda-02", "decision": "APPROVE", "summary": "Selected Option A: Real phone and WhatsApp calling"}}
+{"type": "v2_idea", "ts": "2026-10-10T14:52:18Z", "data": {"id": "v2-opt-a", "title": "Real phone & WhatsApp calling", "linked_to": "agenda-02"}}
+{"type": "agenda_item", "ts": "2026-10-10T14:52:20Z", "data": {"item_id": "agenda-03", "title": "Irreversible Checkpoint: Make Repo Public & Submit", "index": 3, "total": 4}}
+{"type": "checkpoint", "ts": "2026-10-10T14:52:24Z", "data": {"item_id": "agenda-03", "action": "DEPLOY", "reason": "Irreversible: Making repo public and submitting entry requires desktop confirmation"}}
+{"type": "user_said", "ts": "2026-10-10T14:52:30Z", "data": {"text": "Yes, approve submission, hold until laptop confirm."}}
+{"type": "checkpoint_resolved", "ts": "2026-10-10T14:52:32Z", "data": {"item_id": "agenda-03", "approved": true}}
+{"type": "agenda_item", "ts": "2026-10-10T14:52:34Z", "data": {"item_id": "agenda-04", "title": "Scale: Hackathon Participant Network Expansion", "index": 4, "total": 4}}
+{"type": "user_said", "ts": "2026-10-10T14:52:38Z", "data": {"text": "Yes, offer it to every team here. Scale it up."}}
+{"type": "decision", "ts": "2026-10-10T14:52:40Z", "data": {"item_id": "agenda-04", "decision": "APPROVE", "summary": "Approved expansion to all 42 hackathon teams"}}
+{"type": "participants_scaled", "ts": "2026-10-10T14:52:41Z", "data": {"count": 42, "label": "42 Hackathon Teams Connected"}}
+{"type": "call_ended", "ts": "2026-10-10T14:52:42Z", "data": {"duration_s": 60}}
+{"type": "brief_ready", "ts": "2026-10-10T14:52:43Z", "data": {}}
