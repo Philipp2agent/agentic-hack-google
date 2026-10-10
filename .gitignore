@@ -15,3 +15,6 @@ src/data/call.json
 src/data/meta.json
 src/data/audio/
 src/data/*.tmp
+.venv/
+run/
+.repos/

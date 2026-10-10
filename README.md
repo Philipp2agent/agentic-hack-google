@@ -14,6 +14,25 @@
 
 ---
 
+## ⏱️ Try it on your own repo in 3 minutes
+
+Clone, enter **your own** keys, point it at **your** repository, get called about it, watch the live screen fill up.
+
+```bash
+git clone https://github.com/Philipp2agent/agentic-hack-google.git
+cd agentic-hack-google
+./setup.sh      # Python 3.12+ venv, asks hidden for your Gradium + Gemini keys, asks for your repo (path or GitHub URL), writes .env
+./start.sh      # call server + live screen + bridge; prints the PHONE url (HTTPS tunnel if cloudflared is installed) and the LAPTOP url
+```
+
+Then open the **PHONE** url on your phone (tap once, put the Ray-Bans or any Bluetooth headset on) and the **LAPTOP** url (`/live`) on your laptop. The agent opens with one highlight from your repo and leads a one-minute call. `./start.sh --fresh` re-reads the repo after new commits; Ctrl-C stops everything.
+
+**Prerequisites:** Python 3.12 or 3.13, git, a [Gradium API key](https://gradium.ai) and a [Gemini API key](https://aistudio.google.com/apikey) of your own, optionally [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/) for an HTTPS url (phones allow the microphone only over HTTPS). Nothing depends on the original authors: no shared keys, no fixed server, no fixed paths.
+
+**Privacy:** your repo's README, last 30 commit messages, branch names and root status files (STAND, TODO, CHANGELOG, ...) are sent to Gemini to write the briefing, what you say on the call goes to Gradium (speech) and Gemini (dialog, live events). Keys live only in `.env` (git-ignored).
+
+---
+
 ## 🌅 The Problem
 
 Autonomous software agent swarms build code while developers sleep. Overnight, dozens of commits land, branches diverge, background pull requests open, and CI pipelines finish.
@@ -127,7 +146,7 @@ agentic-hack-google/
 ## 🚀 Quickstart Guide
 
 ### 1. Prerequisites
-* Python 3.10 or higher
+* Python 3.12 or higher for the voice call (`gradbot` wheels), 3.10+ for the core engines and tests
 * Git
 
 ### 2. Installation
@@ -140,8 +159,8 @@ cd agentic-hack-google
 python3 -m venv .venv
 source .venv/bin/activate
 
-# Install required dependencies
-pip install fastapi uvicorn google-genai pydantic starlette httpx
+# Install required dependencies (or simply run ./setup.sh)
+pip install -r requirements.txt
 ```
 
 ### 3. Environment Configuration

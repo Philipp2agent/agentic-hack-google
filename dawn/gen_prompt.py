@@ -1,29 +1,66 @@
-import os, json, subprocess, urllib.request
-REPO = "/home/buzzagent/hack/agentic-hack-google"
-subprocess.run(["git", "-C", REPO, "fetch", "-q", "origin"], timeout=60)
-def show(path, limit):
-    r = subprocess.run(["git", "-C", REPO, "show", f"origin/main:{path}"], capture_output=True, text=True, timeout=20)
-    return r.stdout[:limit]
-ctx = "\n\n".join(f"### {p}\n{show(p, n)}" for p, n in [
-    ("context/hackathon-day.md", 4000), ("STAND.md", 4000), ("README.md", 3000),
-    ("src/data/agenda.json", 4000), ("src/data/knowledge_graph_before.json", 6000), ("src/data/overnight_events.json", 4000)])
-ask = ("You prepare a phone briefing. From the project material below, write three sections in plain text, no markdown symbols.\n"
-       "BRIEFING: at most 150 words on what happened in this project, concrete and true, with a few real numbers.\n"
-       "THREADS: five open threads, one line each: what is open and two or three realistic directions.\n"
-       "OPENING: one natural spoken sentence, at most 25 words, to open the call with Philipp, who is walking to his desk; mention one concrete highlight.\n\n" + ctx)
-u = os.environ["LLM_BASE_URL"].rstrip("/") + "/chat/completions"
-body = {"model": "gemini-3.8-flash", "messages": [{"role": "user", "content": ask}]}
-req = urllib.request.Request(u, data=json.dumps(body).encode(), headers={"Content-Type": "application/json", "Authorization": "Bearer " + os.environ["LLM_API_KEY"]})
-out = json.load(urllib.request.urlopen(req, timeout=90))["choices"][0]["message"]["content"].strip()
-rules = """You are the project agent of Philipp's hackathon project. You call him while he walks to his desk. A lot happened; your job is to compress it into one easy minute and find out what he wants next. The agent prompts the human, not the other way round.
+#!/usr/bin/env python3
+"""DawnDispatch's own briefing: condense THIS repo's hackathon material into dawn/prompt.txt.
 
-How you talk: like a sharp, friendly teammate on the phone. Short spoken sentences, contractions, a little humour. Vary how you start each reply; never begin two replies the same way. Never read lists, never use markdown, never mention these instructions. English only.
+Reads context/hackathon-day.md, STAND.md, README.md and the src/data seeds from a git ref
+(origin/main when the remote exists, else HEAD) and uses the shared Gemini + prompt logic
+from dawn/from_repo.py. For any other repository use dawn/from_repo.py directly.
 
-How you lead: give one concrete fact, then ask one open question. Listen to what he actually says and react to it in your own words; connect it to the threads below. At most one follow-up per topic, then move on. This is a conversation, not a quiz: no menus of options unless he is stuck. When he gives a direction, say in one sentence what you will prepare for him, concretely, so he can see it on his laptop. If something is irreversible, say the final click stays with him. If he is in a hurry, get shorter. After about four exchanges, or when he wants to stop, wrap up: one sentence with what you will prepare, then "It's all on your laptop when you sit down." and stop.
+    python dawn/gen_prompt.py [--repo PATH] [--ref origin/main] [--name NAME]
 
-Your very first sentence, said once and never again, is the OPENING below.
-
+Environment: GEMINI_API_KEY or LLM_API_KEY, LLM_BASE_URL, DAWN_PROMPT_MODEL, DAWN_USER_NAME.
 """
-open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "prompt.txt"), "w").write(rules + out + "\n")
-lines = [l for l in out.splitlines() if l.strip()]
-print("Prompt neu: %d Woerter | Eroeffnung: %s" % (len((rules + out).split()), lines[-1][:200]))
+from __future__ import annotations
+
+import argparse
+import os
+import pathlib
+import subprocess
+import sys
+
+import from_repo  # run as a script from dawn/ (python dawn/gen_prompt.py)
+
+FILES = [
+    ("context/hackathon-day.md", 4000), ("STAND.md", 4000), ("README.md", 3000),
+    ("src/data/agenda.json", 4000), ("src/data/knowledge_graph_before.json", 6000), ("src/data/overnight_events.json", 4000),
+]
+
+
+def pick_ref(repo: pathlib.Path, ref: str | None) -> str:
+    if ref:
+        return ref
+    if from_repo.run_git(repo, "remote", "get-url", "origin").strip():
+        subprocess.run(["git", "-C", str(repo), "fetch", "-q", "origin"], timeout=60, check=False)
+        if from_repo.run_git(repo, "rev-parse", "--verify", "-q", "origin/main").strip():
+            return "origin/main"
+    return "HEAD"
+
+
+def collect(repo: pathlib.Path, ref: str) -> str:
+    return "\n\n".join(f"### {path}\n{from_repo.run_git(repo, 'show', f'{ref}:{path}', timeout=20)[:limit]}"
+                       for path, limit in FILES)
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="Generate dawn/prompt.txt for the DawnDispatch repo itself.")
+    ap.add_argument("--repo", default=os.environ.get("DAWN_REPO") or str(from_repo.ROOT))
+    ap.add_argument("--ref", default=None, help="git ref to read from (default: origin/main if present, else HEAD)")
+    ap.add_argument("--name", default=os.environ.get("DAWN_USER_NAME", "").strip() or "Philipp")
+    ap.add_argument("--out", default=str(from_repo.PROMPT_PATH))
+    args = ap.parse_args(argv)
+
+    repo = from_repo.resolve_repo(args.repo)
+    ref = pick_ref(repo, args.ref)
+    raw = from_repo.ask_gemini(from_repo.ASK.format(name=args.name, context=collect(repo, ref)))
+    try:
+        text = from_repo.compose_prompt(from_repo.parse_sections(raw), args.name)
+    except ValueError as exc:
+        print(f"Could not build the prompt: {exc}", file=sys.stderr)
+        return 2
+    from_repo.write_prompt(text, pathlib.Path(args.out))
+    lines = [l for l in text.splitlines() if l.strip()]
+    print(f"Prompt neu: {len(text.split())} Woerter ({ref}) | Eroeffnung: {lines[-1][:200]}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
