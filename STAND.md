@@ -1,8 +1,11 @@
 # STAND agentic-hack-google
 
+## ENTSCHEIDUNGEN AUS LIVE-CALL (18:20 CEST)
+- **Call-Entscheidung A:** Echte WhatsApp Calls gewuenscht -> Task `NACHT-A` an hack-bau2 vergeben.
+- **Call-Entscheidung B:** Repo vorerst privat halten bis Abschluss -> Task `NACHT-B` bestaetigt, Checkpoint schuetzt vor unzeitiger Veroeffentlichung.
+
 ## FRAGEN AN PHILIPP
 - 1. Produktname fuer Video 2 & Branding: Welcher Favorit soll es werden? (A: PromptMe | B: Dawn / DawnDispatch | C: Dispatch) -> Empfehlung: 1A (PromptMe - dreht "Human prompts Agent" genial um)
-- 2. Modell-Konfiguration fuer hack-visual, hack-marketing & hack-review in Buzz (melden Provider-Fehler): (A: In Buzz Desktop Modell neu zuweisen & Neustart | B: hack-chef baut Pakete mit hack-bau1/main) -> Empfehlung: 2A
 
 ## CLAUDE-LINKS ZUM KLICKEN
 - [claude-03: Lauffaehiges MVP E2E Backend, Integration & Video-Tools (PR #3 bereit, Ton-Check)](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-03.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
@@ -28,7 +31,9 @@
 | S-LIVE-UI | Live-Ansicht verfeinern (Fokus zentriert, Rest gedimmt) | hack-bau2 | main | fertig, gemerged | HUD-Fokus & Dimmung fuer Brillenkamera live |
 | S-NACHHER | Nachher-Ansicht Live-Seite ("Das hat das Gespraech gebracht") | hack-bau3 | main | fertig, gemerged | 3 Vorher->Nachher Karten live in /live |
 | S-EXAMPLE | Realistic Example Repo unter examples/ fuer Plug-and-Play | hack-bau1 | main | fertig, gemerged | PayPulse mit 30 Commits & Tests live |
-| S-REVIEW | Frischer Klon E2E Test fuer claude-05 (setup.sh/start.sh) | hack-review / hack-chef | main | laeuft | Verifikation setup.sh/start.sh & E2E Klon |
+| S-REVIEW | Frischer Klon E2E Test fuer claude-05 (setup.sh/start.sh) | hack-bau3 | agent/hack-bau3 | laeuft | Testet ./setup.sh & ./start.sh auf frischem Klon |
+| NACHT-A | Nachtschicht: Echte WhatsApp Calls konfigurieren | hack-bau2 | agent/hack-bau2 | vergeben | Konfiguration / Interface WhatsApp Calling |
+| NACHT-B | Nachtschicht: Repo privat halten bis Abgabe-Checkpoint | hack-chef | main | fertig | Checkpoint aktiv, Veroeffentlichung erst bei Abgabe |
 
 ## ZEITPLAN
 ```mermaid
@@ -41,17 +46,11 @@ gantt
   Phase 2 Idee DawnDispatch      :done, p2, 15:00, 16:15
   Phase 3 Paralleler Bau         :done, p3, 16:15, 17:10
   Phase 4 Probelauf mit Brille   :done, p4, 17:10, 17:50
-  Phase 5 Sprint 18:20 Video 2   :crit, active, p5, 17:50, 18:20
-  Phase 6 Feature-Freeze & Politur :p6, 18:20, 18:45
+  Phase 5 Sprint 18:20 Video 2   :done, p5, 17:50, 18:20
+  Phase 6 Feature-Freeze & Politur :crit, active, p6, 18:20, 18:45
   Phase 7 Abgabe                 :p7, 18:45, 19:00
-  section Parallele Spuren Sprint 18:20
-  claude-04 Live Mission Control :done, p_cl4, 17:00, 17:55
-  S-IDEEN 15 Produktnamen        :done, p_ide, 17:55, 17:58
-  claude-05 Plug-and-Play Repo   :done, p_cl5, 17:55, 18:15
-  S-MKTG Video-2-Skript & Story  :done, p_mkt, 17:55, 18:08
-  S-VISUAL Titelkarte & Abspann  :done, p_vis, 17:55, 18:12
-  S-LIVE-UI Brillen-Fokus Screen :done, p_b2, 17:55, 18:07
-  S-NACHHER Nachher-Ansicht      :done, p_b3, 17:55, 18:03
-  S-EXAMPLE Example Target Repo  :done, p_b1, 17:55, 18:00
-  S-REVIEW Klon & Setup Test     :crit, active, p_rev, 18:15, 18:25
+  section Parallele Spuren Feature-Freeze
+  S-REVIEW Klon & Setup Test     :crit, active, p_rev, 18:20, 18:30
+  NACHT-A WhatsApp Call Config   :active, p_na, 18:20, 18:35
+  NACHT-B Privacy Checkpoint     :done, p_nb, 18:20, 18:25
 ```
