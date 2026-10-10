@@ -1,7 +1,7 @@
 # STAND agentic-hack-google
 
 ## FRAGEN AN PHILIPP
-- 1. Agenten hack-bau2 (Voice/Call) und hack-bau3 (Dashboard/Graph) anlegen, damit wir 4 Spuren parallel bauen? (Option A: Ja, bitte Karten bereitstellen / Option B: hack-bau1 baut alles sequenziell) -> Empfehlung: 1A
+- Keine offenen Fragen. Bau laeuft voll parallel auf 4 Spuren.
 
 ## CLAUDE-LINKS ZUM KLICKEN
 - [claude-02: Architektur & Bau-Pakete](https://claude.ai/code?repositories=Philipp2agent/agentic-hack-google&prompt=Bearbeite%20auftraege/claude-02.md%20und%20liefere%20das%20Ergebnis%20als%20Branch%20mit%20Pull%20Request)
@@ -9,11 +9,11 @@
 | ID | Auftrag | Wer | Branch | Status | Naechster Schritt |
 |---|---|---|---|---|---|
 | Schritt-0 | Datenmodelle & docs/SCHNITTSTELLE.md | hack-chef | main | fertig, gemerged | - |
-| IDEE | Schaerfung: Phone Call UI, Quick Fire, Before/After Graph | hack-chef | main | fertig, gemerged | - |
-| P-CORE | src/core: Knowledge Graph Engine (before/after) & Agenda | hack-bau1 | agent/hack-bau1 | vergeben, laeuft | Bau & PR |
-| P-VOICE | src/voice: Mobile Call Screen (/call) & Gradium Web Audio | hack-bau2 | agent/hack-bau2 | wartet auf Anlegen | Philipp legt hack-bau2 an |
-| P-DASHBOARD | src/dashboard: Vorher-Nachher Graph (/dashboard) & Checkpoints | hack-bau3 | agent/hack-bau3 | wartet auf Anlegen | Philipp legt hack-bau3 an |
-| P-VISUAL | assets/brand: Graph Icons, Call Avatar, Banner (Nano Banana) | hack-visual | agent/hack-visual | vergeben, laeuft | Bildgenerierung |
+| IDEE | DawnDispatch Schaerfung (Call UI, Quick Fire, Graph) | hack-chef | main | fertig, gemerged | - |
+| P-CORE | src/core: Knowledge Graph Engine & Agenda-Inferenz | hack-bau1 | agent/hack-bau1 | vergeben, laeuft | Bau & PR |
+| P-VOICE | src/voice: Mobile Call Screen (/call) & Gradium Audio | hack-bau2 | agent/hack-bau2 | vergeben, laeuft | Bau & PR |
+| P-DASHBOARD | src/dashboard: Vorher-Nachher Graph UI & Checkpoints | hack-bau3 | agent/hack-bau3 | vergeben, laeuft | Bau & PR |
+| P-VISUAL | assets/brand: Graph-Icons, Call-Avatar, Banner | hack-visual | agent/hack-visual | vergeben, laeuft | Bildgenerierung |
 | claude-02 | docs/ARCHITEKTUR.md & gemini-Pakete | Claude-Cloud | claude/... | laeuft in Cloud | Merge nach PR |
 
 ## ZEITPLAN
@@ -29,8 +29,8 @@ gantt
   Phase 4 Feature-Freeze & Video :p4, 18:00, 18:40
   Phase 5 Politur & Abgabe       :p5, 18:40, 19:00
   section Parallele Spuren
-  P-CORE Knowledge Graph Inferenz   :crit, active, p_core, 16:15, 17:45
-  P-VOICE Mobile Call & Gradium     :crit, p_voi, 16:20, 17:45
-  P-DASHBOARD Vorher-Nachher UI     :crit, p_dash, 16:20, 17:45
-  P-VISUAL Graph Icons & Banner     :active, p_vis, 16:15, 17:15
+  P-CORE Knowledge Graph Engine   :crit, active, p_core, 16:15, 17:45
+  P-VOICE Mobile Call & Gradium   :crit, active, p_voi, 16:20, 17:45
+  P-DASHBOARD Vorher-Nachher UI   :crit, active, p_dash, 16:20, 17:45
+  P-VISUAL Graph Icons & Banner   :active, p_vis, 16:15, 17:15
 ```

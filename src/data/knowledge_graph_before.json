@@ -1,0 +1,160 @@
+{
+  "stage": "BEFORE",
+  "generated_at": "2026-10-10T14:17:21Z",
+  "nodes": [
+    {
+      "id": "agent-hack-chef",
+      "label": "hack-chef",
+      "type": "agent",
+      "status": "ACTIVE",
+      "details": "Swarm agent: hack-chef",
+      "metadata": {}
+    },
+    {
+      "id": "evt-001",
+      "label": "Swarm assignment & role coordination question",
+      "type": "event",
+      "status": "UNRESOLVED",
+      "details": "Open items in STAND.md: - hack-bau2 und hack-bau3 anlegen oder Pakete voice/dashboard an hack-bau1 bzw. hack-chef uebergeben?",
+      "metadata": {
+        "severity": "WARNING",
+        "source": "STAND.md / swarm coordination"
+      }
+    },
+    {
+      "id": "evt-002",
+      "label": "feat: Schritt 0 Datenmodelle, Schnittstellendokume",
+      "type": "event",
+      "status": "OPEN",
+      "details": "Commit 8ead13b by hack-chef: feat: Schritt 0 Datenmodelle, Schnittstellendokumentation & Lagebrett aktualisiert",
+      "metadata": {
+        "severity": "INFO",
+        "source": "git commit 8ead13b"
+      }
+    },
+    {
+      "id": "agent-hack-swarm",
+      "label": "hack-swarm",
+      "type": "agent",
+      "status": "ACTIVE",
+      "details": "Swarm agent: hack-swarm",
+      "metadata": {}
+    },
+    {
+      "id": "evt-003",
+      "label": "auftraege: parallelstart",
+      "type": "event",
+      "status": "OPEN",
+      "details": "Commit 2085b70 by hack-agents (buzzagent): auftraege: parallelstart",
+      "metadata": {
+        "severity": "INFO",
+        "source": "git commit 2085b70"
+      }
+    },
+    {
+      "id": "evt-004",
+      "label": "feat(dawndispatch): update IDEE.md, AGENTEN.md, ST",
+      "type": "event",
+      "status": "OPEN",
+      "details": "Commit 3cdd23d by hack-chef: feat(dawndispatch): update IDEE.md, AGENTEN.md, STAND.md and claude-02 for web voice",
+      "metadata": {
+        "severity": "INFO",
+        "source": "git commit 3cdd23d"
+      }
+    },
+    {
+      "id": "evt-005",
+      "label": "feat(idee): update IDEE.md with Ray-Ban demo scrip",
+      "type": "event",
+      "status": "OPEN",
+      "details": "Commit df4339d by hack-chef: feat(idee): update IDEE.md with Ray-Ban demo script, claude-02 and STAND.md",
+      "metadata": {
+        "severity": "INFO",
+        "source": "git commit df4339d"
+      }
+    },
+    {
+      "id": "agenda-01",
+      "label": "Swarm Agent Delegation for Subsystems",
+      "type": "agenda",
+      "status": "PENDING_TRIAGE",
+      "details": "Should we spin up hack-bau2 and hack-bau3, or assign voice and dashboard to existing agents?",
+      "metadata": {
+        "recommended_action": "APPROVE - assign voice to hack-bau1 and dashboard to hack-chef to reduce swarm overhead",
+        "is_irreversible": false
+      }
+    },
+    {
+      "id": "agenda-02",
+      "label": "Parallel Task Execution Pipeline Kickoff",
+      "type": "agenda",
+      "status": "PENDING_TRIAGE",
+      "details": "Unblock parallel worker execution following the overnight parallelstart trigger?",
+      "metadata": {
+        "recommended_action": "APPROVE - activate parallel agent task queues immediately",
+        "is_irreversible": false
+      }
+    },
+    {
+      "id": "agenda-03",
+      "label": "Ray-Ban Demo and Schema Baseline",
+      "type": "agenda",
+      "status": "PENDING_TRIAGE",
+      "details": "Accept updated data models, Ray-Ban commute script, and web voice specs as current milestone?",
+      "metadata": {
+        "recommended_action": "APPROVE - lock Schritt 0 interface specs and advance to live testing",
+        "is_irreversible": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "agent-hack-chef",
+      "target": "evt-001",
+      "relation": "PRODUCED",
+      "status": "PENDING"
+    },
+    {
+      "source": "agent-hack-chef",
+      "target": "evt-002",
+      "relation": "PRODUCED",
+      "status": "PENDING"
+    },
+    {
+      "source": "agent-hack-swarm",
+      "target": "evt-003",
+      "relation": "PRODUCED",
+      "status": "PENDING"
+    },
+    {
+      "source": "agent-hack-chef",
+      "target": "evt-004",
+      "relation": "PRODUCED",
+      "status": "PENDING"
+    },
+    {
+      "source": "agent-hack-chef",
+      "target": "evt-005",
+      "relation": "PRODUCED",
+      "status": "PENDING"
+    },
+    {
+      "source": "evt-001",
+      "target": "agenda-01",
+      "relation": "TRIGGERS",
+      "status": "PENDING"
+    },
+    {
+      "source": "evt-002",
+      "target": "agenda-02",
+      "relation": "TRIGGERS",
+      "status": "PENDING"
+    },
+    {
+      "source": "evt-003",
+      "target": "agenda-03",
+      "relation": "TRIGGERS",
+      "status": "PENDING"
+    }
+  ]
+}
