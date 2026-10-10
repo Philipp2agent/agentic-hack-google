@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DawnDispatch Mission Control</title>
+  <meta name="description" content="Live screen that builds itself during the morning call: knowledge graph, agenda, checkpoints, before/after brief.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/live/static/live.css">
+</head>
+<body>
+<div id="stage" class="standby">
+
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <span class="brand-name">DAWNDISPATCH</span>
+      <span class="brand-sub">MISSION CONTROL</span>
+    </div>
+    <div id="caption" class="caption"></div>
+    <div id="status" class="status">
+      <span class="status-dot"></span>
+      <span id="status-text">STANDBY</span>
+    </div>
+  </header>
+
+  <main id="graph-area">
+    <svg id="graph">
+      <g id="viewport">
+        <g id="links"></g>
+        <g id="nodes"></g>
+      </g>
+    </svg>
+
+    <!-- focus: what the agent just asked / what the user decided, big, in the middle -->
+    <section id="focus" class="focus hidden">
+      <div id="focus-eyebrow" class="focus-eyebrow"></div>
+      <div id="focus-title" class="focus-title"></div>
+      <div id="focus-answer" class="focus-answer"></div>
+      <div id="focus-verdict" class="focus-verdict"></div>
+      <div id="focus-summary" class="focus-summary"></div>
+      <div id="focus-buttons" class="focus-buttons hidden">
+        <button id="cp-approve" class="btn-approve">APPROVE</button>
+        <button id="cp-decline" class="btn-decline">Decline</button>
+      </div>
+    </section>
+
+    <div id="scale-flash" class="scale-flash hidden">
+      <div class="scale-count">+0</div>
+      <div class="scale-label">teams</div>
+    </div>
+
+    <!-- end: what the call delivered, three before -> after statements -->
+    <section id="brief" class="brief hidden">
+      <div class="brief-eyebrow">WHAT THE CALL DELIVERED</div>
+      <div id="brief-sub" class="brief-sub"></div>
+      <ol id="brief-rows" class="brief-rows"></ol>
+      <div class="brief-foot">Version 1 today &rarr; Version 2 decided &middot; dashboard ready</div>
+    </section>
+  </main>
+
+  <aside id="sidebar">
+    <section class="panel panel-call">
+      <div class="panel-title">CALL</div>
+      <div class="call-row">
+        <div class="timer-block">
+          <div id="timer" class="timer">00:00</div>
+          <div id="timer-sub" class="timer-sub">elapsed</div>
+        </div>
+        <div class="budget-block">
+          <svg class="budget-ring" viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="52"/>
+            <circle id="ring-fg" class="ring-fg" cx="60" cy="60" r="52"/>
+          </svg>
+          <div class="budget-inner">
+            <div id="budget-left" class="budget-left">&mdash;</div>
+            <div class="budget-sub">left</div>
+          </div>
+        </div>
+      </div>
+      <div class="speed-row">
+        <div class="speed-label">SPEED</div>
+        <div class="speed-bar"><div id="speed-fill" class="speed-fill"></div></div>
+        <div id="speed-value" class="speed-value">1.00&times;</div>
+      </div>
+      <div id="speed-reason" class="speed-reason"></div>
+    </section>
+
+    <section class="panel panel-agenda">
+      <div class="panel-title">AGENDA <span id="agenda-progress" class="panel-meta"></span></div>
+      <ol id="agenda-list" class="agenda-list">
+        <li class="agenda-empty">waiting for the call</li>
+      </ol>
+    </section>
+
+    <section class="panel panel-said">
+      <div class="panel-title">YOU SAID</div>
+      <div id="said-list" class="said-list"></div>
+    </section>
+  </aside>
+
+</div>
+<script src="/live/static/live.js"></script>
+</body>
+</html>
