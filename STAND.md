@@ -32,7 +32,7 @@
 | S-NACHHER | Nachher-Ansicht Live-Seite ("Das hat das Gespraech gebracht") | hack-bau3 | main | fertig, gemerged | 3 Vorher->Nachher Karten live in /live |
 | S-EXAMPLE | Realistic Example Repo unter examples/ fuer Plug-and-Play | hack-bau1 | main | fertig, gemerged | PayPulse mit 30 Commits & Tests live |
 | S-REVIEW | Frischer Klon E2E Test fuer claude-05 (setup.sh/start.sh) | hack-bau3 | main | fertig, gemerged | E2E-Validierung erfolgreich, docs/REVIEW_CLAUDE_05.md live, 84/84 Tests gruen |
-| NACHT-A | Nachtschicht: Echte WhatsApp Calls konfigurieren | hack-bau2 | agent/hack-bau2 | vergeben | Konfiguration / Interface WhatsApp Calling |
+| NACHT-A | Nachtschicht: Echte WhatsApp Calls konfigurieren | hack-bau2 | main | fertig, gemerged | WhatsApp Media Stream Adapter, docs/WHATSAPP.md, 90/90 Tests gruen |
 | NACHT-B | Nachtschicht: Repo privat halten bis Abgabe-Checkpoint | hack-chef | main | fertig | Checkpoint aktiv, Veroeffentlichung erst bei Abgabe |
 
 ## ZEITPLAN
@@ -51,6 +51,6 @@ gantt
   Phase 7 Abgabe                 :p7, 18:45, 19:00
   section Parallele Spuren Feature-Freeze
   S-REVIEW Klon & Setup Test     :done, p_rev, 18:20, 18:28
-  NACHT-A WhatsApp Call Config   :active, p_na, 18:20, 18:35
+  NACHT-A WhatsApp Call Config   :done, p_na, 18:20, 18:30
   NACHT-B Privacy Checkpoint     :done, p_nb, 18:20, 18:25
 ```

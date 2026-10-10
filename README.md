@@ -193,38 +193,40 @@ Open the key interfaces in your browser:
 * **API Health Check:** [`http://localhost:8000/api/health`](http://localhost:8000/api/health)
 
 ### 5. Running the Automated Test Suite
-Run all 41 test cases across contracts, core models, dashboard API, voice pipeline, and live event schemas:
+Run the complete 90 test cases across contracts, core models, dashboard API, voice pipeline, WhatsApp media stream adapter, live event schemas, plug-and-play bridge, and sample target repository:
 ```bash
-python -m unittest discover -s tests -v
+pytest
 ```
-All tests run in isolated temporary environments and pass 100% offline.
+All 90 tests run in isolated temporary environments and pass 100% offline in ~3 seconds.
 
 ---
 
 ## 🎬 2-Minute Demo Flow
 
-1. **Mobile Incoming Call (`/call`):** Simulated incoming call rings with Web Audio chime; hands-free audio streams to Meta Ray-Bans.
+1. **Mobile Incoming Call (`/call` or phone audio):** Incoming voice call rings with Web Audio chime; hands-free audio streams to Meta Ray-Bans or headset.
 2. **Rapid Quick-Fire Standup:** 60-second dialog covers 4 key overnight items:
    * **Item 1 (Status v1):** Baseline lock-in of mobile call screen and audio engine -> `APPROVE`.
    * **Item 2 (Decision v2):** Selection of Version 2 priority candidate (Option A: Real WhatsApp / Telephony) -> `APPROVE`, auto-dispatched to swarm build queue.
    * **Item 3 (Irreversible Checkpoint):** Public repository submission and autonomous write access -> `APPROVE with Checkpoint`, held in `BLOCKED_ON_CHECKPOINT`.
    * **Item 4 (Scale Network):** Expansion of commute triage network to all 42 hackathon teams -> `APPROVE`.
-3. **Desk Reveal (`/dashboard`):**
+3. **Desk Reveal (`/dashboard` & `/live`):**
    * Before/After Knowledge Graph visually transitions from unresolved red/yellow clusters to green completed nodes.
+   * 3 Post-Call Outcome Cards reveal concrete delta achieved during the walk.
    * Amber pulsing Checkpoint Card shows git commit preview for hackathon submission.
    * Lead clicks **"1-Click Confirm Checkpoint"** -> Action turns `COMPLETED`.
 
-See [`docs/VIDEO_SCRIPT.md`](docs/VIDEO_SCRIPT.md) for the second-by-second video recording storyboard.
+See [`docs/VIDEO_SCRIPT_V2.md`](docs/VIDEO_SCRIPT_V2.md) for the exact 120-second video recording storyboard.
 
 ---
 
 ## 🐝 The Meta Story: Built by an Autonomous Swarm
 
-DawnDispatch was conceived, architected, and built in **2.5 hours** by an autonomous agent swarm collaborating in real-time on a Linux VPS:
+DawnDispatch was conceived, architected, and built in **3.5 hours** by an autonomous agent swarm collaborating in real-time on a Linux VPS:
 
-* **76+ Git Commits** across parallel worktrees (`hack-chef`, `hack-bau1`, `hack-bau2`, `hack-bau3`, `hack-visual`, `Claude-Cloud`).
-* **4,200+ Lines of Code** across backend inference, voice streaming, and interactive graph visualizations.
-* **Zero Merge Conflicts** achieved through strict schema contracts (`docs/SCHNITTSTELLE.md`).
+* **120+ Git Commits** across parallel worktrees (`hack-chef`, `hack-bau1`, `hack-bau2`, `hack-bau3`, `hack-visual`, `hack-ideen`, `hack-marketing`, `hack-review`, `Claude-Cloud`).
+* **90 Automated Unit & Integration Tests** passing 100% across 10 suites.
+* **4,800+ Lines of Code** across backend inference, voice streaming, plug-and-play bridge, WhatsApp telephony adapter, and interactive graph visualizations.
+* **Clean Schema-Driven Architecture** achieved through strict contracts (`docs/SCHNITTSTELLE.md` & `docs/LIVE-EVENTS.md`).
 
 Read the full development narrative and swarm metrics in [`docs/META.md`](docs/META.md).
 
