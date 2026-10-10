@@ -14,6 +14,7 @@ mirrors it to the phone page over the same WebSocket.
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import os
 import pathlib
@@ -24,9 +25,8 @@ import fastapi
 import fastapi.responses
 
 from src.core import state
-from src.core.action_engine import log_decision as core_log_decision
-from src.core.action_engine import process_decisions
-from src.core.models import AgendaItem, TranscriptTurn, now_iso
+from src.core.action_engine import on_decision
+from src.core.models import AgendaItem, DecisionRecord, TranscriptTurn, now_iso
 from src.voice import postcall, prompt
 
 log = logging.getLogger("dawndispatch.voice")
@@ -98,6 +98,34 @@ def team_count() -> int:
         return int(os.environ.get("DAWN_TEAM_COUNT", "24"))
     except ValueError:
         return 24
+
+
+def _read_json(name: str, default: Any) -> Any:
+    path = state.data_dir() / name
+    try:
+        return json.loads(path.read_text(encoding="utf-8")) if path.exists() else default
+    except Exception:
+        return default
+
+
+def participants_payload() -> dict[str, Any]:
+    """participants_scaled data: src/data/participants.json (hack-bau1) first, DAWN_TEAM_COUNT as fallback."""
+    data = _read_json("participants.json", {})
+    count = data.get("total_count") if isinstance(data, dict) else None
+    if not isinstance(count, int) or count <= 0:
+        return {"count": team_count(), "label": "teams at the hackathon"}
+    return {"count": count, "label": data.get("label") or "teams at the hackathon"}
+
+
+def v2_idea_payload(option: str, notes: str, item_id: str) -> dict[str, Any]:
+    """v2_idea data: ids/titles from src/data/v2_options.json when present, else prompt.V2_OPTIONS."""
+    for raw in _read_json("v2_options.json", []) or []:
+        if isinstance(raw, dict) and str(raw.get("key", "")).upper() == option:
+            linked = raw.get("linked_to") or item_id
+            return {"id": raw.get("id") or f"v2-opt-{option.lower()}", "title": raw.get("title") or prompt.V2_OPTIONS.get(option, notes),
+                    "linked_to": linked if isinstance(linked, list) else [linked, prompt.V1_ITEM_ID]}
+    title = prompt.V2_OPTIONS.get(option) or (notes or "a custom Version 2")
+    return {"id": f"v2-opt-{option.lower()}", "title": title, "linked_to": [item_id, prompt.V1_ITEM_ID]}
 
 
 # --- transcript buffering ----------------------------------------------------------------------
@@ -182,7 +210,7 @@ class CallSession:
         kwargs["padding_bonus"] = speed_to_padding(self.speed)  # the tool decides, not the yaml
         return gradbot.SessionConfig(
             voice_id=voice_id(),
-            instructions=prompt.build_instructions(self.agenda),
+            instructions=prompt.build_instructions(),
             language=lang,
             tools=prompt.gradbot_tools(),
             **kwargs,
@@ -228,9 +256,10 @@ class CallSession:
         state.reset()  # fresh decisions/actions/call/meta for every call; events + agenda stay
         state.start_call(language=self.language, voice_id=voice_id())
         try:
-            postcall.refresh_graph_before()
+            if not postcall.paths()["graph_before"].exists():
+                postcall.refresh_graph_before()
         except Exception:
-            log.exception("could not refresh knowledge_graph_before.json")
+            log.exception("could not build knowledge_graph_before.json")
         await self.send_client(prompt.agenda_payload(self.agenda))
         await self.emit("call_started", {"opening": prompt.OPENING})
 
@@ -315,9 +344,10 @@ class CallSession:
             await handle.send_error("decision must be one of APPROVE, REJECT, HOLD, AMEND")
             return
         notes = str(args.get("notes") or "").strip()
-        p = postcall.paths()
-        core_log_decision(item_id, decision, notes, file_path=p["decisions"])
-        process_decisions(p["agenda"], p["decisions"], p["actions"])
+        rec = DecisionRecord(item_id=item_id, decision_type=decision, voice_notes=notes, source="voice_tool")  # type: ignore[arg-type]
+        state.add_decision(rec)
+        # core seam (src/core/action_engine.on_decision): reversible -> executed now, irreversible -> BLOCKED_ON_CHECKPOINT
+        await asyncio.to_thread(on_decision, rec)
         await self.emit("decision", {"item_id": item_id, "decision": decision, "summary": notes[:160]})
 
         if item_id == prompt.V2_ITEM_ID:
@@ -325,12 +355,11 @@ class CallSession:
             if option not in prompt.V2_OPTIONS and option != "OTHER":
                 option = "OTHER"
             state.set_meta("v2_option", option)
-            title = prompt.V2_OPTIONS.get(option) or (notes or "a custom Version 2")
-            await self.emit("v2_idea", {"id": f"v2-{option.lower()}", "title": title, "linked_to": [item_id, prompt.V1_ITEM_ID]})
+            await self.emit("v2_idea", v2_idea_payload(option, notes, item_id))
         if it.is_irreversible and decision == "APPROVE":
             await self._checkpoint(item_id, "Irreversible: makes the repository public and submits. Needs your click on the laptop.")
         if item_id == prompt.SCALE_ITEM_ID and decision == "APPROVE":
-            await self.emit("participants_scaled", {"count": team_count(), "label": "teams at the hackathon"})
+            await self.emit("participants_scaled", participants_payload())
 
         idx = self.item_index(item_id)
         nxt = await self.advance_to(idx + 1)
@@ -378,22 +407,27 @@ class CallSession:
 
 
 class _TranscriptProxy:
-    """Wraps the FastAPI WebSocket so gradbot's user_text / agent_text frames are captured."""
+    """Wraps the FastAPI WebSocket so gradbot's user_text / agent_text frames are captured.
 
-    def __init__(self, websocket: fastapi.WebSocket, session: CallSession):
+    ``get_session`` is a callable because the session is created inside gradbot's on_start.
+    Everything else (accept, receive, send_bytes, close) is delegated untouched.
+    """
+
+    def __init__(self, websocket: fastapi.WebSocket, get_session: Any):
         self._ws = websocket
-        self._session = session
+        self._get_session = get_session
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self._ws, name)
 
     async def send_json(self, payload: Any, *args: Any, **kwargs: Any) -> None:
-        if isinstance(payload, dict):
+        session = self._get_session()
+        if session is not None and isinstance(payload, dict):
             t = payload.get("type")
             if t == "user_text":
-                self._session.on_user_text(payload)
+                session.on_user_text(payload)
             elif t == "agent_text":
-                self._session.on_agent_text(payload)
+                session.on_agent_text(payload)
         await self._ws.send_json(payload, *args, **kwargs)
 
 
@@ -453,14 +487,14 @@ async def ws_chat(websocket: fastapi.WebSocket):
     import gradbot
 
     session: CallSession | None = None
-    proxy_holder: dict[str, Any] = {}
+    proxy = _TranscriptProxy(websocket, lambda: session)
 
     async def on_start(msg: dict) -> Any:
         nonlocal session
         language = (msg.get("language") or os.environ.get("DAWN_LANGUAGE") or "en").lower()
         if language not in gradbot.LANGUAGES:
             language = "en"
-        session = CallSession(proxy_holder["ws"], language=language)
+        session = CallSession(proxy, language=language)  # type: ignore[arg-type]
         await session.start()
         return session.make_config()
 
@@ -468,31 +502,10 @@ async def ws_chat(websocket: fastapi.WebSocket):
         if session is not None:
             await session.on_tool_call(handle, input_handle, ws)
 
-    # the proxy needs the session, the session needs the socket: resolve lazily
-    class _LateProxy(_TranscriptProxy):
-        def __init__(self, ws):
-            self._ws = ws
-
-        @property
-        def _session(self):  # type: ignore[override]
-            return session
-
-        async def send_json(self, payload: Any, *args: Any, **kwargs: Any) -> None:
-            if session is not None and isinstance(payload, dict):
-                t = payload.get("type")
-                if t == "user_text":
-                    session.on_user_text(payload)
-                elif t == "agent_text":
-                    session.on_agent_text(payload)
-            await self._ws.send_json(payload, *args, **kwargs)
-
-    proxy = _LateProxy(websocket)
-    proxy_holder["ws"] = proxy
-    cfg = gradbot_config()
     try:
         await gradbot.websocket.handle_session(
             proxy,  # type: ignore[arg-type]
-            config=cfg,
+            config=gradbot_config(),
             on_start=on_start,
             on_tool_call=on_tool_call,
         )

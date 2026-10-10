@@ -14,16 +14,9 @@ import pathlib
 from typing import Any
 
 from src.core import state
-from src.core.action_engine import mark_irreversible_checkpoint, process_decisions
+from src.core.action_engine import mark_irreversible_checkpoint, on_decision
 from src.core.graph_engine import generate_and_save_graph_after, generate_and_save_graph_before
-from src.core.models import (
-    AgendaItem,
-    load_actions,
-    load_agenda,
-    now_iso,
-    save_actions,
-    save_agenda,
-)
+from src.core.models import AgendaItem, load_agenda, now_iso, save_agenda
 from src.voice.prompt import DEMO_AGENDA, PUBLISH_ITEM_ID, SCALE_ITEM_ID, V2_ITEM_ID, V2_OPTIONS
 
 CHECKPOINT_META_PREFIX = "checkpoint_reason:"
@@ -61,38 +54,35 @@ def refresh_graph_before() -> int:
 
 
 def set_checkpoint_reason(item_id: str, reason: str) -> dict[str, Any]:
-    """Block the action for item_id on a human checkpoint with the given reason (idempotent)."""
-    p = paths()
+    """Block the action for item_id on a human checkpoint with the given reason (idempotent, via src/core)."""
     state.set_meta(CHECKPOINT_META_PREFIX + item_id, reason)
-    actions = load_actions(p["actions"])
-    for act in actions:
-        if act.item_id == item_id:
-            act.status = "BLOCKED_ON_CHECKPOINT"
-            act.checkpoint_reason = reason
-            act.artifacts["reason"] = reason
-            act.artifacts.setdefault("pending_url", f"/dashboard/checkpoint/{item_id}")
-            act.updated_at = now_iso()
-            save_actions(actions, p["actions"])
-            return act.model_dump()
-    created = mark_irreversible_checkpoint(item_id, reason, actions_path=p["actions"])
-    return created.model_dump()
+    action = mark_irreversible_checkpoint(item_id, reason)
+    return action.model_dump()
 
 
-def _reapply_checkpoint_reasons(meta: dict[str, Any]) -> None:
-    p = paths()
-    actions = load_actions(p["actions"])
-    changed = False
-    for key, reason in meta.items():
-        if not key.startswith(CHECKPOINT_META_PREFIX):
-            continue
-        item_id = key[len(CHECKPOINT_META_PREFIX):]
-        for act in actions:
-            if act.item_id == item_id and act.status == "BLOCKED_ON_CHECKPOINT":
-                act.checkpoint_reason = reason
-                act.artifacts["reason"] = reason
-                changed = True
-    if changed:
-        save_actions(actions, p["actions"])
+def _ensure_actions_for_decisions() -> int:
+    """Every recorded decision gets its action through the core seam on_decision (idempotent per item)."""
+    st = state.load()
+    created = 0
+    for item_id in {d.item_id for d in st.decisions}:
+        rec = state.latest_decision(st, item_id)
+        if rec is not None and not any(a.item_id == item_id for a in st.actions):
+            on_decision(rec)
+            created += 1
+    return created
+
+
+def _mirror_checkpoint_reasons() -> None:
+    """Dashboard cards read artifacts.reason; keep it in sync with checkpoint_reason."""
+    def _do(st):
+        for act in st.actions:
+            if act.status == "BLOCKED_ON_CHECKPOINT":
+                reason = st.meta.get(CHECKPOINT_META_PREFIX + act.item_id) or act.checkpoint_reason
+                if reason:
+                    act.checkpoint_reason = reason
+                    act.artifacts["reason"] = reason
+                act.artifacts.setdefault("pending_url", f"/dashboard/checkpoint/{act.item_id}")
+    state.update(_do)
 
 
 def _speaker(role: str) -> str:
@@ -172,9 +162,8 @@ def process_post_call(summary: str | None = None, duration_s: int | None = None)
     ensure_demo_agenda()
     if not p["graph_before"].exists():
         refresh_graph_before()
-    actions = process_decisions(p["agenda"], p["decisions"], p["actions"])
-    st = state.load()
-    _reapply_checkpoint_reasons(st.meta)
+    _ensure_actions_for_decisions()
+    _mirror_checkpoint_reasons()
     graph = generate_and_save_graph_after(p["graph_before"], p["decisions"], p["actions"], p["graph_after"])
     st = state.load()
     briefing = build_briefing(st)
@@ -185,7 +174,7 @@ def process_post_call(summary: str | None = None, duration_s: int | None = None)
     transcript = write_transcript(st, duration_s, summary)
     blocked = [a for a in st.actions if a.status == "BLOCKED_ON_CHECKPOINT"]
     return {
-        "actions": len(actions),
+        "actions": len(st.actions),
         "blocked_on_checkpoint": [a.item_id for a in blocked],
         "graph_after_nodes": len(graph.nodes),
         "briefing": briefing,

@@ -178,6 +178,7 @@
   let ws = null, player = null, recording = false, muted = false;
   let seconds = 0, timerId = null, ended = false, endPending = false, endFallback = null;
   let agenda = [];
+  let wakeLock = null;
   const turnBubbles = {}; let userBubble = null; let hadAgentBubble = false;
 
   function tick() { const d = new Date(); ui.clock.textContent = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
@@ -244,8 +245,22 @@
     (items.length ? items : ['No decisions recorded.']).forEach(t => { const li = document.createElement('li'); li.textContent = t; ui.briefList.appendChild(li); });
   }
 
+  // Screen wake lock so the call keeps running with the phone in the pocket (Chrome/Android, iOS 16.4+ over HTTPS).
+  async function acquireWakeLock() {
+    if (!('wakeLock' in navigator)) return;
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } catch (e) { console.warn('wakeLock denied', e); }
+  }
+  async function releaseWakeLock() {
+    if (wakeLock) { try { await wakeLock.release(); } catch (e) {} wakeLock = null; }
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && recording && !wakeLock) acquireWakeLock(); });
+
   async function startCall() {
     ui.btnStart.disabled = true; ui.startStatus.textContent = 'Connecting audio…';
+    await acquireWakeLock();
     let audioCfg = { pcm: false };
     try { audioCfg = await fetch('/api/audio-config').then(r => r.json()); } catch (e) {}
     try {
@@ -286,6 +301,7 @@
 
   function finishUI(title) {
     if (timerId) { clearInterval(timerId); timerId = null; }
+    releaseWakeLock();
     setConn(false, 'Ended');
     if (title) ui.endedTitle.textContent = title;
     ui.endedSub.textContent = `Call duration ${mmss(seconds)}`;

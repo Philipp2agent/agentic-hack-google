@@ -27,6 +27,13 @@ class SmokeTest(unittest.TestCase):
         self.assertIn(res.status_code, (302, 307))
         self.assertEqual(res.headers["location"], "/dashboard")
 
+    def test_three_demo_pages_answer_200(self):
+        """/call, /live and /dashboard must never 404 (the builders' parts are mounted)."""
+        for path in ("/call", "/live", "/dashboard"):
+            res = self.client.get(path)
+            self.assertEqual(res.status_code, 200, path)
+            self.assertIn("text/html", res.headers["content-type"], path)
+
     def test_dashboard_200(self):
         res = self.client.get("/dashboard")
         self.assertEqual(res.status_code, 200)
@@ -41,11 +48,17 @@ class SmokeTest(unittest.TestCase):
         self.assertIn("/ws/chat", res.text)
         self.assertIn("/static/js/synced-audio-player.js", res.text)
         self.assertNotIn("ringtone", res.text.lower())
+        self.assertIn("navigator.wakeLock.request('screen')", res.text)
 
-    def test_call_sim_200(self):
+    def test_call_sim_200_and_its_backend_routes(self):
         res = self.client.get("/call/sim")
         self.assertEqual(res.status_code, 200)
         self.assertIn("/static/voice/call.js", res.text)
+        if MOUNTED.get("voice_sim"):
+            from src.app import _existing_paths
+
+            self.assertIn("/ws/call", _existing_paths())
+            self.assertIn("/api/end_call", _existing_paths())
 
     def test_dashboard_api_routes_are_included(self):
         for path in ("/api/graph/before", "/api/graph/after", "/api/actions", "/api/transcript", "/api/agenda"):

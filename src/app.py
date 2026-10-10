@@ -70,6 +70,19 @@ except Exception as exc:  # pragma: no cover
     log.warning("dashboard routes not mounted: %s", exc)
     MOUNTED["dashboard"] = False
 
+# --- legacy text simulation (hack-bau2, src/voice/app.py): /ws/call + /api/end_call for /call/sim ---
+try:
+    from src.voice.app import app as voice_sim_app
+
+    taken = _existing_paths()
+    for route in voice_sim_app.routes:
+        if isinstance(route, (APIRoute, APIWebSocketRoute)) and route.path not in taken:
+            app.router.routes.append(route)
+    MOUNTED["voice_sim"] = True
+except Exception as exc:  # pragma: no cover
+    log.warning("voice simulation routes not mounted: %s", exc)
+    MOUNTED["voice_sim"] = False
+
 # --- live screen (claude-04): /live, /ws/events, /api/live/* -----------------------------------
 try:
     from src.live.router import router as live_router
@@ -79,6 +92,16 @@ try:
 except Exception as exc:
     log.info("live router not mounted (%s)", exc)
     MOUNTED["live"] = False
+
+if "/live" not in _existing_paths():
+    _LIVE_PLACEHOLDER = REPO_ROOT / "src" / "voice" / "static" / "live_placeholder.html"
+
+    @app.get("/live", include_in_schema=False)
+    async def live_placeholder():
+        """Stand-in until src/live (claude-04) is merged: shows the recorded call state instead of 404."""
+        if _LIVE_PLACEHOLDER.exists():
+            return fastapi.responses.FileResponse(_LIVE_PLACEHOLDER, media_type="text/html")
+        return fastapi.responses.HTMLResponse("<h1>DawnDispatch live screen</h1><p>src/live not merged yet.</p>")
 
 # --- static files: gradbot's bundled audio JS first (more specific prefix wins) --------------
 try:

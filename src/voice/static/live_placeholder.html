@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DawnDispatch — Live</title>
+<style>
+  body { margin: 0; background: #070b14; color: #f8fafc; font-family: Inter, -apple-system, sans-serif; display: grid; place-items: center; min-height: 100vh; }
+  .box { max-width: 900px; padding: 40px; text-align: center; }
+  h1 { font-size: 56px; margin: 0 0 12px; letter-spacing: -.02em; }
+  p { font-size: 22px; color: #94a3b8; margin: 8px 0; }
+  .brief { margin-top: 28px; text-align: left; font-size: 26px; line-height: 1.5; }
+  .brief li { margin: 10px 0; }
+  code { color: #06b6d4; }
+</style></head>
+<body><div class="box">
+  <h1>Live screen</h1>
+  <p>The mission-control view (<code>src/live</code>, claude-04) is not merged yet. This page shows the recorded call state.</p>
+  <p id="status">Loading…</p>
+  <ul class="brief" id="brief"></ul>
+  <p><a href="/dashboard" style="color:#22c55e">Open the dashboard</a></p>
+</div>
+<script>
+  async function load() {
+    try {
+      const s = await fetch('/api/call/state').then(r => r.json());
+      document.getElementById('status').textContent = `call: ${s.call.status} · decisions: ${s.decisions.length} · time budget: ${s.call.time_budget_s || '—'}s`;
+      const ul = document.getElementById('brief'); ul.innerHTML = '';
+      (s.call.briefing || []).forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+    } catch (e) { document.getElementById('status').textContent = 'state not available'; }
+  }
+  load(); setInterval(load, 2000);
+</script></body></html>
