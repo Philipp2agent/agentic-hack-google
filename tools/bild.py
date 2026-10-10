@@ -5,7 +5,7 @@ Modelle: models/gemini-3.1-flash-image (Entwurf), models/gemini-nano-banana-2.1,
 import argparse, base64, json, mimetypes, os, sys, time, urllib.error, urllib.request
 p = argparse.ArgumentParser(); p.add_argument("prompt")
 p.add_argument("--modell", default="models/gemini-3.1-flash-image"); p.add_argument("--aus", default=None)
-p.add_argument("--ref", action="append", default=[]); a = p.parse_args()
+p.add_argument("--ref", action="append", default=[]); p.add_argument("--format", default=None); a = p.parse_args()
 key = os.environ.get("GEMINI_API_KEY") or os.environ.get("OPENAI_COMPAT_API_KEY")
 if not key: sys.exit("FEHLER: kein Schluessel in GEMINI_API_KEY oder OPENAI_COMPAT_API_KEY")
 m = a.modell if a.modell.startswith("models/") else "models/" + a.modell
@@ -13,6 +13,7 @@ parts = [{"text": a.prompt}]
 for r in a.ref:
     parts.append({"inline_data": {"mime_type": mimetypes.guess_type(r)[0] or "image/png", "data": base64.b64encode(open(r, "rb").read()).decode()}})
 body = {"contents": [{"parts": parts}], "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}}
+if a.format: body["generationConfig"]["imageConfig"] = {"aspectRatio": a.format}
 req = urllib.request.Request(f"https://generativelanguage.googleapis.com/v1beta/{m}:generateContent", data=json.dumps(body).encode(),
                              headers={"Content-Type": "application/json", "x-goog-api-key": key})
 try: d = json.load(urllib.request.urlopen(req, timeout=180))
