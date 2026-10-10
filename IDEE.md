@@ -1,81 +1,90 @@
-# IDEE: VoxField Copilot – Hands-Free Voice Agent für Servicetechniker
+# IDEE: DawnDispatch – Autonomous Morning Commute Voice Dispatcher & Action Dashboard
 
-> **Kern in einem Satz:** Ein autonomer, sprachgesteuerter Vor-Ort-Assistent mit Gradium Voice und Gemini, der Technikern freihändig bei Diagnose, Teilebeschaffung und Dokumentation hilft und vor unumkehrbaren Aktionen verbindliche Sprach-Freigaben einholt.
-
----
-
-## 1. Problem
-Servicetechniker und Handwerker stehen vor komplexen Industrieanlagen oder Haustechniksystemen mit Handschuhen, Werkzeug und schmutzigen Händen. Bei Störungen müssen sie bisher:
-1. Handschuhe ausziehen, Smartphone/Laptop bedienen oder Hotline anrufen.
-2. Fehlercodes mühsam manuell in PDF-Handbüchern und ERP/Katalogen nachschlagen.
-3. Teure Teilebestellungen oder Kundenfreigaben manuell per Mail/Portal abwickeln.
-4. Nach getaner Arbeit handschriftlich oder abends am PC Berichte tippen (oft lückenhaft).
-
-## 2. Echter Nutzer (Persona)
-**Stefan (42), Servicetechniker für Heizungs- und Klimatechnik in Zürich.**
-- Arbeitet mobil vor Ort in Kellern und Technikräumen.
-- Hat bei laufendem Fehler beide Hände an der Anlage.
-- Benötigt sofortige, präzise Antworten ohne Bildschirmtippen.
-- Darf Reparaturfreigaben und Ersatzteile bis 500 CHF eigenverantwortlich beauftragen, muss dies aber sauber auditieren.
+> **Core in one sentence:** An autonomous morning agent that calls your phone via Twilio and Gradium Voice while you walk to work, walks you through critical overnight decisions from night-shift agent runs, and reveals completed, personalized work on your laptop dashboard when you arrive ("Show me, don't tell me").
 
 ---
 
-## 3. Die Lösung: VoxField Copilot
-Ein multimodaler KI-Agent mit:
-- **Gradium Voice Front Door:** Natürlicher, unterbrechbarer Sprachdialog mit semantischer Pausenerkennung auf Deutsch/Englisch.
-- **Gemini 3.8 Flash Orchestrator:** Plant Diagnoseschritte, wählt Werkzeuge (Fehlercode-DB, Ersatzteilkatalog, Ticket-System), steuert den Workflow.
-- **Human Checkpoint (DeepMind-Kriterium 3):** Sobald Geld ausgegeben oder verbindliche Verträge ausgelöst werden (z. B. Express-Ersatzteil für 180 CHF bestellen), hält der Agent an und verlangt Stefans ausdrückliche Sprachfreigabe.
-- **Gemini Nano Banana (Multimodal / bild.py):** Erstellt bei Bedarf schematische Einbau-/Explosionsskizzen des betroffenen Bauteils.
-- **Automatischer Einsatzbericht:** Generiert am Ende strukturiertes Einsatzprotokoll mit Audio-Zusammenfassung via Gradium / Gemini Audio.
+## 1. User & Problem (Persona)
+**User:** Alex (or Philipp), Tech Lead / Product Founder in Zurich.  
+**The Problem:**
+- While commuting to work (walking, bus, train), dozens of overnight notifications, test runs, customer escalations, and PRs flood in.
+- Typing on a smartphone while walking is clumsy, slow, and unsafe; reading complex dashboards on mobile is painful.
+- Often, key blockers sit idle until the engineer sits down at their laptop at 08:30, delaying the entire team's morning.
+
+**The Solution:**
+- At 07:30, the phone rings via Twilio.
+- Powered by **Gradium Voice** and **Gemini 3.8 Flash**, the agent greets Alex with a prioritized 3-item morning agenda synthesized from overnight runs.
+- In under 90 seconds of hands-free conversation, Alex makes 2–3 high-leverage decisions (hold/proceed with release, authorize emergency overtime, trigger hotfix).
+- **"Show me, don't tell me":** Upon opening the laptop at the office, the Web Dashboard displays the fully executed actions—not just meeting notes, but held releases, deployed fixes, updated triage tickets, and an audit trail.
 
 ---
 
-## 4. 2-Minuten-Demo-Ablauf (Video & Jury-Live)
-| Zeit | Wer | Aktion / Interaktion | Sichtbares / Hörbares Ergebnis |
+## 2. 2-Minute Demo Script (Video & Live Jury Presentation)
+
+| Time | Actor | Interaction / Action | Visible / Audible Output |
 |---|---|---|---|
-| **0:00 - 0:25** | Stefan | Spricht freihändig ins Headset/Web: *"Hallo Vox, ich stehe an Wärmepumpe WP-400. Fehlercode E-74 blinkt, Überdruckventil zischt."* | Gradium STT transkribiert in Echtzeit; Voice-Antwort: *"Fehler E-74: Überdruckventil V-12 blockiert. Ich prüfe Handbuch und Lagerbestand."* |
-| **0:25 - 0:55** | Agent | Führt Tools autonom aus: diagnostiziert Ursache, schlägt Dichtungstausch vor, generiert Bauteilskizze mit Gemini Nano Banana. | Dashboard zeigt Bauteilskizze und Teilenummer `V12-SEAL-2026`. Agent liest Handlungsanweisung vor. |
-| **0:55 - 1:25** | Agent & Stefan | **Human Checkpoint:** Agent: *"Dichtungssatz im Zentrallager Zürich verfügbar. Express-Kurier kostet 140 CHF. Soll ich die Bestellung jetzt verbindlich auslösen?"* Stefan: *"Ja, bitte bestellen!"* | Unumkehrbare Aktion wird erst nach Freigabe getriggert. Bestätigung: *"Bestellung #8491 ausgelöst, Kurier ETA 45 Minuten."* |
-| **1:25 - 2:00** | Agent | Agent fasst Einsatzbericht zusammen, schließt Ticket im System, erzeugt Audioprotokoll für den Kunden. | Vollständiger Einsatzbericht auf dem Dashboard sichtbar; Audio-Zusammenfassung wird abgespielt. |
+| **0:00 - 0:25** | Phone Rings (Commute) | Philipp is walking to work. Phone rings via Twilio. He answers on speaker / headset. | Gradium Voice (natural audio): *"Good morning Philipp. Your overnight triage is ready. 3 items require your call: 1) Staging test failure, 2) Emergency SLA ticket, 3) Compute quota alert. Let's start with item 1: The billing migration failed validation tests. Should we hold the 9 AM release and dispatch a hotfix bot?"* |
+| **0:25 - 0:55** | Voice Dialogue & Decisions | Philipp (hands-free): *"Hold the release, and dispatch the hotfix bot to isolate the schema diff."*<br>Agent: *"Confirmed. Release held. Item 2: Enterprise customer Acme requests emergency SLA fix. Senior engineer asks for 2h overtime approval. Approve?"*<br>Philipp: *"Approved up to 3 hours."*<br>Agent: *"Approved. All decisions recorded and queued for execution. See you at your desk."* | Live speech-to-text and tool-calling on backend. Agent commits human-checkpoint approvals with signed audit logs. Agent hangs up. |
+| **0:55 - 1:35** | Laptop Reveal: "Show me, don't tell me" | Philipp arrives at laptop, switches screen share to Web Dashboard (`localhost` / tunnel). | **Dashboard displays live executed state:**<br>1. **Audio & Call Card:** Waveform/transcript of the commute call.<br>2. **Executed Action 1:** Release banner `HELD BY VOICE @ 07:32`; hotfix branch created with diff.<br>3. **Executed Action 2:** Overtime approval logged in audit trail with timestamp & budget ceiling.<br>4. **Executive Standup Card:** Auto-generated 3-bullet summary ready for 09:00 standup. |
+| **1:35 - 2:00** | DeepMind Criteria & Architecture | Presenter recaps against jury criteria. | Highlights: (1) Acts autonomously (triage + execution), (2) Solves real human commute bottleneck, (3) Human checkpoint (voice approval before irreversible deployment), (4) Live working stack (Gradium + Gemini 3.8 Flash + Twilio). |
 
 ---
 
-## 5. Scope: Must-have vs. Nice-to-have (bis 18:00 Feature-Freeze)
-
-### Must-have (Kern bis 18:00)
-- [x] Gradium Voice Integration (STT & TTS Dialog-Schleife mit Unterbrechung/Pausen).
-- [x] Gemini 3.8 Flash Agent mit Tool-Calling (Diagnose-Tool, Teilekatalog-Tool, Bestell-Tool mit Checkpoint).
-- [x] Human-in-the-Loop Checkpoint: Klare Trennung zwischen Lese-Aktionen und Freigabe-Aktionen.
-- [x] Visuelles Web-Dashboard (Streamlit/FastAPI/HTML): Live-Transkript, Status des Agenten, generierte Visuals & Ticket-Status.
-- [x] Mock-APIs für Katalog & ERP (realistisch mit Zürich-Standorten).
-
-### Nice-to-have (wenn Zeit bleibt)
-- [ ] Live-Foto-Analyse: Techniker hält Smartphone-Kamera auf das Bauteil, Gemini analysiert Typenschild.
-- [ ] Twilio-Telefonie-Anbindung über gradbot.
-- [ ] Export als PDF-Rapport.
-
----
-
-## 6. Risiken & Gegenmaßnahmen
-1. **Latenz in der Sprachschleife:**
-   - *Gegenmaßnahme:* Streaming STT über Gradium WebSocket, kurze System-Prompts für schnelle Antworten, Gemini Flash als Orchestrator.
-2. **Fehlinterpretation der Bestätigung:**
-   - *Gegenmaßnahme:* Eindeutiges Zwei-Phasen-Commit im Agenten (stateful Flag `awaiting_confirmation_for_action`).
-3. **Netzwerk / API-Quota am Hackathon:**
-   - *Gegenmaßnahme:* Robuste Fallbacks auf lokale Mock-Tools, Caching von Bild-Generierungen für Standard-Demofälle.
+## 3. System Components & Tech Stack
+- **Voice Front Door (Telephony & Dialog):**
+  - **Twilio Voice Webhook:** Inbound / Outbound phone call management.
+  - **gradbot Framework & Gradium:** Low-latency STT (Speech-to-Text), semantic end-of-turn pause detection, and Gradium TTS voice streaming.
+- **Orchestration & LLM:**
+  - **Gemini 3.8 Flash:**
+    - Tool calling during the phone call (invoking decision-logging tools).
+    - Overnight briefing synthesizer (summarizes mock inbox/alerts into structured agenda).
+    - Post-call execution agent (translates approvals into executed mock-system actions).
+- **Backend & Storage:**
+  - **FastAPI / uvicorn (Python):** REST & WebSocket server running on VPS, exposed via cloudflared.
+  - **State Store (JSON / SQLite):** Overnight events, Call state, Recorded decisions, Executed artifacts.
+- **Web Dashboard:**
+  - Modern, responsive web interface (HTML/Tailwind/FastAPI).
+  - Displays Morning Agenda, Audio playback / Transcript, Live Action Cards ("Show me, don't tell me").
+- **Language:** All prompts, UI, voice dialog, and logs are in **English**.
 
 ---
 
-## 7. 3 Entscheidungen für Philipp (bitte mit z. B. "1A 2A 3A" antworten)
+## 4. Scope: Must-have vs. Nice-to-have (Feature Freeze 18:00 CEST)
 
-### Entscheidung 1: Einsatz-Szenario
-- **1A: Technischer Außendienst / Industrieanlage (FieldOps)** *(Empfehlung)* – Handwerker vor defekter Heizung/Pumpe mit Handschuhen. Extrem nachvollziehbarer Hands-Free Nutzen für die Jury.
-- **1B: Facility-Management / Wasserschaden-Notruf (CareOps)** – Hausverwaltung koordiniert nächtlichen Rohrbruch mit Mietern und Notdienst.
+### Must-have (Core for 18:00 Freeze)
+- [x] **Working Voice Flow:** Twilio phone call connection to gradbot/Gradium + Gemini 3.8 Flash dialog loop (with browser voice fallback).
+- [x] **Structured Morning Agenda:** Overnight events loaded, prioritized into 3 concise decisions.
+- [x] **Human Checkpoint Enforcement:** Explicit voice confirmation required before irreversible mock actions execute.
+- [x] **"Show Me" Web Dashboard:** Responsive UI displaying:
+  1. Overnight alerts & summary.
+  2. Transcript & decision audit log from the phone call.
+  3. Action result artifacts (e.g. Held release notice, Triage ticket, Audit trail).
+- [x] **Reproducible Demo Scenario:** Deterministic seed data demonstrating the complete workflow reliably.
 
-### Entscheidung 2: Demo-Kanal & Interface
-- **2A: Web-Voice Dashboard (Browser Audio + Live-Screen)** *(Empfehlung)* – Ideale Präsentation für 2-Min-Video und 5-Min-Jury-Demo (man sieht den Agenten denken, hört die Stimme, sieht das generierte Bild).
-- **2B: Echter Telefonanruf (Twilio / gradbot)** – Beeindruckend im Audio, aber kein visueller Screen für die Video-Abgabe.
+### Nice-to-have (If time allows)
+- [ ] Outbound auto-dial trigger from a "Trigger Morning Call" button on the web dashboard.
+- [ ] Visual asset generated with Gemini Nano Banana (`tools/bild.py`) as part of the overnight incident report.
+- [ ] WhatsApp / SMS follow-up summary link sent via Twilio right after call ends.
 
-### Entscheidung 3: Visuelle Komponente
-- **3A: Bauteil-Skizzen via Gemini Nano Banana (`tools/bild.py`) einbinden** *(Empfehlung)* – Zeigt multimodale Tiefe (Voice + Text + Bildgenerierung).
-- **3B: Rein tabellarische / schematische Datenanzeige** – Schlanker, weniger Abhängigkeiten, aber visuell weniger spektakulär.
+---
+
+## 5. Risks & Countermeasures
+1. **Telephony / Audio Latency on Conference Wi-Fi:**
+   - *Countermeasure:* Gradbot supports local browser-audio fallback (`gradbot` web client) if mobile signal drops during live presentation; recorded audio backup of the real Twilio call available.
+2. **Ambiguous Speech Recognition over Phone Line:**
+   - *Countermeasure:* Constrained dialogue state; agent prompts with clear binary options ("Should I hold the release, or proceed?"); confirmation repetitions for high-risk actions.
+3. **Tight Timeline (Feature Freeze at 18:00 CEST):**
+   - *Countermeasure:* Parallel execution: Claude-Cloud designs the modular architecture and writes Gemini worker specs (`auftraege/gemini-NN.md`); Gemini workers implement backend, voice flow, and UI in parallel branches.
+
+---
+
+## 6. 3 Decisions for Philipp (1A/1B)
+1. **Call Trigger:**
+   - **1A: Outbound Call (Triggered via Web-Button or Scheduled)** *(Empfehlung)* – Handy klingelt "von selbst", perfekte Story für "Ich gehe zur Arbeit und mein Handy klingelt".
+   - **1B: Inbound Call (Philipp ruft Twilio-Nummer an)** – Technisch einfacher (kein Twilio Outbound API Call nötig), aber weniger magisch.
+2. **Szenario-Domäne:**
+   - **2A: Tech Lead / DevOps (Staging Failure, Hotfix Dispatch, Overtime Approval)** *(Empfehlung)* – Höchste Relevanz und Glaubwürdigkeit vor einer Tech- und AI-Jury.
+   - **2B: Product / Ops Executive (Budget overrun, Vendor contract sign-off, Customer escalation)** – Breiter verständlich, aber weniger technisch greifbar.
+3. **Dashboard "Show Me"-Fokus:**
+   - **3A: Action & Execution Cards (Visual Diff, Triage Artifact, Signed Audit Trail)** *(Empfehlung)* – Maximale Demonstration von autonomem Agenten-Handeln ("Show me, don't tell me").
+   - **3B: Executive Briefing & Audio Recap (Visual Timeline + Podcast Player)** – Fokus auf Informationsverdichtung statt Aktionsausführung.
